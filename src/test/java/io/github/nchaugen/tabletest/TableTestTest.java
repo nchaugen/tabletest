@@ -85,6 +85,18 @@ public class TableTestTest {
     }
 
     @TableTest("""
+        input     | size?
+        []        | 0
+        [1]       | 1
+//        [1, 2]    | 2
+        [1, 2, 3] | 3
+        """)
+    void testCommentedOutRows(List<Integer> input, int expectedSize) {
+        assertNotEquals(2, expectedSize);
+        assertNotEquals(2, input.size());
+    }
+
+    @TableTest("""
         Person                 | AgeCategory?
         [name: Fred, age: 22]  | ADULT
         [name: Wilma, age: 19] | TEEN

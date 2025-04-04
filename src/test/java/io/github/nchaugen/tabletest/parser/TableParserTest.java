@@ -33,6 +33,22 @@ public class TableParserTest {
     }
 
     @Test
+    void shouldParseTableWithCommentedOutRows() {
+        //language=TableTest
+        String input = """
+            a     | b | c
+            // 1 | 2 | 3
+            '//4' | 5 | 6
+            """;
+
+        Table result = TableParser.parse(input);
+
+        assertEquals(1, result.rowCount());
+        assertEquals(List.of("a", "b", "c"), result.headers());
+        assertEquals(List.of("//4", "5", "6"), result.row(0).cells());
+    }
+
+    @Test
     void shouldParseTableWithQuotedPipes() {
         //language=TableTest
         String input = """

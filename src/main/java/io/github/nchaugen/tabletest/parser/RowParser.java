@@ -19,7 +19,19 @@ public class RowParser {
         return PARSER.parse(input);
     }
 
-    private static final Parser PARSER = row();
+    private static final Parser PARSER = line();
+
+    static Parser line() {
+        return either(comment(), row());
+    }
+
+    static Parser comment() {
+        return sequence(
+            anyWhitespace(),
+            ParserCombinators.string("//"),
+            atLeast(0, characterExceptNonEscaped('\n'))
+        );
+    }
 
     static Parser row() {
         return entries(cell(), character('|'));
