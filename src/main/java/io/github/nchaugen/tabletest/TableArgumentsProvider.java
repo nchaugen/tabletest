@@ -1,6 +1,7 @@
 package io.github.nchaugen.tabletest;
 
 import io.github.nchaugen.tabletest.parser.ParserCombinators;
+import io.github.nchaugen.tabletest.parser.TableParser;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.converter.DefaultArgumentConverter;
@@ -53,36 +54,37 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
 
     private static Object convertValue(Object value, Function<Object, Object> converter) {
         return switch (value) {
-            case List<?> list -> convertListElements(list);
-            case Map<?, ?> map -> convertMapValues(map);
+            case List<?> list -> convertList(list);
+            case Map<?, ?> map -> convertMap(map);
             default -> converter.apply(value);
         };
     }
 
-    private static Object convertElement(Object value) {
-        if (value instanceof String input) {
-            if (ParserCombinators.integer().parse(input).isCompleteSuccess()) {
-                return Integer.parseInt(input);
-            } else if (ParserCombinators.decimal().parse(input).isCompleteSuccess()) {
-                return Double.parseDouble(input);
-            }
-        }
-        return value;
-    }
-
-    private static List<?> convertListElements(List<?> list) {
+    private static List<?> convertList(List<?> list) {
         return list.stream()
             .map(it -> convertValue(it, TableArgumentsProvider::convertElement))
             .collect(Collectors.toList());
     }
 
-    private static Map<?, ?> convertMapValues(Map<?, ?> map) {
+    private static Map<?, ?> convertMap(Map<?, ?> map) {
         return map.entrySet().stream()
             .map(entry -> Map.entry(
                 entry.getKey(),
                 convertValue(entry.getValue(), TableArgumentsProvider::convertElement)
             ))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private static Object convertElement(Object value) {
+        if (value instanceof String input) {
+            if (ParserCombinators.integer().parse(input).isCompleteSuccess()) {
+                return Integer.parseInt(input);
+            }
+            else if (ParserCombinators.decimal().parse(input).isCompleteSuccess()) {
+                return Double.parseDouble(input);
+            }
+        }
+        return value;
     }
 
     private static ParameterContext contextOf(Parameter parameter) {

@@ -1,6 +1,7 @@
-package io.github.nchaugen.tabletest;
+package io.github.nchaugen.tabletest.parser;
 
-import io.github.nchaugen.tabletest.parser.RowParser;
+import io.github.nchaugen.tabletest.Row;
+import io.github.nchaugen.tabletest.Table;
 
 import java.util.Arrays;
 

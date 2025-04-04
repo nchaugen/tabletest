@@ -80,7 +80,8 @@ public class RowParser {
                 forwardRef(RowParser::map),
                 forwardRef(RowParser::list),
                 either(
-                    quotedString(),
+                    singleQuotedString(),
+                    doubleQuotedString(),
                     capture(atLeast(1, characterExcept(',', ']')))
                 )
             ),
@@ -93,10 +94,18 @@ public class RowParser {
     }
 
     static Parser string() {
-        return either(quotedString(), unquotedString());
+        return either(singleQuotedString(), doubleQuotedString(), unquotedString());
     }
 
-    private static Parser quotedString() {
+    private static Parser singleQuotedString() {
+        return sequence(
+            character('\''),
+            capture(atLeast(0, characterExceptNonEscaped('\''))),
+            character('\'')
+        );
+    }
+
+    private static Parser doubleQuotedString() {
         return sequence(
             character('"'),
             capture(atLeast(0, characterExceptNonEscaped('"'))),

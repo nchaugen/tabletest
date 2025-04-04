@@ -1,5 +1,6 @@
-package io.github.nchaugen.tabletest;
+package io.github.nchaugen.tabletest.parser;
 
+import io.github.nchaugen.tabletest.Table;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -10,6 +11,7 @@ public class TableParserTest {
 
     @Test
     void shouldParseTable() {
+        //language=TableTest
         String input = """
             a | b | c
             1 | 2 | 3
@@ -32,21 +34,26 @@ public class TableParserTest {
 
     @Test
     void shouldParseTableWithQuotedPipes() {
+        //language=TableTest
         String input = """
             Name    | Character | Usage
             Pipe    | "|"       | Separates columns
+            Pipe    | '|'       | Separates columns
             Newline | "\\n"     | Separates rows
+            Newline | '\\n'     | Separates rows
             Newline | \\n       | Separates rows
             """;
 
         Table result = TableParser.parse(input);
 
-        assertEquals(3, result.rowCount());
+        assertEquals(5, result.rowCount());
         assertEquals(3, result.columnCount());
 
         assertEquals("|", result.row(0).cell(1));
-        assertEquals("\\n", result.row(1).cell(1));
+        assertEquals("|", result.row(1).cell(1));
         assertEquals("\\n", result.row(2).cell(1));
+        assertEquals("\\n", result.row(3).cell(1));
+        assertEquals("\\n", result.row(4).cell(1));
     }
 
 }

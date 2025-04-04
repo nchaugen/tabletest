@@ -74,10 +74,11 @@ class RowParserTest {
             "100_000", "100_000",
             "a b c", "a b c",
             "\"abc\"", "abc",
+            "'abc'", "abc",
             "[]", List.of(),
-            "[a, b, c]", List.of("a", "b", "c"),
+            "[a, 'b', \"c\"]", List.of("a", "b", "c"),
             "[:]", Map.of(),
-            "[a: 1, b: 2, c: 3]", Map.of("a", "1", "b", "2", "c", "3")
+            "[a: 1, b: '2', c: \"3\"]", Map.of("a", "1", "b", "2", "c", "3")
         ).forEach(
             (input, expected) ->
                 assertEquals(List.of(expected), cell().parse(input).captures())
@@ -87,9 +88,10 @@ class RowParserTest {
     @Test
     void shouldCaptureRow() {
         Map.of(
-            "a  | b   | c    ", List.of("a", "b", "c"),
-            "[] | [:] | s t r", List.of(List.of(), Map.of(), "s t r"),
-            "4  | 5.5 | 6_000", List.of("4", "5.5", "6_000")
+            "a  | b     | c    ", List.of("a", "b", "c"),
+            "[] | [:]   | s t r", List.of(List.of(), Map.of(), "s t r"),
+            "4  | 5.5   | 6_000", List.of("4", "5.5", "6_000"),
+            "1  | \"2\" | '3'", List.of("1", "2", "3")
         ).forEach(
             (input, expected) ->
                 assertEquals(
