@@ -1,17 +1,18 @@
 package io.github.nchaugen.tabletest.parser;
 
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.anyWhitespace;
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.atLeast;
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.capture;
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.captureElements;
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.captureNamedElements;
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.character;
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.characterExcept;
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.characterExceptNonEscaped;
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.either;
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.forwardRef;
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.optional;
-import static io.github.nchaugen.tabletest.parser.ParserCombinators.sequence;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.capture;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.captureElements;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.captureNamedElements;
+import static io.github.nchaugen.tabletest.parser.CombinationParser.atLeast;
+import static io.github.nchaugen.tabletest.parser.CombinationParser.either;
+import static io.github.nchaugen.tabletest.parser.CombinationParser.optional;
+import static io.github.nchaugen.tabletest.parser.CombinationParser.sequence;
+import static io.github.nchaugen.tabletest.parser.Parser.forwardRef;
+import static io.github.nchaugen.tabletest.parser.StringParser.anyWhitespace;
+import static io.github.nchaugen.tabletest.parser.StringParser.character;
+import static io.github.nchaugen.tabletest.parser.StringParser.characterExcept;
+import static io.github.nchaugen.tabletest.parser.StringParser.characterExceptNonEscaped;
+import static io.github.nchaugen.tabletest.parser.StringParser.string;
 
 public class RowParser {
 
@@ -28,7 +29,7 @@ public class RowParser {
     static Parser comment() {
         return sequence(
             anyWhitespace(),
-            ParserCombinators.string("//"),
+            string("//"),
             atLeast(0, characterExceptNonEscaped('\n'))
         );
     }
@@ -38,50 +39,50 @@ public class RowParser {
     }
 
     static Parser cell() {
-        return sequence(anyWhitespace(), cellValue(), anyWhitespace());
+        return sequence(anyWhitespace(), anyValue(), anyWhitespace());
     }
 
-    static Parser cellValue() {
-        return either(map(), list(), string());
+    static Parser anyValue() {
+        return either(mapValue(), listValue(), singleValue());
     }
 
-    static Parser map() {
+    static Parser mapValue() {
         return sequence(
             character('['),
-            captureNamedElements(either(emptyMap(), mapEntries())),
+            captureNamedElements(either(emptyMapValue(), keyValuePairs())),
             character(']')
         );
     }
 
-    private static Parser emptyMap() {
+    private static Parser emptyMapValue() {
         return sequence(anyWhitespace(), character(':'), anyWhitespace());
     }
 
-    private static Parser mapEntries() {
-        return entries(mapEntry(), character(','));
+    private static Parser keyValuePairs() {
+        return entries(keyValuePair(), character(','));
     }
 
-    private static Parser mapEntry() {
+    private static Parser keyValuePair() {
         return sequence(mapKey(), character(':'), elementValue());
     }
 
     private static Parser mapKey() {
-        return sequence(anyWhitespace(), capture(keyName()), anyWhitespace());
+        return sequence(anyWhitespace(), capture(mapKeyName()), anyWhitespace());
     }
 
-    private static Parser keyName() {
+    private static Parser mapKeyName() {
         return atLeast(1, characterExcept(',', '[', ']', ':'));
     }
 
-    static Parser list() {
+    static Parser listValue() {
         return sequence(
             character('['),
-            captureElements(optional(listEntries())),
+            captureElements(optional(elementValues())),
             character(']')
         );
     }
 
-    private static Parser listEntries() {
+    private static Parser elementValues() {
         return entries(elementValue(), character(','));
     }
 
@@ -89,11 +90,11 @@ public class RowParser {
         return sequence(
             anyWhitespace(),
             either(
-                forwardRef(RowParser::map),
-                forwardRef(RowParser::list),
+                forwardRef(RowParser::mapValue),
+                forwardRef(RowParser::listValue),
                 either(
-                    singleQuotedString(),
-                    doubleQuotedString(),
+                    singleQuotedValue(),
+                    doubleQuotedValue(),
                     capture(atLeast(1, characterExcept(',', ']')))
                 )
             ),
@@ -105,11 +106,11 @@ public class RowParser {
         return sequence(entry, atLeast(0, sequence(separator, entry)));
     }
 
-    static Parser string() {
-        return either(singleQuotedString(), doubleQuotedString(), unquotedString());
+    static Parser singleValue() {
+        return either(singleQuotedValue(), doubleQuotedValue(), unquotedValue());
     }
 
-    private static Parser singleQuotedString() {
+    private static Parser singleQuotedValue() {
         return sequence(
             character('\''),
             capture(atLeast(0, characterExceptNonEscaped('\''))),
@@ -117,7 +118,7 @@ public class RowParser {
         );
     }
 
-    private static Parser doubleQuotedString() {
+    private static Parser doubleQuotedValue() {
         return sequence(
             character('"'),
             capture(atLeast(0, characterExceptNonEscaped('"'))),
@@ -125,7 +126,7 @@ public class RowParser {
         );
     }
 
-    private static Parser unquotedString() {
+    private static Parser unquotedValue() {
         return capture(
             optional(
                 sequence(

@@ -1,6 +1,6 @@
 package io.github.nchaugen.tabletest;
 
-import io.github.nchaugen.tabletest.parser.ParserCombinators;
+import io.github.nchaugen.tabletest.parser.NumberParser;
 import io.github.nchaugen.tabletest.parser.TableParser;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -77,10 +77,10 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
 
     private static Object convertElement(Object value) {
         if (value instanceof String input) {
-            if (ParserCombinators.integer().parse(input).isCompleteSuccess()) {
+            if (NumberParser.integer().parse(input).isCompleteSuccess()) {
                 return Integer.parseInt(input);
             }
-            else if (ParserCombinators.decimal().parse(input).isCompleteSuccess()) {
+            else if (NumberParser.decimal().parse(input).isCompleteSuccess()) {
                 return Double.parseDouble(input);
             }
         }

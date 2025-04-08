@@ -5,16 +5,22 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static io.github.nchaugen.tabletest.parser.CaptureParser.capture;
+import static io.github.nchaugen.tabletest.parser.CombinationParser.atLeast;
+import static io.github.nchaugen.tabletest.parser.CombinationParser.sequence;
+import static io.github.nchaugen.tabletest.parser.ParseResult.failure;
+import static io.github.nchaugen.tabletest.parser.StringParser.character;
+import static io.github.nchaugen.tabletest.parser.StringParser.characterExceptNonEscaped;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static io.github.nchaugen.tabletest.parser.RowParser.cell;
-import static io.github.nchaugen.tabletest.parser.RowParser.list;
-import static io.github.nchaugen.tabletest.parser.RowParser.map;
+import static io.github.nchaugen.tabletest.parser.RowParser.listValue;
+import static io.github.nchaugen.tabletest.parser.RowParser.mapValue;
 
 class RowParserTest {
 
     @Test
-    void shouldCaptureListElement() {
+    void shouldCaptureListValueElement() {
         Map.of(
             "[]", List.of(),
             "[a, b, c]", List.of("a", "b", "c"),
@@ -24,16 +30,16 @@ class RowParserTest {
             "[[a:b],[c]]", List.of(Map.of("a", "b"), List.of("c")),
             "[\"a, b\", c]", List.of("a, b", "c")
         ).forEach(
-            (input, expected) -> assertEquals(List.of(expected), list().parse(input).captures())
+            (input, expected) -> assertEquals(List.of(expected), listValue().parse(input).captures())
         );
 
         List.of("", "[", "]", "[[]").forEach(
-            input -> assertFalse(list().parse(input).isSuccess())
+            input -> assertFalse(listValue().parse(input).isSuccess())
         );
     }
 
     @Test
-    void shouldCaptureMapElement() {
+    void shouldCaptureMapValueElement() {
         Map.of(
             "[:]", Map.of(),
             "[a: 1, b: 2, c: 3]", Map.of("a", "1", "b", "2", "c", "3"),
@@ -41,16 +47,16 @@ class RowParserTest {
             "[a: [x:1], b: [y:2]]", Map.of("a", Map.of("x", "1"), "b", Map.of("y", "2")),
             "[:]]", Map.of()
         ).forEach(
-            (input, expected) -> assertEquals(List.of(expected), map().parse(input).captures())
+            (input, expected) -> assertEquals(List.of(expected), mapValue().parse(input).captures())
         );
 
         List.of("", "[:", ":]", "[[:]").forEach(
-            input -> assertFalse(map().parse(input).isSuccess())
+            input -> assertFalse(mapValue().parse(input).isSuccess())
         );
     }
 
     @Test
-    void shouldCaptureStringElement() {
+    void shouldCaptureSingleValueElement() {
         Map.of(
             "", "",
             "abc", "abc",
@@ -62,7 +68,7 @@ class RowParserTest {
             "\"|\"", "|"
         ).forEach(
             (input, expected) ->
-                assertEquals(List.of(expected), RowParser.string().parse(input).captures())
+                assertEquals(List.of(expected), RowParser.singleValue().parse(input).captures())
         );
     }
 
@@ -104,5 +110,24 @@ class RowParserTest {
         );
     }
 
+    @Test
+    void shouldMatchTableRow() {
+        Parser tableRow = sequence(
+            capture(atLeast(1, characterExceptNonEscaped('|'))),
+            atLeast(
+                0, sequence(
+                    character('|'),
+                    capture(atLeast(0, characterExceptNonEscaped('|')))
+                )
+            )
+        );
+
+        assertEquals(failure(), tableRow.parse(""));
+        assertEquals(List.of("a"), tableRow.parse("a").captures());
+        assertEquals(List.of("a ", ""), tableRow.parse("a |").captures());
+        assertEquals(List.of("a ", " b"), tableRow.parse("a | b").captures());
+        assertEquals(List.of("a ", " ", " c"), tableRow.parse("a | | c").captures());
+        assertEquals(List.of("a \\| b ", " c"), tableRow.parse("a \\| b | c").captures());
+    }
 
 }
