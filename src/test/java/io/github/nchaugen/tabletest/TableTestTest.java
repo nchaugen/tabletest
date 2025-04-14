@@ -1,5 +1,10 @@
 package io.github.nchaugen.tabletest;
 
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.params.converter.ArgumentConversionException;
+import org.junit.jupiter.params.converter.ArgumentConverter;
+import org.junit.jupiter.params.converter.ConvertWith;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +66,7 @@ public class TableTestTest {
         []                     | 0     | java.util.List
         [[1, 2, 3], [a, b, c]] | 2     | java.util.List
         """)
-    void testListListColumn(List<Object> list, int expectedSize, Class<?> expectedElementType) {
+    void testListListColumn(List<?> list, int expectedSize, Class<?> expectedElementType) {
         assertEquals(expectedSize, list.size());
         if (!list.isEmpty())
             assertInstanceOf(expectedElementType, list.getFirst());
@@ -101,13 +106,7 @@ public class TableTestTest {
         [name: Fred, age: 22]  | ADULT
         [name: Wilma, age: 19] | TEEN
         """)
-    void testMapToObject(Map<String, Object> personAttributes, AgeCategory expectedAgeCategory) {
-        Person person = new Person(
-            (String) personAttributes.getOrDefault("name", "Barry"),
-            "Flintstone",
-            (Integer) personAttributes.getOrDefault("age", 16)
-        );
-
+    void testMapToObject(@ConvertWith(PersonConverter.class) Person person, AgeCategory expectedAgeCategory) {
         assertEquals(expectedAgeCategory, person.ageCategory());
     }
 
@@ -125,6 +124,20 @@ public class TableTestTest {
             if (age < 20) return AgeCategory.TEEN;
             return AgeCategory.ADULT;
         }
+    }
 
+    private static class PersonConverter implements ArgumentConverter {
+        @SuppressWarnings("rawtypes")
+        @Override
+        public Object convert(Object source, ParameterContext context) throws ArgumentConversionException {
+            if (source instanceof Map attributes) {
+                return new Person(
+                    (String) attributes.getOrDefault("name", "Fred"),
+                    "Flintstone",
+                    Integer.parseInt((String) attributes.getOrDefault("age", "16"))
+                );
+            }
+            throw new ArgumentConversionException("Cannot convert " + source.getClass().getSimpleName() + " to Person");
+        }
     }
 }
