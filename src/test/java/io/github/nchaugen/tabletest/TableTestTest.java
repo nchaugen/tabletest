@@ -93,7 +93,7 @@ public class TableTestTest {
         input     | size?
         []        | 0
         [1]       | 1
-//        [1, 2]    | 2
+        // [1, 2]    | 2
         [1, 2, 3] | 3
         """)
     void testCommentedOutRows(List<Integer> input, int expectedSize) {
