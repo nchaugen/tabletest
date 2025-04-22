@@ -11,23 +11,8 @@ import static io.github.nchaugen.tabletest.ParameterUtil.contextOf;
 
 public class ParameterTypeConverter {
 
-    public static Object convertValue(Object value, Parameter parameter/*, Class<?> testClass*/) {
-        Object convertedValue = convertValue(value, NestedTypes.of(parameter), parameter);
-//        if (convertedValue instanceof Map<?, ?> mapValue && parameter.getType() != Map.class) {
-//            Optional<Object> parsedValue = Arrays.stream(testClass.getDeclaredMethods())
-//                .filter(method -> method.getReturnType().equals(parameter.getType()))
-//                .filter(method -> method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(Map.class))
-//                .findFirst()
-//                .map(method -> {
-//                    try {
-//                        return method.invoke(testClass, mapValue);
-//                    } catch (IllegalAccessException | InvocationTargetException e) {
-//                        return null;
-//                    }
-//                });
-//            return parsedValue.orElse(convertedValue);
-//        }
-        return convertedValue;
+    public static Object convertValue(Object value, Parameter parameter) {
+        return convertValue(value, NestedTypes.of(parameter), parameter);
     }
 
     private static Object convertValue(
