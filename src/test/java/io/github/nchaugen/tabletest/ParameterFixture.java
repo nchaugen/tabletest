@@ -111,7 +111,7 @@ public class ParameterFixture {
     }
 
     @SuppressWarnings("unused")
-    private void parameterisedListValueParams(
+    private void parameterizedListValueParams(
         List<Object> objList,
         List<String> strList,
         List<Byte> byteList,
@@ -124,6 +124,24 @@ public class ParameterFixture {
         List<List<List<Byte>>> listOfListOfBytesList,
         List<Map<String, Long>> mapOfLongsList,
         List<Map<String, List<Long>>> mapOfListOfLongsList
+    ) {
+        // This method is only used to get the parameter type
+    }
+
+    @SuppressWarnings("unused")
+    private void parameterizedMapValueParams(
+        Map<?, Object> objectMap,
+        Map<?, String> stringMap,
+        Map<String, Byte> byteMap,
+        Map<?, Short> shortMap,
+        Map<?, Integer> integerMap,
+        Map<?, Long> longMap,
+        Map<?, Double> doubleMap,
+        Map<?, List<Short>> mapOfShortList,
+        Map<?, List<Long>> mapOfLongList,
+        Map<?, List<List<Byte>>> mapOfListOfByteList,
+        Map<?, Map<?, Long>> mapOfLongMap,
+        Map<?, Map<String, List<Long>>> mapOfMapOfLongsList
     ) {
         // This method is only used to get the parameter type
     }

@@ -20,7 +20,7 @@ public class TableTestTest {
         Int | String | Date       | Class
         1   | abc    | 2025-01-20 | java.lang.Integer
         """)
-    void testColumnTypes(int integer, String string, LocalDate date, Class<?> type) {
+    void singleValueTypeConversion(int integer, String string, LocalDate date, Class<?> type) {
         assertNotEquals(0, integer);
         assertNotNull(string);
         assertNotNull(date);
@@ -33,7 +33,7 @@ public class TableTestTest {
         [1]       | 1     | 1
         [3, 2, 1] | 3     | 6
         """)
-    void testIntegerListColumn(List<Integer> list, int expectedSize, int expectedSum) {
+    void integerListTypeConversion(List<Integer> list, int expectedSize, int expectedSum) {
         assertEquals(expectedSize, list.size());
 
         assertEquals(
@@ -55,7 +55,7 @@ public class TableTestTest {
         ['def, abc', ghi] | 2     | java.lang.String
         [abc, def]        | 2     | java.lang.String
         """)
-    void testStringListColumn(List<String> list, int expectedSize, Class<?> expectedElementType) {
+    void stringListTypeConversion(List<String> list, int expectedSize, Class<?> expectedElementType) {
         assertEquals(expectedSize, list.size());
         if (!list.isEmpty())
             assertInstanceOf(expectedElementType, list.getFirst());
@@ -66,7 +66,7 @@ public class TableTestTest {
         []                     | 0     | java.util.List
         [[1, 2, 3], [a, b, c]] | 2     | java.util.List
         """)
-    void testListListColumn(List<?> list, int expectedSize, Class<?> expectedElementType) {
+    void nestedListTypeConversion(List<List<?>> list, int expectedSize, Class<?> expectedElementType) {
         assertEquals(expectedSize, list.size());
         if (!list.isEmpty())
             assertInstanceOf(expectedElementType, list.getFirst());
@@ -85,7 +85,7 @@ public class TableTestTest {
         [one: [a: bc], two: [d: ef, g: hi]] | 2
         [1: one, 2: two, 3: three]          | 3
         """)
-    void testMapColumn(Map<String, Object> map, int expectedSize) {
+    void mapTypeConversion(Map<String, Object> map, int expectedSize) {
         assertEquals(expectedSize, map.size());
     }
 
@@ -96,7 +96,7 @@ public class TableTestTest {
         // [1, 2]    | 2
         [1, 2, 3] | 3
         """)
-    void testCommentedOutRows(List<Integer> input, int expectedSize) {
+    void testComments(List<Integer> input, int expectedSize) {
         assertNotEquals(2, expectedSize);
         assertNotEquals(2, input.size());
     }

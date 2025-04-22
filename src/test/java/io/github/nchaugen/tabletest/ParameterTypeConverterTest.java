@@ -171,4 +171,74 @@ class ParameterTypeConverterTest {
         }
     }
 
+    @Nested
+    class MapValues {
+
+        @Test
+        void are_implicitly_converted_according_to_parameterized_parameter_type() {
+            List.of(
+                List.of(
+                    "java.util.Map<?, ?>",
+                    Map.of(),
+                    Map.of()
+                ),
+                List.of(
+                    "java.util.Map<java.lang.String, java.lang.Byte>",
+                    Map.of("key", "1"),
+                    Map.of("key", (byte) 1)
+                ),
+                List.of(
+                    "java.util.Map<?, java.lang.Integer>",
+                    Map.of("key", "2"),
+                    Map.of("key", 2)
+                ),
+                List.of(
+                    "java.util.Map<?, java.lang.Long>",
+                    Map.of("key", "3"),
+                    Map.of("key", 3L)
+                ),
+                List.of(
+                    "java.util.Map<?, java.lang.Double>",
+                    Map.of("key", "4"),
+                    Map.of("key", 4.0)
+                ),
+                List.of(
+                    "java.util.Map<?, java.lang.String>",
+                    Map.of("key", "5"),
+                    Map.of("key", "5")
+                ),
+                List.of(
+                    "java.util.Map<?, java.util.List<java.lang.Short>>",
+                    Map.of("key", List.of("6")),
+                    Map.of("key", List.of((short) 6))
+                ),
+                List.of(
+                    "java.util.Map<?, java.util.Map<?, java.lang.Long>>",
+                    Map.of("key", Map.of("1", "7")),
+                    Map.of("key", Map.of("1", 7L))
+                )
+            ).forEach((testCase) -> {
+                          String typeName = (String) testCase.get(0);
+                          Map<?, ?> parsedListValue = (Map<?, ?>) testCase.get(1);
+                          Map<?, ?> expectedValue = (Map<?, ?>) testCase.get(2);
+                          Object actualValue = convertValue(parsedListValue, parameter(typeName));
+                          assertEquals(expectedValue, actualValue, () -> "Failed for " + typeName);
+                      }
+            );
+        }
+
+        @Test
+        void fail_when_conversion_according_to_parameterized_parameter_type_not_possible() {
+            Map.of(
+                "java.util.Map<?, java.lang.Short>", Map.of("key", "x")
+            ).forEach((String typeName, Map<?, ?> parsedMapValue) ->
+                          assertThrows(
+                              ArgumentConversionException.class,
+                              () -> convertValue(parsedMapValue, parameter(typeName)),
+                              () -> "Expected failure for " + typeName
+                          )
+            );
+        }
+    }
+
 }
