@@ -33,7 +33,7 @@ public class TableParserTest {
     }
 
     @Test
-    void shouldParseTableWithCommentedOutRows() {
+    void shouldIgnoreComments() {
         //language=TableTest
         String input = """
             a     | b | c
@@ -49,7 +49,30 @@ public class TableParserTest {
     }
 
     @Test
-    void shouldParseTableWithQuotedPipes() {
+    void shouldIgnoreBlankLines() {
+        //language=TableTest
+        String input = """
+                   \s
+            a | b | c
+           \s
+            1 | 2 | 3
+           \s
+                     \s
+            4 | 5 | 6
+                           \s
+           \s""";
+
+        Table result = TableParser.parse(input);
+
+        assertEquals(2, result.rowCount());
+        assertEquals(List.of("a", "b", "c"), result.headers());
+        assertEquals(List.of("1", "2", "3"), result.row(0).cells());
+        assertEquals(List.of("4", "5", "6"), result.row(1).cells());
+
+    }
+
+    @Test
+    void shouldAllowQuotedSpecialCharacters() {
         //language=TableTest
         String input = """
             Name    | Character | Usage
@@ -71,5 +94,4 @@ public class TableParserTest {
         assertEquals("\\n", result.row(3).cell(1));
         assertEquals("\\n", result.row(4).cell(1));
     }
-
 }

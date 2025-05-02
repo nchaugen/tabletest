@@ -13,6 +13,7 @@ public class TableParser {
     public static Table parse(String input) {
         return new Table(
             Arrays.stream(input.split(ROW_SEPARATOR))
+                .filter(it -> !it.isBlank())
                 .map(TableParser::parseRow)
                 .filter(Objects::nonNull)
                 .toList()

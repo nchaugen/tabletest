@@ -24,6 +24,7 @@ import java.lang.annotation.Target;
  *   <li><b>Lists</b> - enclosed in [] with comma-separated elements</li>
  *   <li><b>Maps</b> - enclosed in [] with comma-separated key:value pairs</li>
  *   <li><b>Comments</b> - lines starting with // are ignored</li>
+ *   <li><b>Empty lines</b> - lines with only whitespace are ignored</li>
  * </ul>
  * <p>
  * Values are automatically converted to method parameter types, including nested parameterized types.

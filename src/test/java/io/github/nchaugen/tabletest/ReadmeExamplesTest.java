@@ -42,11 +42,11 @@ public class ReadmeExamplesTest {
     }
 
     @TableTest("""
-                Map                                      | Size?
-                [1: Hello, 2: World]                     | 2
-        //        ["|": 1, ',': 2, abc: 3]                 | 3
-                [string: abc, list: [1, 2], map: [a: 4]] | 3
-                [:]                                      | 0
+        Map                                      | Size?
+        [1: Hello, 2: World]                     | 2
+        // ["|": 1, ',': 2, abc: 3]                 | 3
+        [string: abc, list: [1, 2], map: [a: 4]] | 3
+        [:]                                      | 0
         """)
     void testMap(Map<String, Object> map, int expectedSize) {
         assertEquals(expectedSize, map.size());

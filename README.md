@@ -65,14 +65,13 @@ void testList(List<Object> list, int expectedSize) {
 
 ## Map value format
 
-Map values are enclosed in square brackets, and key-value pairs are separated by commas. A colon separates a key from its value. The key must be a single-value. The value can be either single or compound values. An empty map is represented by a colon enclosed in square brackets.
+Map values are enclosed in square brackets, and key-value pairs are separated by commas. A colon separates a key from its value. The key must be an unquoted single-value. The value can be either single or compound values. An empty map is represented by a colon enclosed in square brackets.
 
 ```java
 
 @TableTest("""
     Map                                      | Size?
     [1: Hello, 2: World]                     | 2
-    ["|": 1, ',': 2, abc: 3]                 | 3
     [string: abc, list: [1, 2], map: [a: 4]] | 3
     [:]                                      | 0
     """)
@@ -81,20 +80,24 @@ void testMap(Map<String, Object> map, int expectedSize) {
 }
 ```
 
-## Comment format
+## Comments and blank lines
 
-The table format supports comments. A comment is a line that starts with `//`, excluding any whitespace in front. Comments are ignored when parsing the table. This allows you to add explanations or notes to your tables without affecting the test data and also to temporarily disable a data row without deleting it.
+The table format supports comments. A comment is a line that starts with `//`, excluding any whitespace in front. Comments are ignored when parsing the table. This allows you to add explanations or notes to your tables without affecting the test data and also to temporarily disable a data row without removing it.
+
+Blank lines are allowed and will also be ignored when the table is parsed. This can be used for visually separating groups of related rows.
 
 ```java
 
 @TableTest("""
     String         | Length?
     Hello world    | 11
+
     // The next row is currently disabled
     // "World, hello" | 12
-    //
+
     // Special characters must be quoted
     '|'            | 1
+    '[:]'          | 3
     """)
 void testComment(String string, int expectedLength) {
     assertEquals(expectedLength, string.length());
