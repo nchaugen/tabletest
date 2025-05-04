@@ -15,10 +15,16 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <tabletest-parser.version>1.0-SNAPSHOT</tabletest-parser.version>
         <junit.version>5.12.2</junit.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>io.github.nchaugen</groupId>
+            <artifactId>tabletest-parser</artifactId>
+            <version>${tabletest-parser.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>

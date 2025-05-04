@@ -1,4 +1,4 @@
-package io.github.nchaugen.tabletest;
+package io.github.nchaugen.tabletest.junit;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;

@@ -1,4 +1,4 @@
-package io.github.nchaugen.tabletest;
+package io.github.nchaugen.tabletest.junit;
 
 import org.junit.jupiter.params.converter.DefaultArgumentConverter;
 
@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.github.nchaugen.tabletest.ParameterUtil.contextOf;
+import static io.github.nchaugen.tabletest.junit.ParameterUtil.contextOf;
 
 public class ParameterTypeConverter {
 

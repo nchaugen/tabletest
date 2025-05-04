@@ -1,4 +1,4 @@
-package io.github.nchaugen.tabletest;
+package io.github.nchaugen.tabletest.junit;
 
 import java.io.File;
 import java.lang.reflect.Method;

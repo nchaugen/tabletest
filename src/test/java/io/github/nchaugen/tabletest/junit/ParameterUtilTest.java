@@ -1,9 +1,9 @@
-package io.github.nchaugen.tabletest;
+package io.github.nchaugen.tabletest.junit;
 
 import java.util.List;
 
-import static io.github.nchaugen.tabletest.ParameterFixture.parameter;
-import static io.github.nchaugen.tabletest.ParameterUtil.nestedElementTypesOf;
+import static io.github.nchaugen.tabletest.junit.ParameterFixture.parameter;
+import static io.github.nchaugen.tabletest.junit.ParameterUtil.nestedElementTypesOf;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ParameterUtilTest {

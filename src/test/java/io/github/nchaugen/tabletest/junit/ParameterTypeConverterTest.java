@@ -1,4 +1,4 @@
-package io.github.nchaugen.tabletest;
+package io.github.nchaugen.tabletest.junit;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -7,8 +7,8 @@ import org.junit.jupiter.params.converter.ArgumentConversionException;
 import java.util.List;
 import java.util.Map;
 
-import static io.github.nchaugen.tabletest.ParameterFixture.parameter;
-import static io.github.nchaugen.tabletest.ParameterTypeConverter.convertValue;
+import static io.github.nchaugen.tabletest.junit.ParameterFixture.parameter;
+import static io.github.nchaugen.tabletest.junit.ParameterTypeConverter.convertValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;

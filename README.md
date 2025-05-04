@@ -6,9 +6,9 @@ TableTest-style test methods are declared using the `@TableTest` annotation, sup
 
 There must be a test method parameter for each table column. Columns map to parameters purly based on order (first column maps to first parameter, second to second. etc.), thus the column header and the name of the parameter are allowed to differ.
 
-## Table format
+## Table Format
 
-Tables are formatted using a pipe character (`|`) to separate columns. The first line is a header row describing each column, and the following lines are data rows. Each data row is a test case, with the values in the row passed as arguments to the test method.
+Tables use pipe characters (`|`) to separate columns. The first line contains header descriptions, and subsequent lines represent individual test cases whose values are passed as arguments to the test method.
 
 ```java
 
@@ -23,11 +23,13 @@ void testAddition(int augend, int addend, int sum) {
 }
 ```
 
-Column values can be either **single values** or two types of compound values: **lists** and **maps**. As demonstrated in the example above and specified below, table values are implicitly converted to the declared parameter types when the test is run.
+Column values can be **single values**, **lists**, or **maps**.
 
-## Single-value format
+## Single-Value Format
 
-Single-values can be specified with or without quotes. An unquoted value cannot contain any of the following characters: `[`, `|`, `,`, or `:`. If a value contains any of these characters, it must be enclosed in single or double quotes. Whitespace before and after an unquoted value is ignored, so if a value is to start or end in whitespace, this must be specified using quotes. An empty value is represented by two single or double quotes with no space between them.
+Single values can appear with or without quotes. Unquoted values must not contain `[`, `|`, `,`, or `:` characters. These special characters require single or double quotes.
+
+Whitespace around unquoted values is trimmed. To preserve leading or trailing whitespace, use quotes. Empty values are represented by adjacent quote pairs (`""` or `''`).
 
 ```java
 
@@ -43,9 +45,9 @@ void testString(String value, int expectedLength) {
 }
 ```
 
-## List value format
+## List Value Format
 
-List values are enclosed in square brackets with elements separated by commas. Both single and compound values can be elements of the list. An empty list is represented by open and close square brackets with nothing inside.
+Lists are enclosed in square brackets with comma-separated elements. Lists can contain single values or compound values (nested lists/maps). Empty lists are represented by `[]`.
 
 ```java
 
@@ -63,9 +65,9 @@ void testList(List<Object> list, int expectedSize) {
 }
 ```
 
-## Map value format
+## Map Value Format
 
-Map values are enclosed in square brackets, and key-value pairs are separated by commas. A colon separates a key from its value. The key must be an unquoted single-value. The value can be either single or compound values. An empty map is represented by a colon enclosed in square brackets.
+Maps use square brackets with comma-separated key-value pairs. Keys and values are separated by colons. Keys must be unquoted single values, while values can be single or compound. Empty maps are represented by `[:]`.
 
 ```java
 
@@ -80,11 +82,11 @@ void testMap(Map<String, Object> map, int expectedSize) {
 }
 ```
 
-## Comments and blank lines
+## Comments and Blank Lines
 
-The table format supports comments. A comment is a line that starts with `//`, excluding any whitespace in front. Comments are ignored when parsing the table. This allows you to add explanations or notes to your tables without affecting the test data and also to temporarily disable a data row without removing it.
+Lines starting with `//` (ignoring leading whitespace) are treated as comments and ignored during parsing. Comments allow adding explanations or temporarily disabling data rows.
 
-Blank lines are allowed and will also be ignored when the table is parsed. This can be used for visually separating groups of related rows.
+Blank lines are also ignored and can be used to visually group related rows.
 
 ```java
 
@@ -104,13 +106,13 @@ void testComment(String string, int expectedLength) {
 }
 ```
 
-## Argument conversion
+## Argument Conversion
 
-TableTest will attempt to implicitly convert table values to the declared parameter types when the test is run. It supports the [implicit type converters built-in to JUnit Jupiter](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion).
+TableTest automatically converts table values to match declared parameter types during test execution. It leverages [JUnit Jupiter's built-in implicit type converters](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion).
 
-Using parameterized types for the test parameters, list elements and map values will also be implicitly converted. Map keys are not converted and will always be of type String.
+List elements, and map values benefit from implicit conversion to match parameterized types. Map keys remain as String type and are not converted.
 
-If there is no parameter type information to guide the conversion, or the type is not supported by implicit conversion, values will be of type String.
+Without parameter type information or for unsupported conversion types, single values default to String type.
 
 ```java
 @TableTest("""

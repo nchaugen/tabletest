@@ -1,4 +1,4 @@
-package io.github.nchaugen.tabletest;
+package io.github.nchaugen.tabletest.junit;
 
 import org.junit.jupiter.api.extension.ParameterContext;
 

@@ -1,5 +1,7 @@
-package io.github.nchaugen.tabletest;
+package io.github.nchaugen.tabletest.junit;
 
+import io.github.nchaugen.tabletest.parser.Row;
+import io.github.nchaugen.tabletest.parser.Table;
 import io.github.nchaugen.tabletest.parser.TableParser;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.AnnotationBasedArgumentsProvider;
@@ -8,7 +10,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import java.lang.reflect.Parameter;
 import java.util.stream.Stream;
 
-import static io.github.nchaugen.tabletest.ParameterTypeConverter.convertValue;
+import static io.github.nchaugen.tabletest.junit.ParameterTypeConverter.convertValue;
 
 class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest> {
 
