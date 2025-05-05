@@ -1,6 +1,8 @@
 # TableTest
 
-TableTest is an extension to JUnit 5 for data-driven testing. It allows you to define a table of test data in a readable format, making it easier to understand, extend and maintain your tests.
+TableTest offers extensions to JVM-based test frameworks for data-driven testing. It allows you to define test data for multiple test scenarios in a readable table format, making it easier to understand, extend and maintain your tests.
+
+Currently JUnit 5 is supported as separate module `tabletest-junit`.
 
 TableTest-style test methods are declared using the `@TableTest` annotation, supplying a table of data as a multi-line string. `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
 

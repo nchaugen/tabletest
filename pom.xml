@@ -5,38 +5,79 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.nchaugen</groupId>
-    <artifactId>tabletest-junit</artifactId>
+    <artifactId>tabletest</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-    <name>TableTest for JUnit</name>
-    <url>https://github.com/nchaugen/tabletest-junit</url>
+    <inceptionYear>2025</inceptionYear>
+
+    <name>TableTest</name>
+    <description>Extensions to JVM based test frameworks for data-driven testing with the TableTest format</description>
+    <url>https://github.com/nchaugen/tabletest</url>
+
+    <modules>
+        <module>tabletest-parser</module>
+        <module>tabletest-junit</module>
+    </modules>
 
     <properties>
+        <copyright.holder>Nils Christian Haugen</copyright.holder>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <tabletest-parser.version>1.0-SNAPSHOT</tabletest-parser.version>
-        <junit.version>5.12.2</junit.version>
+        <version.tabletest-parser>1.0-SNAPSHOT</version.tabletest-parser>
+        <version.junit>5.12.2</version.junit>
+        <repository.url>git@github.com:nchaugen/tabletest.git</repository.url>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>io.github.nchaugen</groupId>
-            <artifactId>tabletest-parser</artifactId>
-            <version>${tabletest-parser.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>nchaugen</id>
+            <name>Nils Christian Haugen</name>
+            <email>nchaugen@gmail.com</email>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>github.com</system>
+        <url>${repository.url}/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:${repository.url}</connection>
+        <developerConnection>scm:git:${repository.url}</developerConnection>
+        <url>${repository.url}</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>tabletest-parser</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
