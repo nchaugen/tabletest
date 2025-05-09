@@ -1,14 +1,62 @@
 # TableTest
 
-TableTest offers extensions to JVM-based test frameworks for data-driven testing. It allows you to define test data for multiple test scenarios in a readable table format, making it easier to understand, extend and maintain your tests.
+TableTest offers extensions to JVM-based test frameworks for data-driven testing using a table format. It allows you to define test data for multiple test scenarios in a readable table format, making it easier to understand, extend and maintain your tests.
 
-Currently JUnit 5 is supported as separate module `tabletest-junit`.
+Currently, JUnit 5 is the only supported test framework.
+
+## Installation
+
+### Maven
+Add `tabletest-junit` as a test scope dependency in your pom.xml alongside `junit-jupiter`:
+
+```xml
+    <dependencies>
+        <dependency>
+            <groupId>io.github.nchaugen.tabletest</groupId>
+            <artifactId>tabletest-junit</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.12.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+```
+
+### Gradle
+
+Add `tabletest-junit` as a testImplementation dependency to your build.gradle alongside `junit-jupiter`:
+
+```groovy
+dependencies {
+    testImplementation 'io.github.nchaugen.tabletest:tabletest-junit:1.0.0'    
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+
+    maxHeapSize = '1G'
+
+    testLogging {
+        events "passed"
+    }
+}
+```
+
+Please see the [Gradle docs](https://docs.gradle.org/current/userguide/java_testing.html) for more information on how to configure testing.
+
+## Usage
 
 TableTest-style test methods are declared using the `@TableTest` annotation, supplying a table of data as a multi-line string. `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
 
 There must be a test method parameter for each table column. Columns map to parameters purly based on order (first column maps to first parameter, second to second. etc.), thus the column header and the name of the parameter are allowed to differ.
 
-## Table Format
+### Table Format
 
 Tables use pipe characters (`|`) to separate columns. The first line contains header descriptions, and subsequent lines represent individual test cases whose values are passed as arguments to the test method.
 
@@ -27,7 +75,7 @@ void testAddition(int augend, int addend, int sum) {
 
 Column values can be **single values**, **lists**, or **maps**.
 
-## Single-Value Format
+### Single-Value Format
 
 Single values can appear with or without quotes. Unquoted values must not contain `[`, `|`, `,`, or `:` characters. These special characters require single or double quotes.
 
@@ -47,7 +95,7 @@ void testString(String value, int expectedLength) {
 }
 ```
 
-## List Value Format
+### List Value Format
 
 Lists are enclosed in square brackets with comma-separated elements. Lists can contain single values or compound values (nested lists/maps). Empty lists are represented by `[]`.
 
@@ -67,7 +115,7 @@ void testList(List<Object> list, int expectedSize) {
 }
 ```
 
-## Map Value Format
+### Map Value Format
 
 Maps use square brackets with comma-separated key-value pairs. Keys and values are separated by colons. Keys must be unquoted single values, while values can be single or compound. Empty maps are represented by `[:]`.
 
@@ -84,7 +132,7 @@ void testMap(Map<String, Object> map, int expectedSize) {
 }
 ```
 
-## Comments and Blank Lines
+### Comments and Blank Lines
 
 Lines starting with `//` (ignoring leading whitespace) are treated as comments and ignored during parsing. Comments allow adding explanations or temporarily disabling data rows.
 
@@ -94,6 +142,7 @@ Blank lines are also ignored and can be used to visually group related rows.
 
 @TableTest("""
     String         | Length?
+    
     Hello world    | 11
 
     // The next row is currently disabled
@@ -108,13 +157,13 @@ void testComment(String string, int expectedLength) {
 }
 ```
 
-## Argument Conversion
+### Argument Conversion
 
 TableTest automatically converts table values to match declared parameter types during test execution. It leverages [JUnit Jupiter's built-in implicit type converters](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion).
 
-List elements, and map values benefit from implicit conversion to match parameterized types. Map keys remain as String type and are not converted.
+List elements and map values benefit from implicit conversion to match parameterized types. Map keys remain as a String type and are not converted.
 
-Without parameter type information or for unsupported conversion types, single values default to String type.
+Without parameter type information or for unsupported conversion types, single values default to the String type.
 
 ```java
 @TableTest("""
@@ -137,3 +186,10 @@ void testNestedParameterizedTypes(
 ```
 
 JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit) or [argument aggregation](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-aggregation) can be used for conversions not supported by implicit conversion.
+
+
+## License
+
+TableTest is licensed under the liberal and business-friendly [Apache Licence, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) and is freely available on [GitHub](https://github.com/nchaugen/tabletest). Additionally, the `tabletest-junit` distribution uses `junit-jupiter-params` which is released under [Eclipse Public License 2.0](https://raw.githubusercontent.com/junit-team/junit5/refs/heads/main/LICENSE.md).
+
+TableTest binaries are published to the repositories of Maven Central. The artefacts signatures can be validated against [this PGP public key](https://keyserver.ubuntu.com/pks/lookup?search=nchaugen%40gmail.com).
