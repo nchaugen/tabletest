@@ -6,13 +6,13 @@
 
     <groupId>io.github.nchaugen</groupId>
     <artifactId>tabletest</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2025</inceptionYear>
 
     <name>TableTest</name>
-    <description>Extensions to JVM based test frameworks for data-driven testing with the TableTest format</description>
+    <description>Extensions to JVM-based test frameworks for data-driven testing with the TableTest format</description>
     <url>https://github.com/nchaugen/tabletest</url>
 
     <modules>
@@ -25,9 +25,27 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.tabletest-parser>1.0-SNAPSHOT</version.tabletest-parser>
-        <version.junit>5.12.2</version.junit>
         <repository.url>git@github.com:nchaugen/tabletest.git</repository.url>
+        <version.junit>5.12.2</version.junit>
+        <version.plugin.release>3.1.1</version.plugin.release>
+        <version.plugin.license>3.0</version.plugin.license>
+        <version.plugin.clean>3.2.0</version.plugin.clean>
+        <version.plugin.resources>3.2.0</version.plugin.resources>
+        <version.plugin.compiler>3.10.1</version.plugin.compiler>
+        <version.plugin.surefire>2.22.1</version.plugin.surefire>
+        <version.plugin.jar>3.2.2</version.plugin.jar>
+        <version.plugin.install>3.0.1</version.plugin.install>
+        <version.plugin.deploy>3.0.0</version.plugin.deploy>
+        <version.plugin.site>3.12.0</version.plugin.site>
+        <version.plugin.help>3.2.0</version.plugin.help>
+        <version.plugin.assembly>3.4.2</version.plugin.assembly>
+        <version.plugin.dependency>3.3.0</version.plugin.dependency>
+        <version.plugin.javadoc>3.11.2</version.plugin.javadoc>
+        <version.plugin.source>3.3.1</version.plugin.source>
+        <version.plugin.reports>3.0.0</version.plugin.reports>
+        <version.plugin.staging>1.7.0</version.plugin.staging>
+        <version.plugin.gpg>3.2.7</version.plugin.gpg>
+        <surefire.arguments />
     </properties>
 
     <licenses>
@@ -79,49 +97,230 @@
         </dependencies>
     </dependencyManagement>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
-        <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${version.plugin.staging}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+
+            <!-- Define release properties. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${version.plugin.release}</version>
+                <configuration>
+                    <releaseProfiles>extras,gpg</releaseProfiles>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <tagNameFormat>tabletest-@{project.version}</tagNameFormat>
+                </configuration>
+            </plugin>
+
+            <!-- Add licence headers to all files. -->
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>${version.plugin.license}</version>
+                <inherited>false</inherited>
+                <configuration>
+                    <header>${project.basedir}/NOTICE</header>
+                    <aggregate>true</aggregate>
+                    <failIfMissing>true</failIfMissing>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <properties>
+                        <copyright.holder>${copyright.holder}</copyright.holder>
+                    </properties>
+                    <includes>
+                        <include>**/main/java/**/*.java</include>
+                    </includes>
+                    <strictCheck>true</strictCheck>
+                    <mapping>
+                        <java>SLASHSTAR_STYLE</java>
+                    </mapping>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
             <plugins>
-                <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.1.0</version>
-                </plugin>
-                <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
-                <plugin>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.1</version>
+                    <version>${version.plugin.clean}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>${version.plugin.jar}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${version.plugin.resources}</version>
+                    <configuration>
+                        <!-- Setting this property suppresses a warning on implicit setting the filter encoding. -->
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <propertiesEncoding>${project.build.sourceEncoding}</propertiesEncoding>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
+                    <version>${version.plugin.install}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${version.plugin.surefire}</version>
+                    <configuration>
+                        <argLine>${surefire.arguments}</argLine>
+                        <trimStackTrace>false</trimStackTrace>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>${version.plugin.deploy}</version>
                 </plugin>
-                <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.7.1</version>
+                    <version>${version.plugin.site}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${version.plugin.compiler}</version>
+                    <inherited>true</inherited>
+                    <configuration>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <showWarnings>true</showWarnings>
+                        <showDeprecation>true</showDeprecation>
+                        <compilerArgument>-Xlint:all,-options,-processing</compilerArgument>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${version.plugin.javadoc}</version>
+                    <configuration>
+                        <source>${sourcecode.main.version}</source>
+                        <failOnWarnings>true</failOnWarnings>
+                        <detectOfflineLinks>false</detectOfflineLinks>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>${version.plugin.assembly}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${version.plugin.dependency}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-help-plugin</artifactId>
+                    <version>${version.plugin.help}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>${version.plugin.reports}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
+
     </build>
+
+    <profiles>
+        <!-- Creates additional artefacts that are required for deployment. -->
+        <profile>
+            <id>extras</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Create source code artefact. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${version.plugin.source}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Create javadoc artifact. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${version.plugin.javadoc}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Sign any created artefact. (Requires configuration of gpg on the executing machine.) -->
+        <profile>
+            <id>gpg</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Sign artifacts. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${version.plugin.gpg}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
 </project>
