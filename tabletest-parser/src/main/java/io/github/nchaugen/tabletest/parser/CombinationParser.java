@@ -13,6 +13,8 @@ import static io.github.nchaugen.tabletest.parser.ParseResult.success;
  */
 public class CombinationParser {
 
+    private CombinationParser() {}
+
     /**
      * Creates a parser that applies multiple parsers and succeeds if any one succeeds.
      * Tries parsers in order, returning on first success or failing if all fail.

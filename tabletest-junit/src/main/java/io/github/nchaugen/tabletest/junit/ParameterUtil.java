@@ -8,8 +8,32 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Utility class providing helper methods for working with Java reflection Parameter objects
+ * in the context of JUnit test parameters.
+ * <ul>
+ *   <li>Create JUnit ParameterContext objects from Java reflection Parameter instances</li>
+ *   <li>Extract type information from complex generic parameter types</li>
+ *   <li>Handle primitive-to-wrapper type conversions</li>
+ * </ul>
+ * <p>
+ * These utilities are used by the {@link ParameterTypeConverter} to process
+ * parameters from test methods annotated with {@link TableTest}.
+ */
 public class ParameterUtil {
 
+    private ParameterUtil() {}
+
+    /**
+     * Creates a JUnit ParameterContext from a Java reflection Parameter.
+     * <p>
+     * This method creates a minimal implementation of the ParameterContext interface
+     * that wraps the given parameter. The resulting context can be used with JUnit's
+     * ArgumentConverter implementations.
+     *
+     * @param parameter The Java reflection Parameter to wrap in a ParameterContext
+     * @return A new ParameterContext instance wrapping the given parameter
+     */
     public static ParameterContext contextOf(Parameter parameter) {
         return new ParameterContext() {
             @Override
@@ -29,6 +53,18 @@ public class ParameterUtil {
         };
     }
 
+    /**
+     * Extracts the nested class types from a parameterized type.
+     * <p>
+     * This method analyses a parameter's generic type information and returns a list
+     * of all the Class objects in the type hierarchy. For example, for a parameter of type
+     * {@code List<Map<String, Integer>>}, it would return [List.class, Map.class, Integer.class].
+     * <p>
+     * The method handles primitive types by returning their corresponding wrapper classes.
+     *
+     * @param parameter The parameter whose nested types should be extracted
+     * @return A list of Class objects representing the nested types in the parameter
+     */
     public static List<? extends Class<?>> nestedElementTypesOf(Parameter parameter) {
         return Arrays.stream(parameter.getParameterizedType().getTypeName().split("<"))
             .map(it -> it.replaceAll(">", ""))
@@ -40,6 +76,18 @@ public class ParameterUtil {
             .toList();
     }
 
+    /**
+     * Resolves a type name string to its corresponding Class object.
+     * <p>
+     * This method handles both primitive types (converting them to their wrapper types)
+     * and regular class names. For primitive types, it returns the corresponding wrapper class.
+     * For class names, it attempts to load the class using Class.forName().
+     * <p>
+     * If the class cannot be found, this method returns null.
+     *
+     * @param typeName The name of the type to resolve
+     * @return The Class object corresponding to the given type name, or null if not found
+     */
     private static Class<?> findClass(String typeName) {
         try {
             return switch (typeName) {

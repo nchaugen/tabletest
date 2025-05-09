@@ -49,5 +49,16 @@ import java.lang.annotation.Target;
 @ParameterizedTest
 @ArgumentsSource(TableArgumentsProvider.class)
 public @interface TableTest {
+    /**
+     * The table data in string format, with pipe-separated columns (|).
+     * <p>
+     * The string should contain a header row followed by one or more data rows.
+     * The number of columns must match the number of parameters in the test method.
+     * <p>
+     * Text-block syntax (""") is recommended for multi-line tables to maintain
+     * readability. Empty lines and lines starting with // are ignored.
+     *
+     * @return The table data as a formatted string
+     */
     String value() default "";
 }

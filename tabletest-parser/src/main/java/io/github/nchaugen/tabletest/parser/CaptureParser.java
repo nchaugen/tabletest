@@ -10,6 +10,8 @@ import static io.github.nchaugen.tabletest.parser.ParseResult.failure;
  */
 public class CaptureParser {
 
+    private CaptureParser() {}
+
     /**
      * Creates a parser that captures the matched value on success.
      *

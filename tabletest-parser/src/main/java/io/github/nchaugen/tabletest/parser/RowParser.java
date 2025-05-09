@@ -19,6 +19,8 @@ import static io.github.nchaugen.tabletest.parser.StringParser.string;
  */
 public class RowParser {
 
+    private RowParser() {}
+
     /**
      * Parses a string representing a TableTest row with pipe-separated cells.
      *

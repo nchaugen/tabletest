@@ -18,6 +18,8 @@ import static io.github.nchaugen.tabletest.parser.ParseResult.success;
  */
 public class StringParser {
 
+    private StringParser() {}
+
     /**
      * Creates a parser matching a specific character.
      *

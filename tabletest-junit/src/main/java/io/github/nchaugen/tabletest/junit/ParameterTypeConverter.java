@@ -9,12 +9,46 @@ import java.util.stream.Collectors;
 
 import static io.github.nchaugen.tabletest.junit.ParameterUtil.contextOf;
 
+/**
+ * A utility class that handles conversion of parsed table values to the appropriate parameter types
+ * for JUnit tests using the {@link TableTest} annotation.
+ * <p>
+ * This converter handles various data structures, including:
+ * <ul>
+ *   <li>Basic scalar values (using JUnit's DefaultArgumentConverter)</li>
+ *   <li>Lists of values with automatic element type conversion</li>
+ *   <li>Maps with automatic value type conversion</li>
+ *   <li>Nested collections with complex generic type parameters</li>
+ * </ul>
+ * <p>
+ * The class works recursively to handle deeply nested data structures like lists of lists
+ * or maps containing lists, ensuring each element is properly converted to the expected type.
+ */
 public class ParameterTypeConverter {
 
+    private ParameterTypeConverter() {}
+
+    /**
+     * Converts a parsed TableFormat value to the appropriate parameter type. This method handles
+     * various data structures and performs recursive conversion as needed.
+     *
+     * @param value The value from parsed table data that needs to be converted
+     * @param parameter The method parameter that defines the target type
+     * @return The converted value matching the parameter's expected type
+     */
     public static Object convertValue(Object value, Parameter parameter) {
         return convertValue(value, NestedTypes.of(parameter), parameter);
     }
 
+    /**
+     * Recursively converts values based on their parsed type and the expected parameter type.
+     * Handles Lists, Maps, and scalar values differently.
+     *
+     * @param value The parsed value to convert
+     * @param nestedTypes Information about the nested types in parameterized types
+     * @param parameter The original method parameter providing context
+     * @return The converted value
+     */
     private static Object convertValue(
         Object value,
         NestedTypes nestedTypes,
@@ -27,6 +61,14 @@ public class ParameterTypeConverter {
         };
     }
 
+    /**
+     * Converts a single scalar value using JUnit's DefaultArgumentConverter if needed.
+     *
+     * @param value The parsed value to convert
+     * @param nestedTypes Information about the nested types in parameterized types
+     * @param parameter The original method parameter providing context
+     * @return The converted scalar value
+     */
     @SuppressWarnings("DataFlowIssue")
     private static Object convertSingleValue(Object value, NestedTypes nestedTypes, Parameter parameter) {
         return nestedTypes.hasNext()
@@ -34,6 +76,15 @@ public class ParameterTypeConverter {
                : value;
     }
 
+    /**
+     * Converts each element in a list to the appropriate type based on the parameter's
+     * generic type information.
+     *
+     * @param list The parsed list containing values to convert
+     * @param nestedTypes Information about nested types for list elements
+     * @param parameter The original method parameter providing context
+     * @return A new list with converted elements
+     */
     private static List<?> convertList(
         List<?> list,
         NestedTypes nestedTypes,
@@ -44,6 +95,15 @@ public class ParameterTypeConverter {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Converts each value in a map to the appropriate type based on the parameter's
+     * generic type information (keys remain unchanged).
+     *
+     * @param map The parsed map containing keys and values
+     * @param nestedTypes Information about nested types for map values
+     * @param parameter The original method parameter providing context
+     * @return A new map with converted values
+     */
     private static Map<?, ?> convertMap(
         Map<?, ?> map,
         NestedTypes nestedTypes,
@@ -61,23 +121,56 @@ public class ParameterTypeConverter {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    /**
+     * A record that manages information about nested types within a parameterized type.
+     * <p>
+     * This helps track the type hierarchy in complex generic types like List&lt;Map&lt;String, Integer&gt;&gt;
+     * to ensure proper conversion at each level.
+     */
     private record NestedTypes(
         List<? extends Class<?>> elementTypes
     ) {
+        /**
+         * Creates a NestedTypes instance from a parameter.
+         * <p>
+         * If the parameter has a @ConvertWith annotation, returns an empty list
+         * since conversion will be handled by the custom converter.
+         * Otherwise, extracts the nested element types from the parameter.
+         *
+         * @param parameter The method parameter to analyze
+         * @return A NestedTypes instance containing type information
+         */
         static NestedTypes of(Parameter parameter) {
             return parameter.isAnnotationPresent(org.junit.jupiter.params.converter.ConvertWith.class)
                    ? new NestedTypes(List.of())
                    : new NestedTypes(ParameterUtil.nestedElementTypesOf(parameter));
         }
 
+        /**
+         * Checks if there are more nested types in the hierarchy.
+         *
+         * @return true if there are more nested types, false otherwise
+         */
         boolean hasNext() {
             return !elementTypes.isEmpty();
         }
 
+        /**
+         * Returns the next type in the nested type hierarchy.
+         *
+         * @return The next class in the hierarchy, or null if none exists
+         */
         Class<?> next() {
             return elementTypes.isEmpty() ? null : elementTypes.getFirst();
         }
 
+        /**
+         * Returns a new NestedTypes instance with the first element removed.
+         * <p>
+         * This is used when moving down the type hierarchy during recursive conversions.
+         *
+         * @return A new NestedTypes instance with the first element removed
+         */
         NestedTypes skipNext() {
             return elementTypes.isEmpty()
                    ? this

@@ -10,6 +10,8 @@ import java.util.Objects;
 public class TableParser {
     private static final String ROW_SEPARATOR = "\\n";
 
+    private TableParser() {}
+
     /**
      * Parses input string in TableTest format into a Table representation.
      *

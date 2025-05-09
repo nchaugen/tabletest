@@ -18,6 +18,8 @@ import static java.util.Collections.unmodifiableList;
  */
 public abstract sealed class ParseResult permits ParseResult.Success, ParseResult.Failure {
 
+    private ParseResult() {}
+
     static Success success(String value, String rest, List<Object> captures) {
         return new Success(value, rest, captures);
     }
@@ -135,8 +137,7 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
     }
 
     static final class Failure extends ParseResult {
-        private Failure() {
-        }
+        private Failure() {}
 
         @Override
         public boolean isSuccess() {
