@@ -35,16 +35,22 @@ public class TableParserTest {
     void shouldIgnoreComments() {
         //language=TableTest
         String input = """
-            a     | b | c
-            // 1 | 2 | 3
-            '//4' | 5 | 6
+            a     | b
+            // comment
+            // 0 | 1
+            '//2' | 3
+            4 //  | 5
+            6     | // 7
+            8     | 9 //
             """;
 
         Table result = TableParser.parse(input);
 
-        assertEquals(1, result.rowCount());
-        assertEquals(List.of("a", "b", "c"), result.headers());
-        assertEquals(List.of("//4", "5", "6"), result.row(0).cells());
+        assertEquals(List.of("a", "b"), result.headers());
+        assertEquals(List.of("//2", "3"), result.row(0).cells());
+        assertEquals(List.of("4 //", "5"), result.row(1).cells());
+        assertEquals(List.of("6", "// 7"), result.row(2).cells());
+        assertEquals(List.of("8", "9 //"), result.row(3).cells());
     }
 
     @Test
