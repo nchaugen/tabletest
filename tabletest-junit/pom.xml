@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.0</version>
     </parent>
 
     <artifactId>tabletest-junit</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
 
     <name>TableTest JUnit</name>
     <description>Extension to JUnit 5 for data-driven testing with the TableTest format</description>
 
     <properties>
-        <version.tabletest-parser>0.1.0-SNAPSHOT</version.tabletest-parser>
+        <version.tabletest-parser>0.1.0</version.tabletest-parser>
         <version.junit-params>5.12.2</version.junit-params>
         <version.junit>5.12.2</version.junit>
     </properties>
