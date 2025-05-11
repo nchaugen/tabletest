@@ -6,13 +6,13 @@
 
     <groupId>io.github.nchaugen</groupId>
     <artifactId>tabletest</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2025</inceptionYear>
 
     <name>TableTest</name>
-    <description>Extensions to JVM-based test frameworks for data-driven testing with the TableTest format</description>
+    <description>Extension to JVM-based test frameworks for data-driven testing with the TableTest format</description>
     <url>https://github.com/nchaugen/tabletest</url>
 
     <modules>
@@ -26,7 +26,6 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <repository.url>git@github.com:nchaugen/tabletest.git</repository.url>
-        <version.junit>5.12.2</version.junit>
         <version.plugin.release>3.1.1</version.plugin.release>
         <version.plugin.license>3.0</version.plugin.license>
         <version.plugin.clean>3.2.0</version.plugin.clean>
@@ -45,6 +44,7 @@
         <version.plugin.reports>3.0.0</version.plugin.reports>
         <version.plugin.staging>1.7.0</version.plugin.staging>
         <version.plugin.gpg>3.2.7</version.plugin.gpg>
+        <version.plugin.publishing>0.7.0</version.plugin.publishing>
         <surefire.arguments />
     </properties>
 
@@ -81,22 +81,6 @@
         <tag>HEAD</tag>
     </scm>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>tabletest-parser</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <version>${version.junit}</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -106,6 +90,15 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>${version.plugin.publishing}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -210,7 +203,6 @@
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <showWarnings>true</showWarnings>
                         <showDeprecation>true</showDeprecation>
-                        <compilerArgument>-Xlint:all,-options,-processing</compilerArgument>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -218,9 +210,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${version.plugin.javadoc}</version>
                     <configuration>
-                        <source>${sourcecode.main.version}</source>
                         <failOnWarnings>true</failOnWarnings>
-                        <detectOfflineLinks>false</detectOfflineLinks>
                     </configuration>
                 </plugin>
                 <plugin>

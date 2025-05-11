@@ -4,52 +4,6 @@ TableTest offers extensions to JVM-based test frameworks for data-driven testing
 
 Currently, JUnit 5 is the only supported test framework.
 
-## Installation
-
-### Maven
-Add `tabletest-junit` as a test scope dependency in your pom.xml alongside `junit-jupiter`:
-
-```xml
-    <dependencies>
-        <dependency>
-            <groupId>io.github.nchaugen.tabletest</groupId>
-            <artifactId>tabletest-junit</artifactId>
-            <version>1.0.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.12.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-```
-
-### Gradle
-
-Add `tabletest-junit` as a testImplementation dependency to your build.gradle alongside `junit-jupiter`:
-
-```groovy
-dependencies {
-    testImplementation 'io.github.nchaugen.tabletest:tabletest-junit:1.0.0'    
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-tasks.named('test', Test) {
-    useJUnitPlatform()
-
-    maxHeapSize = '1G'
-
-    testLogging {
-        events "passed"
-    }
-}
-```
-
-Please see the [Gradle docs](https://docs.gradle.org/current/userguide/java_testing.html) for more information on how to configure testing.
-
 ## Usage
 
 TableTest-style test methods are declared using the `@TableTest` annotation, supplying a table of data as a multi-line string. `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
@@ -186,6 +140,57 @@ void testNestedParameterizedTypes(
 ```
 
 JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit) or [argument aggregation](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-aggregation) can be used for conversions not supported by implicit conversion.
+
+
+## Installation
+
+To use TableTest with JUnit 5, add `tabletest-junit` as a test scope dependency alongside `junit-jupiter`.
+
+`tabletest-junit` requires Java version 21 or higher. It includes `junit-jupiter-params` library version 5.12.2, so using the same version for `junit-jupiter` in your project is recommended.
+
+### Maven
+Add `tabletest-junit` and `junit-jupiter` as test scope dependencies in your `pom.xml` file:
+
+```xml
+    <dependencies>
+        <dependency>
+            <groupId>io.github.nchaugen.tabletest</groupId>
+            <artifactId>tabletest-junit</artifactId>
+            <version>0.1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.12.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+```
+
+### Gradle
+
+Add `tabletest-junit` and `junit-jupiter` as testImplementation dependencies in your `build.gradle` file:
+
+```groovy
+dependencies {
+    testImplementation 'io.github.nchaugen.tabletest:tabletest-junit:0.1.0'    
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+
+    maxHeapSize = '1G'
+
+    testLogging {
+        events "passed"
+    }
+}
+```
+
+Please see the [Gradle docs](https://docs.gradle.org/current/userguide/java_testing.html) for more information on how to configure testing.
 
 
 ## License
