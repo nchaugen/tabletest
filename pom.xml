@@ -6,7 +6,7 @@
 
     <groupId>io.github.nchaugen</groupId>
     <artifactId>tabletest</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2025</inceptionYear>
@@ -25,8 +25,6 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <repository.url>git@github.com:nchaugen/tabletest.git</repository.url>
-        <version.plugin.release>3.1.1</version.plugin.release>
         <version.plugin.license>3.0</version.plugin.license>
         <version.plugin.clean>3.2.0</version.plugin.clean>
         <version.plugin.resources>3.2.0</version.plugin.resources>
@@ -45,6 +43,7 @@
         <version.plugin.staging>1.7.0</version.plugin.staging>
         <version.plugin.gpg>3.2.7</version.plugin.gpg>
         <version.plugin.publishing>0.7.0</version.plugin.publishing>
+        <version.plugin.multi-module-release>3.7.10</version.plugin.multi-module-release>
         <surefire.arguments />
     </properties>
 
@@ -71,15 +70,8 @@
 
     <issueManagement>
         <system>github.com</system>
-        <url>${repository.url}/issues</url>
+        <url>${project.url</url>
     </issueManagement>
-
-    <scm>
-        <connection>scm:git:${repository.url}</connection>
-        <developerConnection>scm:git:${repository.url}</developerConnection>
-        <url>${repository.url}</url>
-        <tag>HEAD</tag>
-    </scm>
 
     <distributionManagement>
         <snapshotRepository>
@@ -90,39 +82,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.sonatype.central</groupId>
-                <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>${version.plugin.publishing}</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <publishingServerId>central</publishingServerId>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>${version.plugin.staging}</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-
-            <!-- Define release properties. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>${version.plugin.release}</version>
-                <configuration>
-                    <releaseProfiles>extras,gpg</releaseProfiles>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <tagNameFormat>tabletest-@{project.version}</tagNameFormat>
-                </configuration>
-            </plugin>
-
             <!-- Add licence headers to all files. -->
             <plugin>
                 <groupId>com.mycila</groupId>
@@ -153,6 +112,22 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Release changed modules -->
+            <plugin>
+                <groupId>com.github.danielflower.mavenplugins</groupId>
+                <artifactId>multi-module-maven-release-plugin</artifactId>
+                <version>${version.plugin.multi-module-release}</version>
+                <configuration>
+                    <serverId>github</serverId>
+                    <releaseProfiles>
+                        <releaseProfile>release</releaseProfile>
+                    </releaseProfiles>
+                    <releaseGoals>
+                        <releaseGoal>deploy</releaseGoal>
+                    </releaseGoals>
+                </configuration>
             </plugin>
         </plugins>
 
@@ -240,10 +215,7 @@
     <profiles>
         <!-- Creates additional artefacts that are required for deployment. -->
         <profile>
-            <id>extras</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
+            <id>release</id>
             <build>
                 <plugins>
                     <!-- Create source code artefact. -->
@@ -275,19 +247,8 @@
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>
-            </build>
-        </profile>
 
-        <!-- Sign any created artefact. (Requires configuration of gpg on the executing machine.) -->
-        <profile>
-            <id>gpg</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <!-- Sign artifacts. -->
+                    <!-- Sign artefacts. (Requires configuration of gpg on the executing machine.) -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
@@ -308,9 +269,19 @@
                             </execution>
                         </executions>
                     </plugin>
+
+                    <!-- Publish to Maven Central -->
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>${version.plugin.publishing}</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
-
     </profiles>
 </project>
