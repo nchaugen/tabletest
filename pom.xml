@@ -13,11 +13,6 @@
     <description>Extension to JVM-based test frameworks for data-driven testing with the TableTest format</description>
     <url>https://github.com/nchaugen/tabletest</url>
 
-    <modules>
-        <module>tabletest-parser</module>
-        <module>tabletest-junit</module>
-    </modules>
-
     <properties>
         <copyright.holder>Nils Christian Haugen</copyright.holder>
         <maven.compiler.source>21</maven.compiler.source>
