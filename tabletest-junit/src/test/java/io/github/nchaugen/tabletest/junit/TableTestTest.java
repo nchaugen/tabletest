@@ -101,6 +101,16 @@ public class TableTestTest {
         assertNotEquals(2, input.size());
     }
 
+    @TableTest(resource = "external.table")
+    void testExternalTable(int a, int b, int expectedSum) {
+        assertEquals(expectedSum, a + b);
+    }
+
+    @TableTest(resource = "/subfolder/custom_encoding.table", encoding = "ISO-8859-1")
+    void testExternalTableInSubfolder(String string, int expectedLength) {
+        assertEquals(expectedLength, string.length());
+    }
+
     @TableTest("""
         Person                 | AgeCategory?
         [name: Fred, age: 22]  | ADULT

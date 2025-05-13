@@ -6,7 +6,7 @@ Currently, JUnit 5 is the only supported test framework.
 
 ## Usage
 
-TableTest-style test methods are declared using the `@TableTest` annotation, supplying a table of data as a multi-line string. `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
+TableTest-style test methods are declared using the `@TableTest` annotation, either supplying a table of data as a multi-line string or as an external resource. `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
 
 There must be a test method parameter for each table column. Columns map to parameters purly based on order (first column maps to first parameter, second to second. etc.), thus the column header and the name of the parameter are allowed to differ.
 
@@ -86,31 +86,6 @@ void testMap(Map<String, Object> map, int expectedSize) {
 }
 ```
 
-### Comments and Blank Lines
-
-Lines starting with `//` (ignoring leading whitespace) are treated as comments and ignored during parsing. Comments allow adding explanations or temporarily disabling data rows.
-
-Blank lines are also ignored and can be used to visually group related rows.
-
-```java
-
-@TableTest("""
-    String         | Length?
-    
-    Hello world    | 11
-
-    // The next row is currently disabled
-    // "World, hello" | 12
-
-    // Special characters must be quoted
-    '|'            | 1
-    '[:]'          | 3
-    """)
-void testComment(String string, int expectedLength) {
-    assertEquals(expectedLength, string.length());
-}
-```
-
 ### Argument Conversion
 
 TableTest automatically converts table values to match declared parameter types during test execution. It leverages [JUnit Jupiter's built-in implicit type converters](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion).
@@ -141,6 +116,48 @@ void testNestedParameterizedTypes(
 
 JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit) or [argument aggregation](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-aggregation) can be used for conversions not supported by implicit conversion.
 
+
+### Comments and Blank Lines
+
+Lines starting with `//` (ignoring leading whitespace) are treated as comments and ignored during parsing. Comments allow adding explanations or temporarily disabling data rows.
+
+Blank lines are also ignored and can be used to visually group related rows.
+
+```java
+@TableTest("""
+    String         | Length?
+    
+    Hello world    | 11
+
+    // The next row is currently disabled
+    // "World, hello" | 12
+
+    // Special characters must be quoted
+    '|'            | 1
+    '[:]'          | 3
+    """)
+void testComment(String string, int expectedLength) {
+    assertEquals(expectedLength, string.length());
+}
+```
+
+### Table in External File
+
+As an alternative to specifying the table as a multi-line string in the annotation, you can load it from an external file using the `resource` attribute. The file is located as a resource relative to the test class and is typically stored in the test `resources` directory or one of its subdirectories.
+
+By default, the file is assumed to use UTF-8 encoding. If your file uses a different encoding, specify it with the `encoding` attribute.
+
+```java
+@TableTest(resource = "/external.table")
+void testExternalTable(int a, int b, int sum) {
+    assertEquals(sum, a + b);
+}
+
+@TableTest(resource = "/custom-encoding.table", encoding = "ISO-8859-1")
+void testExternalTableWithCustomEncoding(String string, int expectedLength) {
+    assertEquals(expectedLength, string.length());
+}
+```
 
 ## Installation
 
@@ -191,6 +208,17 @@ tasks.named('test', Test) {
 ```
 
 Please see the [Gradle docs](https://docs.gradle.org/current/userguide/java_testing.html) for more information on how to configure testing.
+
+
+## IDE Support
+
+The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) enhances your development experience when working with TableTest format tables. The plugin provides:
+
+- Code assistance for table formatting
+- Syntax highlighting for table content
+- Visual feedback for invalid table syntax
+
+Installing the plugin streamlines the creation and maintenance of data-driven tests, making it easier to work with both inline and external table files.
 
 
 ## License

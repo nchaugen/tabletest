@@ -43,6 +43,7 @@ import java.lang.annotation.Target;
  * </ul>
  * <p>
  * Values are automatically converted to method parameter types, including nested parameterized types.
+ * The number of columns must match the number of parameters in the test method.
  * <p>
  * Example:
  * <pre>
@@ -65,15 +66,25 @@ import java.lang.annotation.Target;
 @ArgumentsSource(TableArgumentsProvider.class)
 public @interface TableTest {
     /**
-     * The table data in string format, with pipe-separated columns (|).
-     * <p>
-     * The string should contain a header row followed by one or more data rows.
-     * The number of columns must match the number of parameters in the test method.
+     * The table data in string format.
      * <p>
      * Text-block syntax (""") is recommended for multi-line tables to maintain
-     * readability. Empty lines and lines starting with // are ignored.
-     *
-     * @return The table data as a formatted string
+     * readability.
      */
     String value() default "";
+
+    /**
+     * The path of the resource containing the table data.
+     */
+    String resource() default "";
+
+    /**
+     * The encoding to use when reading the table data file; must be a valid charset.
+     * <p>
+     * Defaults to {@code "UTF-8"}.
+     *
+     * @see java.nio.charset.StandardCharsets
+     */
+    String encoding() default "UTF-8";
+
 }
