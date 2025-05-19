@@ -24,7 +24,7 @@
         <version.plugin.clean>3.2.0</version.plugin.clean>
         <version.plugin.resources>3.2.0</version.plugin.resources>
         <version.plugin.compiler>3.10.1</version.plugin.compiler>
-        <version.plugin.surefire>2.22.1</version.plugin.surefire>
+        <version.plugin.surefire>3.1.2</version.plugin.surefire>
         <version.plugin.jar>3.2.2</version.plugin.jar>
         <version.plugin.install>3.0.1</version.plugin.install>
         <version.plugin.deploy>3.0.0</version.plugin.deploy>
@@ -82,7 +82,15 @@
         </snapshotRepository>
     </distributionManagement>
 
+    <modules>
+        <module>tabletest-parser</module>
+        <module>tabletest-junit</module>
+    </modules>
+
     <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
+
         <plugins>
             <!-- Add licence headers to all files. -->
             <plugin>
