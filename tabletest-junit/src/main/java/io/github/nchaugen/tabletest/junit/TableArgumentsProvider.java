@@ -82,8 +82,8 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
     /**
      * Resolves and validates method parameters against the table structure.
      * <p>
-     * Verifies that the number of table columns matches the number of method parameters,
-     * ensuring data consistency before conversion.
+     * Verifies that the number of table columns matches the number of method parameters.
+     * One extra column is allowed, which will be interpreted as the name of the argument set.
      *
      * @param context The test extension context
      * @param table The parsed table data
@@ -92,7 +92,7 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
      */
     private static Parameter[] resolveParameters(ExtensionContext context, Table table) {
         Parameter[] parameters = context.getRequiredTestMethod().getParameters();
-        if (table.columnCount() != parameters.length) {
+        if (table.columnCount() < parameters.length || table.columnCount() > parameters.length + 1) {
             throw new IllegalArgumentException(
                 String.format(
                     "Number of columns in table (%d) does not match number of parameters in test method (%d)",
@@ -150,16 +150,24 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
      * <p>
      * Uses {@link ParameterTypeConverter} to convert each cell value to the appropriate type
      * based on the method parameter's declared type.
+     * <p>
+     * If the row has one additional cell compared to the number of parameters, the first cell becomes
+     * the name of the argument set.
      *
-     * @param row The row of data from the table
+     * @param row        The row of data from the table
      * @param parameters The method parameters defining the expected types
      * @return An Arguments instance containing the converted values
      */
     private static Arguments toArguments(Row row, Parameter[] parameters) {
-        return Arguments.of(
-            row
-                .mapIndexed((index, cell) -> convertValue(cell, parameters[index]))
-                .toArray()
-        );
+        boolean hasScenarioColumn = row.cellCount() == (parameters.length + 1);
+
+        Object[] arguments = row
+            .skipFirstIf(hasScenarioColumn)
+            .mapIndexed((index, cell) -> convertValue(cell, parameters[index]))
+            .toArray();
+
+        return hasScenarioColumn
+               ? Arguments.argumentSet(row.cell(0).toString(), arguments)
+               : Arguments.of(arguments);
     }
 }

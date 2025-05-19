@@ -1,6 +1,8 @@
 # TableTest-Junit Changelog
 
 ## [Unreleased]
+### Added
+- Support for the first column being a scenario name
 
 ## [0.2.0]
 ### Added

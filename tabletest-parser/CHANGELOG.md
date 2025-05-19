@@ -1,5 +1,8 @@
 # TableTest-Parser Changelog
 
+## [Unreleased]
+- Support conditional skip of first column when scenario name
+
 ## [0.1.0] - 2025-05-11
 ### Added
 - Table parser for multiline strings with pipe-separated columns

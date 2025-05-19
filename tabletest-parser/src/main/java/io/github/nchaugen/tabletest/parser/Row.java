@@ -36,6 +36,10 @@ public record Row(List<Object> cells) {
         return !cells.isEmpty() ? cells.size() : 0;
     }
 
+    public Row skipFirstIf(boolean test) {
+       return test ? new Row(cells.stream().skip(1).toList()) : this;
+    }
+
     /**
      * Maps each cell with its index to a new value.
      *

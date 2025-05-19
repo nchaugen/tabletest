@@ -112,6 +112,16 @@ public class TableTestTest {
     }
 
     @TableTest("""
+    Scenario     | a | b
+    Zero is zero | 0 | 0
+    One is two   | 1 | 2
+    Two is four  | 2 | 4
+    """)
+    void testScenarioName(int a, int b) {
+        assertEquals(b, 2 * a);
+    }
+
+    @TableTest("""
         Person                 | AgeCategory?
         [name: Fred, age: 22]  | ADULT
         [name: Wilma, age: 19] | TEEN
