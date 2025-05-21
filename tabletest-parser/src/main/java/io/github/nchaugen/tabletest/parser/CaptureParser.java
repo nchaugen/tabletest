@@ -54,6 +54,19 @@ public class CaptureParser {
     }
 
     /**
+     * Creates a parser that captures a matched group of values as a set.
+     *
+     * @param parser base parser to use
+     * @return parser that captures values as a group
+     */
+    public static Parser captureElementSet(Parser parser) {
+        return input -> switch (parser.parse(input)) {
+            case Failure ignored -> failure();
+            case Success success -> success.captureSet();
+        };
+    }
+
+    /**
      * Creates a parser that captures key-value pairs as a map.
      *
      * @param parser base parser to use

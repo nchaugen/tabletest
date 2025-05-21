@@ -1,7 +1,8 @@
 # TableTest-Parser Changelog
 
 ## [Unreleased]
-- Support conditional skip of first column when scenario name
+- Support conditionally skip first column in row
+- Support for sets with comma-separated elements
 
 ## [0.1.0] - 2025-05-11
 ### Added

@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static io.github.nchaugen.tabletest.parser.CaptureParser.capture;
@@ -18,6 +19,7 @@ import static io.github.nchaugen.tabletest.parser.RowParser.listValue;
 import static io.github.nchaugen.tabletest.parser.RowParser.mapValue;
 import static io.github.nchaugen.tabletest.parser.RowParser.parse;
 import static io.github.nchaugen.tabletest.parser.RowParser.row;
+import static io.github.nchaugen.tabletest.parser.RowParser.setValue;
 import static io.github.nchaugen.tabletest.parser.RowParser.singleValue;
 import static io.github.nchaugen.tabletest.parser.StringParser.character;
 import static io.github.nchaugen.tabletest.parser.StringParser.characterExcept;
@@ -111,6 +113,56 @@ class RowParserTest {
         // Test invalid lists
         List.of("", "[", "]", "[[]").forEach(
             input -> assertFalse(listValue().parse(input).isSuccess())
+        );
+    }
+
+    @Test
+    void shouldCaptureSetValueElement() {
+        // Test empty set
+        assertEquals(List.of(Set.of()), setValue().parse("{}").captures());
+
+        // Test simple set
+        assertEquals(
+            List.of(Set.of("a", "b", "c")),
+            setValue().parse("{a, b, c, b, a}").captures()
+        );
+
+        // Test set of lists
+        assertEquals(
+            List.of(Set.of(List.of("a"), List.of("b"), List.of("c"))),
+            setValue().parse("{[a], [b], [c], [b], [a]}").captures()
+        );
+
+        // Test set of sets
+        assertEquals(
+            List.of(Set.of(Set.of("a"), Set.of("b"), Set.of("c"))),
+            setValue().parse("{{a}, {b}, {c}, {b}, {a}}").captures()
+        );
+
+        // Test set of maps
+        assertEquals(
+            List.of(Set.of(Map.of("a", "b"), List.of("c"))),
+            setValue().parse("{[a:b], [c], [c], [a:b]}").captures()
+        );
+
+        // Test mixed content sets
+        assertEquals(
+            List.of(Set.of(List.of(), "a")),
+            setValue().parse("{[], a, a, a, a, [], []}").captures()
+        );
+
+        // Test set with quoted values
+        assertEquals(
+            List.of(Set.of("a, b", "c")),
+            setValue().parse("{\"a, b\", c, 'a, b'}").captures()
+        );
+
+        // Test with trailing character - edge case
+        assertEquals(List.of(Set.of()), setValue().parse("{}}").captures());
+
+        // Test invalid sets
+        List.of("", "{", "}", "{{}").forEach(
+            input -> assertFalse(setValue().parse(input).isSuccess())
         );
     }
 

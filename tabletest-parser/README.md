@@ -14,7 +14,7 @@ Augend | Addend | Sum?
 
 ```
 
-Column values can be **single values**, **lists**, or **maps**.
+Column values can be **single values**, **lists**, **sets**, or **maps**.
 
 ### Single-Value Format
 
@@ -43,6 +43,21 @@ List             | Size?
 [[1, 2], [3, 4]] | 2
 [[a: 4], [b: 5]] | 2
 []               | 0
+
+```
+
+### Set Value Format
+
+Sets are enclosed in curly braces with comma-separated elements. Sets can contain single values or compound values (nested lists/sets/maps). Empty sets are represented by `{}`.
+
+```tabletest
+Set              | Size?
+{Hello, World}   | 2
+{Hello, Hello}   | 1
+{'|', "|", abc}  | 2
+{[1, 2], [1, 2]} | 1
+{[a: 4], [a: 4]} | 1
+{}               | 0
 
 ```
 
@@ -91,8 +106,8 @@ import io.github.nchaugen.tabletest.parser.TableParser;
 
 // Parse a multi-line string in TableTest format
 String tableText = """
-    Name       | Age | Skills       | Attributes 
-    John Smith | 30  | [Java, SQL]  | [strength: 8, dexterity: 6] 
+    Name       | Age | Skills       | Attributes
+    John Smith | 30  | [Java, SQL]  | [strength: 8, dexterity: 6]
     Jane Doe   | 28  | [Python, JS] | [wisdom: 9, charisma: 10]
     """;
 
@@ -169,9 +184,10 @@ TableTest supports three types of cell values:
 
 1. **Simple Values**: Plain text or quoted text with `"` or `'`. Represented as `String`.
 2. **Lists**: Values enclosed in square brackets like `[item1, item2]`. Represented as `List<Object>`.
-3. **Maps**: Key-value pairs like `[key1: value1, key2: value2]`. Represented as `Map<String, Object>`.
+3. **Sets**: Values enclosed in curly braces like `{item1, item2}`. Represented as `Set<Object>`.
+4. **Maps**: Key-value pairs like `[key1: value1, key2: value2]`. Represented as `Map<String, Object>`.
 
-Lists and maps can contain nested structures of any type, allowing for complex data representation.
+Lists, sets and maps can contain nested structures of any type, allowing for complex data representation.
 
 ### Special Features
 

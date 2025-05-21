@@ -16,6 +16,7 @@
 package io.github.nchaugen.tabletest.parser;
 
 import static io.github.nchaugen.tabletest.parser.CaptureParser.capture;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.captureElementSet;
 import static io.github.nchaugen.tabletest.parser.CaptureParser.captureElements;
 import static io.github.nchaugen.tabletest.parser.CaptureParser.captureNamedElements;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.atLeast;
@@ -74,7 +75,7 @@ public class RowParser {
 
     /**
      * Creates a parser for a single cell with surrounding whitespace.
-     * Cell values can be in one of three forms: a map value, a list value, or a single value.
+     * Cell values can be in one of three forms: a map value, a list value, a set value, or a single value.
      *
      * @return parser for table cells
      */
@@ -83,7 +84,7 @@ public class RowParser {
     }
 
     private static Parser value() {
-        return either(mapValue(), listValue(), singleValue());
+        return either(mapValue(), listValue(), setValue(), singleValue());
     }
 
     /**
@@ -121,6 +122,20 @@ public class RowParser {
     }
 
     /**
+     * Creates a parser for set values enclosed in curly braces.
+     * Sets can be empty or contain comma-separated elements.
+     *
+     * @return parser for set values
+     */
+    static Parser setValue() {
+        return sequence(
+            character('{'),
+            captureElementSet(optional(elementValues())),
+            character('}')
+        );
+    }
+
+    /**
      * Creates a parser for list values enclosed in square brackets.
      * Lists can be empty or contain comma-separated elements.
      *
@@ -144,10 +159,11 @@ public class RowParser {
             either(
                 forwardRef(RowParser::mapValue),
                 forwardRef(RowParser::listValue),
+                forwardRef(RowParser::setValue),
                 either(
                     singleQuotedValue(),
                     doubleQuotedValue(),
-                    capture(atLeast(1, characterExcept(',', ']')))
+                    capture(atLeast(1, characterExcept(',', ']', '}')))
                 )
             ),
             anyWhitespace()

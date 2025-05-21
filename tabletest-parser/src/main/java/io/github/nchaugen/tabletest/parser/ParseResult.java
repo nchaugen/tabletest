@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -108,6 +109,10 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
 
         ParseResult.Success captureGroup() {
             return new Success(value, rest, List.of(List.copyOf(captures)));
+        }
+
+        ParseResult.Success captureSet() {
+            return new Success(value, rest, List.of(Set.copyOf(captures)));
         }
 
         ParseResult.Success captureNamedElements() {
