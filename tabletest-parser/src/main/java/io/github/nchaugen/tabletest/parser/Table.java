@@ -68,8 +68,8 @@ public final class Table {
      * @param mapper function to transform rows
      * @return stream of transformed objects
      */
-    public <T> Stream<T> map(Function<Row, T> mapper) {
-        return data.stream().map(mapper);
+    public <T> Stream<T> map(Function<Row, Stream<T>> mapper) {
+        return data.stream().flatMap(mapper);
     }
 
     /**

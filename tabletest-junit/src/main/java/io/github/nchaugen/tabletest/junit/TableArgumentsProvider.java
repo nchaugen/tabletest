@@ -27,7 +27,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,9 +51,17 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
      * <p>
      * The method parses the table string provided in the annotation, validates
      * that the number of columns matches the number of method parameters, and
-     * converts each row into method arguments.
+     * converts each row into one or more method arguments.
+     * <p>
+     * A row becomes multiple instances of method arguments when cells contain sets of
+     * values and the corresponding test method parameter is not of type Set. In this
+     * situation, method arguments are generated for all set values. If multiple columns
+     * contain sets, method arguments are generated for all combinations.
+     * <p>
+     * NOTE! Be careful with excessive use of expanding sets in the same table, as the
+     * number of value combinations can quickly explode and cause long run times.
      *
-     * @param context The current extension context
+     * @param context   The current extension context
      * @param tableTest The TableTest annotation containing the table data
      * @return A stream of Arguments objects, one for each data row in the table
      * @throws IllegalArgumentException if column and parameter counts don't match
@@ -58,7 +70,7 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
     protected Stream<? extends Arguments> provideArguments(ExtensionContext context, TableTest tableTest) {
         String input = resolveInput(context, tableTest);
         Table table = TableParser.parse(input);
-        Parameter[] parameters = resolveParameters(context, table);
+        Parameter[] parameters = resolveParameters(context, table.columnCount());
 
         return table.map(row -> toArguments(row, parameters));
     }
@@ -69,7 +81,7 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
      * Uses either the inline value from the annotation or loads
      * an external resource if specified.
      *
-     * @param context The test extension context
+     * @param context   The test extension context
      * @param tableTest The annotation containing the configuration
      * @return The table data string to parse
      */
@@ -85,18 +97,18 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
      * Verifies that the number of table columns matches the number of method parameters.
      * One extra column is allowed, which will be interpreted as the name of the argument set.
      *
-     * @param context The test extension context
-     * @param table The parsed table data
+     * @param context     The test extension context
+     * @param columnCount The number of columns in the table
      * @return Array of method parameters
      * @throws IllegalArgumentException if column and parameter counts don't match
      */
-    private static Parameter[] resolveParameters(ExtensionContext context, Table table) {
+    private static Parameter[] resolveParameters(ExtensionContext context, int columnCount) {
         Parameter[] parameters = context.getRequiredTestMethod().getParameters();
-        if (table.columnCount() < parameters.length || table.columnCount() > parameters.length + 1) {
+        if (columnCount < parameters.length || columnCount > parameters.length + 1) {
             throw new IllegalArgumentException(
                 String.format(
                     "Number of columns in table (%d) does not match number of parameters in test method (%d)",
-                    table.columnCount(),
+                    columnCount,
                     parameters.length
                 )
             );
@@ -110,8 +122,8 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
      * Reads the content of the specified resource using the provided encoding
      * and returns it as a string with normalized line breaks.
      *
-     * @param resource Path to the resource containing table data
-     * @param encoding Character encoding to use when reading the file
+     * @param resource  Path to the resource containing table data
+     * @param encoding  Character encoding to use when reading the file
      * @param testClass Class to use for resource resolution
      * @return Contents of the resource as a string
      * @throws RuntimeException if an IO error occurs during loading
@@ -131,7 +143,7 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
      * Attempts to load the resource both with and without a leading slash
      * to accommodate different resource path styles.
      *
-     * @param resource Path to the resource file
+     * @param resource  Path to the resource file
      * @param testClass Class to use for resource resolution
      * @return Input stream for the resource
      * @throws NullPointerException if the resource cannot be found
@@ -146,28 +158,111 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
     }
 
     /**
-     * Converts a table row into Arguments by mapping each cell to the corresponding parameter type.
+     * Converts a table row into a stream of Arguments instances by mapping each cell to
+     * the corresponding parameter type and possibly expanding sets of values to one Arguments
+     * instance per value.
      * <p>
      * Uses {@link ParameterTypeConverter} to convert each cell value to the appropriate type
      * based on the method parameter's declared type.
      * <p>
-     * If the row has one additional cell compared to the number of parameters, the first cell becomes
-     * the name of the argument set.
+     * If the row has one additional cell compared to the number of parameters, the first cell is
+     * assumed to be the name of the argument set.
      *
      * @param row        The row of data from the table
      * @param parameters The method parameters defining the expected types
-     * @return An Arguments instance containing the converted values
+     * @return An Stream of Arguments containing the converted values
      */
-    private static Arguments toArguments(Row row, Parameter[] parameters) {
-        boolean hasScenarioColumn = row.cellCount() == (parameters.length + 1);
+    private static Stream<? extends Arguments> toArguments(Row row, Parameter[] parameters) {
+        Optional<String> scenarioName = getScenarioName(row, parameters);
 
-        Object[] arguments = row
-            .skipFirstIf(hasScenarioColumn)
+        List<Object> convertedValues = row
+            .skipFirstIf(scenarioName.isPresent())
             .mapIndexed((index, cell) -> convertValue(cell, parameters[index]))
-            .toArray();
+            .collect(Collectors.toList());
 
-        return hasScenarioColumn
-               ? Arguments.argumentSet(row.cell(0).toString(), arguments)
-               : Arguments.of(arguments);
+        return generateValueCombinations(convertedValues, parameters, 0)
+            .map(values ->
+                     scenarioName.isPresent()
+                     ? Arguments.argumentSet(scenarioName.get(), values.toArray())
+                     : Arguments.of(values.toArray())
+            );
     }
+
+    /**
+     * Returns the name of the scenario for the specified row, if present.
+     * <p>
+     * If the row has one additional cell compared to the number of parameters, the first cell is
+     * assumed to be the name of the argument set.
+     *
+     * @param row row of data from the table
+     * @param parameters test method parameters
+     */
+    private static Optional<String> getScenarioName(Row row, Parameter[] parameters) {
+        return isFirstColumnScenarioName(row, parameters)
+               ? Optional.of(row.cell(0).toString())
+               : Optional.empty();
+    }
+
+    private static boolean isFirstColumnScenarioName(Row row, Parameter[] parameters) {
+        return row.cellCount() == (parameters.length + 1);
+    }
+
+    /**
+     * Recursively generates all combinations of values by expanding sets that are not
+     * declared a Set type in the test method parameter.
+     *
+     * @param arguments  values from the row
+     * @param parameters test method parameters
+     * @param position   position to be processed next
+     * @return Stream of all possible value combinations
+     */
+    private static Stream<List<?>> generateValueCombinations(
+        List<?> arguments,
+        Parameter[] parameters,
+        int position
+    ) {
+        if (position >= arguments.size()) {
+            return Stream.of(new ArrayList<>(arguments));
+        }
+
+        Object currentArgument = arguments.get(position);
+        Class<?> currentParameterType = parameters[position].getType();
+        return isToBeExpanded(currentArgument, currentParameterType)
+               ? ((Set<?>) currentArgument).stream()
+                   .flatMap(value ->
+                                generateValueCombinations(
+                                    argumentsWithValueAtPosition(arguments, value, position),
+                                    parameters, position + 1
+                                ))
+               : generateValueCombinations(arguments, parameters, position + 1);
+
+    }
+
+    /**
+     * Returns true if the provided value should be expanded into multiple arguments.
+     * <p>
+     * This is decided if the provided value is a Set and the corresponding test method
+     * parameter is not of type Set.
+     *
+     * @param currentArgument value to consider for be expansion
+     * @param currentParameterType type of the corresponding test method parameter
+     */
+    private static boolean isToBeExpanded(Object currentArgument, Class<?> currentParameterType) {
+        return currentArgument instanceof Set<?> && !currentParameterType.isAssignableFrom(Set.class);
+    }
+
+    /**
+     * Returns a new list with the value at the specified position replaced with the provided value.
+     *
+     * @param arguments list of values
+     * @param value     value to replace the existing value at the specified position
+     * @param pos       position of the value to replace
+     * @return new list with the provided value in the specified position
+     */
+    private static List<?> argumentsWithValueAtPosition(List<?> arguments, Object value, int pos) {
+        List<Object> newValues = new ArrayList<>(arguments);
+        newValues.set(pos, value);
+        return newValues;
+    }
+
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.params.converter.ConvertWith;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -112,13 +113,22 @@ public class TableTestTest {
     }
 
     @TableTest("""
-    Scenario     | a | b
-    Zero is zero | 0 | 0
-    One is two   | 1 | 2
-    Two is four  | 2 | 4
-    """)
+        Scenario     | a | b
+        Zero is zero | 0 | 0
+        One is two   | 1 | 2
+        Two is four  | 2 | 4
+        """)
     void testScenarioName(int a, int b) {
         assertEquals(b, 2 * a);
+    }
+
+    @TableTest("""
+        Scenario                      | a                | b | c | d         | e
+        Anything multiplied by 0 is 0 | {-1, 0, 1, 1000} | 0 | 0 | {1, 2, 3} | 3
+        """)
+    void testSetOfApplicableValues(int a, int b, int c, Set<Integer> d, int e) {
+        assertEquals(c, a * b);
+        assertEquals(e, d.size());
     }
 
     @TableTest("""

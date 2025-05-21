@@ -20,6 +20,7 @@ import org.junit.jupiter.params.converter.DefaultArgumentConverter;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.github.nchaugen.tabletest.junit.ParameterUtil.contextOf;
@@ -71,6 +72,7 @@ public class ParameterTypeConverter {
     ) {
         return switch (value) {
             case List<?> list -> convertList(list, nestedTypes.skipNext(), parameter);
+            case Set<?> set -> convertSet(set, nestedTypes.skipNext(), parameter);
             case Map<?, ?> map -> convertMap(map, nestedTypes.skipNext(), parameter);
             default -> convertSingleValue(value, nestedTypes, parameter);
         };
@@ -108,6 +110,16 @@ public class ParameterTypeConverter {
         return list.stream()
             .map(it -> convertValue(it, nestedTypes, parameter))
             .collect(Collectors.toList());
+    }
+
+    private static Set<?> convertSet(
+        Set<?> set,
+        NestedTypes nestedTypes,
+        Parameter parameter
+    ) {
+        return set.stream()
+            .map(it -> convertValue(it, nestedTypes, parameter))
+            .collect(Collectors.toSet());
     }
 
     /**

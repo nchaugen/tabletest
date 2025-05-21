@@ -3,6 +3,8 @@
 ## [Unreleased]
 ### Added
 - Support for the first column being a scenario name
+- Support for set values in tables
+- Support for expanding set values to one test per value
 
 ## [0.2.0]
 ### Added

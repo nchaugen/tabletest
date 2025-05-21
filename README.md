@@ -69,6 +69,25 @@ void testList(List<Object> list, int expectedSize) {
 }
 ```
 
+### Set Value Format
+
+Sets are enclosed in curly braces with comma-separated elements. Sets can contain single values or compound values (nested lists/sets/maps). Empty sets are represented by `{}`.
+
+```java
+@TableTest("""
+    Set              | Size?
+    {Hello, World}   | 2
+    {Hello, Hello}   | 1
+    {'|', "|", abc}  | 2
+    {[1, 2], [1, 2]} | 1
+    {[a: 4], [a: 4]} | 1
+    {}               | 0
+    """)
+void testSet(Set<Object> set, int expectedSize) {
+    assertEquals(expectedSize, set.size());
+}
+```
+
 ### Map Value Format
 
 Maps use square brackets with comma-separated key-value pairs. Keys and values are separated by colons. Keys must be unquoted single values, while values can be single or compound. Empty maps are represented by `[:]`.
@@ -116,6 +135,23 @@ void testNestedParameterizedTypes(
 
 JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit) or [argument aggregation](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-aggregation) can be used for conversions not supported by implicit conversion.
 
+### Expanding Set Values
+
+TableTest will expand rows with set values that are not declared to be sets in the test method parameters. This means that the row will be tested multiple times, one time for each value in the set. If multiple cells contain set values to be expanded, all combinations of values will be tested. 
+
+Be careful with excessive use of expanding sets in the same table, as the number of value combinations can quickly explode and cause long run times.
+
+In the example below, the test method will be executed four times, with parameter `a` taking the values -1, 0, 1, and 1000 respectively. Parameter `d` will take the value `Set.of(1, 2, 3)` each time.
+```java
+@TableTest("""
+    Scenario                      | a                | b | c | d         | e
+    Anything multiplied by 0 is 0 | {-1, 0, 1, 1000} | 0 | 0 | {1, 2, 3} | 3
+    """)
+void testSetOfApplicableValues(int a, int b, int c, Set<Integer> d, int e) {
+    assertEquals(c, a * b);
+    assertEquals(e, d.size());
+}
+```
 
 ### Comments and Blank Lines
 
