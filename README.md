@@ -4,11 +4,27 @@ TableTest offers extensions to JVM-based test frameworks for data-driven testing
 
 Currently, JUnit 5 is the only supported test framework.
 
+## Quick Start
+
+Add the dependency, then create your first table test:
+
+```java
+@TableTest("""
+    Input | Expected
+    1     | "one"
+    2     | "two"
+    3     | "three"
+    """)
+void testNumberToWord(int number, String word) {
+    assertEquals(word, NumberConverter.toWord(number));
+}
+```
+
 ## Usage
 
 TableTest-style test methods are declared using the `@TableTest` annotation, either supplying a table of data as a multi-line string or as an external resource. `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
 
-There must be a test method parameter for each table column. Columns map to parameters purly based on order (first column maps to first parameter, second to second. etc.), thus the column header and the name of the parameter are allowed to differ.
+There must be a test method parameter for each table column. Columns map to parameters based strictly on order (first column maps to first parameter, second column to second parameter, etc.). The column header names and parameter names can be different, but keeping them aligned improves readability.
 
 ### Table Format
 
@@ -107,9 +123,14 @@ void testMap(Map<String, Object> map, int expectedSize) {
 
 ### Argument Conversion
 
-TableTest automatically converts table values to match declared parameter types during test execution. It leverages [JUnit Jupiter's built-in implicit type converters](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion).
+TableTest automatically converts table values to match declared parameter types during test execution. It leverages [JUnit Jupiter's built-in implicit type converters](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion) to do this.
 
-List elements and map values benefit from implicit conversion to match parameterized types. Map keys remain as a String type and are not converted.
+For example:
+- String `"42"` converts to `int`, `long`, or Integer value `42`
+- String `"true"` converts to `boolean` or `Boolean` value `true`
+- String `"2024-01-15"` converts to `LocalDate` for January 15, 2024 
+
+List elements and map values benefit from implicit conversion to match parameterized types. For example, `[1, 2, 3]` becomes `List<Integer>` when the parameter is declared as such. Map keys remain as a String type and are not converted.
 
 Without parameter type information or for unsupported conversion types, single values default to the String type.
 
@@ -171,7 +192,7 @@ void testEvenOddSums(int x, int y, boolean expectedResult) {
 
 Use expandable sets judiciously. The number of test cases grows multiplicatively with each additional set (two sets of size 10 generate 100 test cases), which can significantly increase test execution time.
 
-Sets are only expanded when the parameter type doesn't match `Set<\?>`. When the parameter is declared as a set type, the entire set is passed as a single argument: 
+Sets are only expanded when the parameter type doesn't match `Set<?>`. When the parameter is declared as a set type, the entire set is passed as a single argument: 
 
 ```java
 @TableTest("""
@@ -184,7 +205,6 @@ void testSetParameter(Set<String> values, int expectedSize) {
     assertEquals(expectedSize, values.size());
 }
 ```
-
 
 ### Comments and Blank Lines
 
@@ -242,7 +262,7 @@ Add `tabletest-junit` and `junit-jupiter` as test scope dependencies in your `po
         <dependency>
             <groupId>io.github.nchaugen.tabletest</groupId>
             <artifactId>tabletest-junit</artifactId>
-            <version>0.1.0</version>
+            <version>0.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -260,7 +280,7 @@ Add `tabletest-junit` and `junit-jupiter` as testImplementation dependencies in 
 
 ```groovy
 dependencies {
-    testImplementation 'io.github.nchaugen.tabletest:tabletest-junit:0.1.0'    
+    testImplementation 'io.github.nchaugen.tabletest:tabletest-junit:0.2.0'    
     testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
