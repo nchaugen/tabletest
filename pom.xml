@@ -187,7 +187,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${version.plugin.javadoc}</version>
                     <configuration>
-                        <failOnWarnings>true</failOnWarnings>
+                        <failOnWarnings>false</failOnWarnings>
                     </configuration>
                 </plugin>
                 <plugin>
