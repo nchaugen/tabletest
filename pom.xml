@@ -4,7 +4,7 @@
 
     <groupId>io.github.nchaugen</groupId>
     <artifactId>tabletest</artifactId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2025</inceptionYear>
