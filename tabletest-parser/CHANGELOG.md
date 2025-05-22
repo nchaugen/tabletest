@@ -1,6 +1,8 @@
 # TableTest-Parser Changelog
 
 ## [Unreleased]
+
+## [0.2.0] - 2025-05-22
 - Support conditionally skip first column in row
 - Support for sets with comma-separated elements
 
