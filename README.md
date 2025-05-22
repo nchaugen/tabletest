@@ -137,21 +137,54 @@ JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12
 
 ### Expanding Set Values
 
-TableTest will expand rows with set values that are not declared to be sets in the test method parameters. This means that the row will be tested multiple times, one time for each value in the set. If multiple cells contain set values to be expanded, all combinations of values will be tested. 
+TableTest automatically expands rows containing set values into multiple test invocations when the corresponding parameter isn't declared as a `Set` type. Each value in the set becomes a separate test case, maintaining all other parameter values.
 
-Be careful with excessive use of expanding sets in the same table, as the number of value combinations can quickly explode and cause long run times.
+In this example, the test method is run 12 times, three times for each row, once for each value in the set in column `Example years`.
 
-In the example below, the test method will be executed four times, with parameter `a` taking the values -1, 0, 1, and 1000 respectively. Parameter `d` will take the value `Set.of(1, 2, 3)` each time.
 ```java
 @TableTest("""
-    Scenario                      | a                | b | c | d         | e
-    Anything multiplied by 0 is 0 | {-1, 0, 1, 1000} | 0 | 0 | {1, 2, 3} | 3
+    Scenario                              | Example years      | Is leap year?
+    Years not divisible by 4              | {2001, 2002, 2003} | false
+    Years divisible by 4                  | {2004, 2008, 2012} | true
+    Years divisible by 100 but not by 400 | {2100, 2200, 2300} | false
+    Years divisible by 400                | {2000, 2400, 2800} | true
     """)
-void testSetOfApplicableValues(int a, int b, int c, Set<Integer> d, int e) {
-    assertEquals(c, a * b);
-    assertEquals(e, d.size());
+public void testLeapYear(Year year, boolean expectedResult) {
+    assertEquals(expectedResult, year.isLeap(), "Year " + year);
 }
 ```
+Set expansion works with scenario names and preserves the original scenario name for all generated test invocations.
+
+When multiple cells in the same row contain expandable sets, TableTest performs a cartesian product, generating test cases for all possible combinations of values. This powerful feature enables testing multiple scenarios without redundant table entries.
+
+```java
+@TableTest("""
+    Scenario       | x         | y       | even sum?
+    Even plus even | {2, 4, 6} | {8, 10} | true
+    Odd plus even  | {1, 3, 5} | {6, 8}  | false
+    """)
+void testEvenOddSums(int x, int y, boolean expectedResult) {
+    boolean isEvenSum = (x + y) % 2 == 0;
+    assertEquals(expectedResult, isEvenSum);
+}
+```
+
+Use expandable sets judiciously. The number of test cases grows multiplicatively with each additional set (two sets of size 10 generate 100 test cases), which can significantly increase test execution time.
+
+Sets are only expanded when the parameter type doesn't match `Set<\?>`. When the parameter is declared as a set type, the entire set is passed as a single argument: 
+
+```java
+@TableTest("""
+    Values       | Size?
+    {1, 2, 3}    | 3
+    {a, b, c, d} | 4
+    {}           | 0
+    """)
+void testSetParameter(Set<String> values, int expectedSize) {
+    assertEquals(expectedSize, values.size());
+}
+```
+
 
 ### Comments and Blank Lines
 

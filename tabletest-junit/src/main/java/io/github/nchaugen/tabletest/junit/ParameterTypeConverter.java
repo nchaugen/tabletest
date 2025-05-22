@@ -112,6 +112,15 @@ public class ParameterTypeConverter {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Converts each element in a set to the appropriate type based on the parameter's
+     * generic type information.
+     *
+     * @param set The parsed set containing values to convert
+     * @param nestedTypes Information about nested types for set elements
+     * @param parameter The original method parameter providing context
+     * @return A new set with converted elements
+     */
     private static Set<?> convertSet(
         Set<?> set,
         NestedTypes nestedTypes,

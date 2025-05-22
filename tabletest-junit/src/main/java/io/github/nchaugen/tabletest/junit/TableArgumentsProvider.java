@@ -203,6 +203,15 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
                : Optional.empty();
     }
 
+    /**
+     * Returns true if the first cell of the row is the name of the scenario.
+     * <p>
+     * This is the case if the row has one additional cell compared to the number of parameters.
+     *
+     * @param row row of data from the table
+     * @param parameters test method parameters
+     * @return true if the first cell of the row is the name of the scenario
+     */
     private static boolean isFirstColumnScenarioName(Row row, Parameter[] parameters) {
         return row.cellCount() == (parameters.length + 1);
     }

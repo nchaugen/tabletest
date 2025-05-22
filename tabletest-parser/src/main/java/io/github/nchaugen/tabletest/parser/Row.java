@@ -36,6 +36,12 @@ public record Row(List<Object> cells) {
         return !cells.isEmpty() ? cells.size() : 0;
     }
 
+    /**
+     * Conditionally removes the first cell in the row returned.
+     *
+     * @param test boolean condition to test
+     * @return new row with first cell removed if test is true, otherwise this row is returned.
+     */
     public Row skipFirstIf(boolean test) {
        return test ? new Row(cells.stream().skip(1).toList()) : this;
     }
