@@ -156,6 +156,27 @@ void testNestedParameterizedTypes(
 
 JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit) or [argument aggregation](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-aggregation) can be used for conversions not supported by implicit conversion.
 
+
+### Scenario Names
+
+TableTest supports descriptive scenario names for test cases, making test output more readable and failures easier to diagnose. For scenario naming, add one extra column at the beginning of your table. This column's values will be used as test case names and won't be mapped to any method parameters.
+
+```java
+@TableTest("""
+    Scenario                              | Year | Is leap year?
+    Years not divisible by 4              | 2001 | false
+    Years divisible by 4                  | 2004 | true
+    Years divisible by 100 but not by 400 | 2100 | false
+    Years divisible by 400                | 2000 | true
+    """)
+public void testLeapYear(Year year, boolean expectedResult) {
+    assertEquals(expectedResult, year.isLeap(), "Year " + year);
+}
+```
+
+In test reports, each test case will be identified by its scenario name rather than the default parameter values, improving test readability. Scenario names do not affect the test execution logic.
+
+
 ### Expanding Set Values
 
 TableTest automatically expands rows containing set values into multiple test invocations when the corresponding parameter isn't declared as a `Set` type. Each value in the set becomes a separate test case, maintaining all other parameter values.
@@ -174,7 +195,7 @@ public void testLeapYear(Year year, boolean expectedResult) {
     assertEquals(expectedResult, year.isLeap(), "Year " + year);
 }
 ```
-Set expansion works with scenario names and preserves the original scenario name for all generated test invocations.
+Set expansion works with scenario names and preserves the original scenario name for all generated test invocations. This allows grouping related test cases under a descriptive heading while still testing multiple values.
 
 When multiple cells in the same row contain expandable sets, TableTest performs a cartesian product, generating test cases for all possible combinations of values. This powerful feature enables testing multiple scenarios without redundant table entries.
 
