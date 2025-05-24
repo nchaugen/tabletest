@@ -2,9 +2,24 @@
 
 TableTest is an extension to JUnit 5 for data-driven testing. It allows you to concisely express how the system is expected to behave using multiple concrete examples.  
 
-Variation in behaviour is specified in a concise table format, one row for each example. This reduces the amount of test code and makes it easier to understand, extend and maintain your tests.
+Variation in behaviour is specified in a concise table format, one row for each example. This reduces the amount of test code and makes it easier to understand, extend, and maintain your tests.
 
 Acting as a parameterized test, a TableTest will run the test method multiple times with the values of each table row provided as arguments. Values are automatically converted to the type of the test method parameter.
+
+**Requirements**: TableTest requires Java 21 or higher and JUnit Jupiter 5.11.0 or higher.
+
+**IDE Support**: The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for tables.
+
+**Latest Updates**: See the [changelog](https://github.com/nchaugen/tabletest/blob/main/CHANGELOG.md) for details on recent releases and changes.
+
+## Why TableTest?
+
+TableTest makes your tests more:
+- **Readable**: Structured tables clearly show inputs and expected outputs
+- **Maintainable**: Add or modify test cases by simply adding or changing table rows
+- **Concise**: Eliminate repetitive test code while increasing test coverage
+- **Self-documenting**: Tables serve as built-in documentation of expected system behaviour
+- **Collaborative**: Non-technical stakeholders can understand and contribute to test cases
 
 ## Quick Start
 
@@ -22,15 +37,30 @@ void testNumberToWord(int number, String word) {
 }
 ```
 
+## Table of Contents
+- [Why TableTest?](#why-tabletest)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+    - [Single Values](#single-values)
+    - [List Values](#list-values)
+    - [Set Values](#set-values)
+    - [Map Values](#map-values)
+    - [Nested Values](#nested-values)
+    - [Explicit Argument Conversion](#explicit-argument-conversion)
+    - [Scenario Names](#scenario-names)
+    - [Expanding Set Values](#expanding-set-values)
+    - [Comments and Blank Lines](#comments-and-blank-lines)
+    - [Table in External File](#table-in-external-file)
+
+- [Installation](#installation)
+    - [Using TableTest with older versions of JUnit Jupiter](#using-tabletest-with-older-versions-of-junit-jupiter)
+
+- [IDE Support](#ide-support)
+- [License](#license)
+
 ## Usage
 
 TableTest-style test methods are declared using the `@TableTest` annotation. The annotation accepts a table of data as a multi-line string or as an external resource. 
-
-Tables use pipe characters (`|`) to separate columns. The first line contains header descriptions, and the following lines represent variations of arguments to the test method. Optionally, the first column may contain a [scenario name](#scenario-names) describing the situation being exemplified by each row.
-
-Column values can be [single values](#single-value-format), [lists](#list-value-format), [sets](#set-value-format), or [maps](#map-value-format).
-
-There must be a test method parameter for each value column (scenario name column excluded). Columns map to parameters based strictly on order (first value column maps to first parameter, second value column to second parameter, etc.). The column header names and parameter names can be different, but keeping them aligned improves readability. Values are [automatically converted](#argument-conversion) to the type of the corresponding test parameter.
 
 ```java
 @TableTest("""
@@ -45,10 +75,16 @@ public void leapYearCalculation(Year year, boolean expectedResult) {
 }
 ```
 
+Tables use pipe characters (`|`) to separate columns. The first line contains header descriptions, and the following lines represent variations of arguments to the test method. Optionally, the first column may contain a [scenario name](#scenario-names) describing the situation being exemplified by each row.
+
+Column values can be [single values](#single-values), [lists](#list-values), [sets](#set-values), or [maps](#map-values).
+
+There must be a test method parameter for each value column (scenario name column excluded). Columns map to parameters based strictly on order, so the first value column maps to the first parameter, the second value column to the second parameter, etc. The column header names and parameter names can be different, but keeping them aligned improves readability. Values are automatically converted to the type of the corresponding test parameter.
+
 Technically `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
 
 
-### Single-Value Format
+### Single Values
 
 Single values can appear with or without quotes. Unquoted values must not contain `[`, `|`, `,`, or `:` characters. These special characters require single or double quotes.
 
@@ -60,82 +96,91 @@ Whitespace around unquoted values is trimmed. To preserve leading or trailing wh
     Value          | Length?
     Hello world    | 11
     "World, hello" | 12
-    '|'            | 1
-    ""             | 0
+    "|"            | 1
+    ''             | 0
     """)
 void testString(String value, int expectedLength) {
     assertEquals(expectedLength, value.length());
 }
 ```
 
-### List Value Format
-
-Lists are enclosed in square brackets with comma-separated elements. Lists can contain single values or compound values (nested lists/maps). Empty lists are represented by `[]`.
-
-```java
-
-@TableTest("""
-    List             | Size?
-    [Hello, World]   | 2
-    ["World, Hello"] | 1
-    ['|', ",", abc]  | 3
-    [[1, 2], [3, 4]] | 2
-    [[a: 4], [b: 5]] | 2
-    []               | 0
-    """)
-void testList(List<Object> list, int expectedSize) {
-    assertEquals(expectedSize, list.size());
-}
-```
-
-### Set Value Format
-
-Sets are enclosed in curly braces with comma-separated elements. Sets can contain single values or compound values (nested lists/sets/maps). Empty sets are represented by `{}`.
-
-```java
-@TableTest("""
-    Set              | Size?
-    {Hello, World}   | 2
-    {Hello, Hello}   | 1
-    {'|', "|", abc}  | 2
-    {[1, 2], [1, 2]} | 1
-    {[a: 4], [a: 4]} | 1
-    {}               | 0
-    """)
-void testSet(Set<Object> set, int expectedSize) {
-    assertEquals(expectedSize, set.size());
-}
-```
-
-### Map Value Format
-
-Maps use square brackets with comma-separated key-value pairs. Keys and values are separated by colons. Keys must be unquoted single values, while values can be single or compound. Empty maps are represented by `[:]`.
-
-```java
-
-@TableTest("""
-    Map                                      | Size?
-    [1: Hello, 2: World]                     | 2
-    [string: abc, list: [1, 2], map: [a: 4]] | 3
-    [:]                                      | 0
-    """)
-void testMap(Map<String, Object> map, int expectedSize) {
-    assertEquals(expectedSize, map.size());
-}
-```
-
-### Argument Conversion
-
-TableTest automatically converts table values to match declared parameter types during test execution. It leverages [JUnit Jupiter's built-in implicit type converters](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion) to do this.
+TableTest leverages [JUnit Jupiter's built-in implicit type converters](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion) for automatic conversion of single values to various types.
 
 For example:
 - String `"42"` converts to `int`, `long`, or Integer value `42`
 - String `"true"` converts to `boolean` or `Boolean` value `true`
-- String `"2024-01-15"` converts to `LocalDate` for January 15, 2024 
+- String `"2024-01-15"` converts to `LocalDate` for January 15, 2024
 
-List elements and map values benefit from implicit conversion to match parameterized types. For example, `[1, 2, 3]` becomes `List<Integer>` when the parameter is declared as such. Map keys remain as a String type and are not converted.
+```java
+@TableTest("""
+    Number | Text | Date       | Class
+    1      | abc  | 2025-01-20 | java.lang.Integer
+    """)
+void singleValues(short number, String text, LocalDate date, Class<?> type) {
+    // test implementation
+}
+```
 
-Without parameter type information or for unsupported conversion types, single values default to the String type.
+### List Values
+
+Lists are enclosed in square brackets with comma-separated elements. Lists can contain single values or compound values (nested lists/maps). Empty lists are represented by `[]`.
+
+List elements benefit from implicit conversion to match parameterized types. For example, `[1, 2, 3]` becomes `List<Integer>` when the parameter is declared as such.
+
+Without parameter type information, single values default to the String type.
+
+```java
+@TableTest("""
+    List      | size? | sum?
+    []        | 0     | 0
+    [1]       | 1     | 1
+    [3, 2, 1] | 3     | 6
+    """)
+void integerList(List<Integer> list, int expectedSize, int expectedSum) {
+  assertEquals(expectedSize, list.size());
+  assertEquals(expectedSum, list.stream().mapToInt(Integer::intValue).sum());
+}
+```
+
+### Set Values
+
+Sets are enclosed in curly braces with comma-separated elements. Sets can contain single values or compound values (nested lists/sets/maps). Empty sets are represented by `{}`.
+
+Like lists, sets also benefit from implicit conversion to match parameterized types. Without parameter type information, single values default to the String type.
+
+```java
+@TableTest("""
+    Set              | Size?
+    {1, 2, 3, 2, 1}  | 3
+    {Hello, Hello}   | 1
+    {}               | 0
+    """)
+void testSet(Set<String> set, int expectedSize) {
+    assertEquals(expectedSize, set.size());
+}
+```
+
+### Map Values
+
+Maps use square brackets with comma-separated key-value pairs. Keys and values are separated by colons. Keys must be unquoted single values, while values can be single or compound. Empty maps are represented by `[:]`.
+
+Map values benefit from implicit conversion to match parameterized types. Map keys remain as a String type and are not converted.
+
+```java
+
+@TableTest("""
+    Map                        | Size?
+    [one: 1, two: 2, three: 3] | 2
+    [:]                        | 0
+    """)
+void testMap(Map<String, Integer> map, int expectedSize) {
+    assertEquals(expectedSize, map.size());
+}
+```
+
+### Nested Values
+
+TableTest supports conversion of nested compound types (lists, sets, maps). Nested values also benefit from implicit conversion to match parameterized types.
 
 ```java
 @TableTest("""
@@ -157,8 +202,50 @@ void testNestedParameterizedTypes(
 }
 ```
 
-JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit) or [argument aggregation](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-aggregation) can be used for conversions not supported by implicit conversion.
+### Explicit Argument Conversion
 
+In addition to automatic type conversion, TableTest supports JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit) or [argument aggregation](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-aggregation). This can be used for conversion to custom types not supported by implicit conversion.
+
+```java
+@TableTest("""
+    Person                 | AgeCategory?
+    [name: Fred, age: 22]  | ADULT
+    [name: Wilma, age: 19] | TEEN
+    """)
+void testExplicitConversion(@ConvertWith(PersonConverter.class) Person person, AgeCategory expectedAgeCategory) {
+    assertEquals(expectedAgeCategory, person.ageCategory());
+}
+
+record Person(String firstName, String lastName, int age) {
+    AgeCategory ageCategory() {
+        return AgeCategory.of(age);
+    }
+}
+
+enum AgeCategory {
+    CHILD, TEEN, ADULT;
+
+    static AgeCategory of(int age) {
+        if (age < 13) return AgeCategory.CHILD;
+        if (age < 20) return AgeCategory.TEEN;
+        return AgeCategory.ADULT;
+    }
+}
+
+private static class PersonConverter implements ArgumentConverter {
+    @Override
+    public Object convert(Object source, ParameterContext context) throws ArgumentConversionException {
+        if (source instanceof Map attributes) {
+            return new Person(
+                (String) attributes.getOrDefault("name", "Fred"),
+                "Flintstone",
+                Integer.parseInt((String) attributes.getOrDefault("age", "16"))
+            );
+        }
+        throw new ArgumentConversionException("Cannot convert " + source.getClass().getSimpleName() + " to Person");
+    }
+}
+```
 
 ### Scenario Names
 
