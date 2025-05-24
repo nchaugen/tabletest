@@ -45,19 +45,6 @@ public void leapYearCalculation(Year year, boolean expectedResult) {
 }
 ```
 
-```java
-
-@TableTest("""
-    Augend | Addend | Sum?
-    2      | 3      | 5
-    0      | 0      | 0
-    1      | 1      | 2
-    """)
-void testAddition(int augend, int addend, int sum) {
-    assertEquals(sum, augend + addend);
-}
-```
-
 Technically `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
 
 
