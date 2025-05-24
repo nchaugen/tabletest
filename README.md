@@ -1,12 +1,14 @@
 # TableTest
 
-TableTest offers extensions to JVM-based test frameworks for data-driven testing using a table format. It allows you to define test data for multiple test scenarios in a readable table format, making it easier to understand, extend and maintain your tests.
+TableTest is an extension to JUnit 5 for data-driven testing. It allows you to concisely express how the system is expected to behave using multiple concrete examples.  
 
-Currently, JUnit 5 is the only supported test framework.
+Variation in behaviour is specified in a concise table format, one row for each example. This reduces the amount of test code and makes it easier to understand, extend and maintain your tests.
+
+Acting as a parameterized test, a TableTest will run the test method multiple times with the values of each table row provided as arguments. Values are automatically converted to the type of the test method parameter.
 
 ## Quick Start
 
-Add the dependency, then create your first table test:
+[Add the dependency](#installation), then create your first table test:
 
 ```java
 @TableTest("""
@@ -22,13 +24,26 @@ void testNumberToWord(int number, String word) {
 
 ## Usage
 
-TableTest-style test methods are declared using the `@TableTest` annotation, either supplying a table of data as a multi-line string or as an external resource. `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
+TableTest-style test methods are declared using the `@TableTest` annotation. The annotation accepts a table of data as a multi-line string or as an external resource. 
 
-There must be a test method parameter for each table column. Columns map to parameters based strictly on order (first column maps to first parameter, second column to second parameter, etc.). The column header names and parameter names can be different, but keeping them aligned improves readability.
+Tables use pipe characters (`|`) to separate columns. The first line contains header descriptions, and the following lines represent variations of arguments to the test method. Optionally, the first column may contain a [scenario name](#scenario-names) describing the situation being exemplified by each row.
 
-### Table Format
+Column values can be [single values](#single-value-format), [lists](#list-value-format), [sets](#set-value-format), or [maps](#map-value-format).
 
-Tables use pipe characters (`|`) to separate columns. The first line contains header descriptions, and subsequent lines represent individual test cases whose values are passed as arguments to the test method.
+There must be a test method parameter for each value column (scenario name column excluded). Columns map to parameters based strictly on order (first value column maps to first parameter, second value column to second parameter, etc.). The column header names and parameter names can be different, but keeping them aligned improves readability. Values are [automatically converted](#argument-conversion) to the type of the corresponding test parameter.
+
+```java
+@TableTest("""
+    Scenario                              | Year | Is leap year?
+    Years not divisible by 4              | 2001 | false
+    Years divisible by 4                  | 2004 | true
+    Years divisible by 100 but not by 400 | 2100 | false
+    Years divisible by 400                | 2000 | true
+    """)
+public void leapYearCalculation(Year year, boolean expectedResult) {
+    assertEquals(expectedResult, year.isLeap(), "Year " + year);
+}
+```
 
 ```java
 
@@ -43,7 +58,8 @@ void testAddition(int augend, int addend, int sum) {
 }
 ```
 
-Column values can be **single values**, **lists**, or **maps**.
+Technically `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
+
 
 ### Single-Value Format
 
@@ -159,7 +175,7 @@ JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12
 
 ### Scenario Names
 
-TableTest supports descriptive scenario names for test cases, making test output more readable and failures easier to diagnose. For scenario naming, add one extra column at the beginning of your table. This column's values will be used as test case names and won't be mapped to any method parameters.
+TableTest supports providing a scenario name describing the situation being exemplified by each row. This makes the tests easier to understand and failures easier to diagnose. For scenario naming, add one extra column at the beginning of your table. This column's values will be used as test case names and won't be mapped to any method parameters.
 
 ```java
 @TableTest("""
