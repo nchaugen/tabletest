@@ -10,7 +10,7 @@ Acting as a parameterized test, a TableTest will run the test method multiple ti
 
 **IDE Support**: The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for tables.
 
-**Latest Updates**: See the [changelog](https://github.com/nchaugen/tabletest/blob/main/CHANGELOG.md) for details on recent releases and changes.
+**Latest Updates**: See the [changelog](https://github.com/nchaugen/tabletest/blob/main/tabletest-junit/CHANGELOG.md) for details on recent releases and changes.
 
 ## Why TableTest?
 
