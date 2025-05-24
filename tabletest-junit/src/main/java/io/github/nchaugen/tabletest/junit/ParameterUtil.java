@@ -15,19 +15,14 @@
  */
 package io.github.nchaugen.tabletest.junit;
 
-import org.junit.jupiter.api.extension.ParameterContext;
-
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
- * Utility class providing helper methods for working with Java reflection Parameter objects
- * in the context of JUnit test parameters.
+ * Utility class providing helper methods for parameter conversion.
  * <ul>
- *   <li>Create JUnit ParameterContext objects from Java reflection Parameter instances</li>
  *   <li>Extract type information from complex generic parameter types</li>
  *   <li>Handle primitive-to-wrapper type conversions</li>
  * </ul>
@@ -37,35 +32,7 @@ import java.util.Optional;
  */
 public class ParameterUtil {
 
-    private ParameterUtil() {}
-
-    /**
-     * Creates a JUnit ParameterContext from a Java reflection Parameter.
-     * <p>
-     * This method creates a minimal implementation of the ParameterContext interface
-     * that wraps the given parameter. The resulting context can be used with JUnit's
-     * ArgumentConverter implementations.
-     *
-     * @param parameter The Java reflection Parameter to wrap in a ParameterContext
-     * @return A new ParameterContext instance wrapping the given parameter
-     */
-    public static ParameterContext contextOf(Parameter parameter) {
-        return new ParameterContext() {
-            @Override
-            public Parameter getParameter() {
-                return parameter;
-            }
-
-            @Override
-            public int getIndex() {
-                return 0;
-            }
-
-            @Override
-            public Optional<Object> getTarget() {
-                return Optional.empty();
-            }
-        };
+    private ParameterUtil() {
     }
 
     /**

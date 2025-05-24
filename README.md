@@ -271,54 +271,117 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 
 ## Installation
 
-To use TableTest with JUnit 5, add `tabletest-junit` as a test scope dependency alongside `junit-jupiter`.
+TableTest requires **Java version 21 or higher** and **JUnit Jupiter version 5.11.0 or higher**.
 
-`tabletest-junit` requires Java version 21 or higher. It includes `junit-jupiter-params` library version 5.12.2, so using the same version for `junit-jupiter` in your project is recommended.
+To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as a test scope dependency alongside `junit-jupiter`.
 
-### Maven
-Add `tabletest-junit` and `junit-jupiter` as test scope dependencies in your `pom.xml` file:
-
+#### Maven
 ```xml
-    <dependencies>
-        <dependency>
-            <groupId>io.github.nchaugen.tabletest</groupId>
-            <artifactId>tabletest-junit</artifactId>
-            <version>0.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.12.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+<dependencies>
+    <dependency>
+        <groupId>io.github.nchaugen</groupId>
+        <artifactId>tabletest-junit</artifactId>
+        <version>0.2.0</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.12.2</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
 ```
 
-### Gradle
-
-Add `tabletest-junit` and `junit-jupiter` as testImplementation dependencies in your `build.gradle` file:
-
+#### Gradle with Groovy DSL (build.gradle)
 ```groovy
 dependencies {
-    testImplementation 'io.github.nchaugen.tabletest:tabletest-junit:0.2.0'    
+    testImplementation 'io.github.nchaugen:tabletest-junit:0.2.0'    
     testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test', Test) {
     useJUnitPlatform()
+}
+```
+#### Gradle with Kotlin DSL (build.gradle.kts)
+```kotlin
+dependencies { 
+    testImplementation("io.github.nchaugen:tabletest-junit:0.2.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.12.2") 
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher") 
+}
 
-    maxHeapSize = '1G'
-
-    testLogging {
-        events "passed"
-    }
+tasks.named<Test>("test") {
+    useJUnitPlatform()
 }
 ```
 
-Please see the [Gradle docs](https://docs.gradle.org/current/userguide/java_testing.html) for more information on how to configure testing.
+### Using TableTest with older versions of JUnit Jupiter
 
+TableTest supports JUnit Jupiter versions 5.11.0 or higher. For projects using JUnit Jupiter versions prior to 5.12.2, you need to exclude the transitive dependencies to avoid conflicts.
+
+If you are using a version of JUnit Jupiter prior to 5.11.0 you need to upgrade to use TableTest.
+
+#### Maven
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>io.github.nchaugen</groupId>
+        <artifactId>tabletest-junit</artifactId>
+        <version>0.2.0</version>
+        <scope>test</scope>
+        <exclusions>
+            <exclusion>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-commons</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.11.0</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+```
+
+#### Gradle with Groovy DSL (build.gradle)
+```groovy
+dependencies { 
+    testImplementation('io.github.nchaugen:tabletest-junit:0.2.0') { 
+        exclude group: 'org.junit.jupiter', module: 'junit-jupiter-params' 
+        exclude group: 'org.junit.platform', module: 'junit-platform-commons' 
+    }
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0' 
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher' 
+}
+tasks.named('test', Test) { 
+    useJUnitPlatform() 
+}
+```
+
+#### Gradle with Kotlin DSL (build.gradle.kts)
+```kotlin
+dependencies { 
+    testImplementation("io.github.nchaugen:tabletest-junit:0.2.0") {
+        exclude(group = "org.junit.jupiter", module = "junit-jupiter-params") 
+        exclude(group = "org.junit.platform", module = "junit-platform-commons") 
+    } 
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0") 
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher") }
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+}
+```
 
 ## IDE Support
 

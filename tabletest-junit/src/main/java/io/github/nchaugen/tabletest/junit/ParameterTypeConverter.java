@@ -15,15 +15,13 @@
  */
 package io.github.nchaugen.tabletest.junit;
 
-import org.junit.jupiter.params.converter.DefaultArgumentConverter;
+import org.junit.platform.commons.support.conversion.ConversionSupport;
 
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static io.github.nchaugen.tabletest.junit.ParameterUtil.contextOf;
 
 /**
  * A utility class that handles conversion of parsed table values to the appropriate parameter types
@@ -42,13 +40,14 @@ import static io.github.nchaugen.tabletest.junit.ParameterUtil.contextOf;
  */
 public class ParameterTypeConverter {
 
-    private ParameterTypeConverter() {}
+    private ParameterTypeConverter() {
+    }
 
     /**
      * Converts a parsed TableFormat value to the appropriate parameter type. This method handles
      * various data structures and performs recursive conversion as needed.
      *
-     * @param value The value from parsed table data that needs to be converted
+     * @param value     The value from parsed table data that needs to be converted
      * @param parameter The method parameter that defines the target type
      * @return The converted value matching the parameter's expected type
      */
@@ -60,9 +59,9 @@ public class ParameterTypeConverter {
      * Recursively converts values based on their parsed type and the expected parameter type.
      * Handles Lists, Maps, and scalar values differently.
      *
-     * @param value The parsed value to convert
+     * @param value       The parsed value to convert
      * @param nestedTypes Information about the nested types in parameterized types
-     * @param parameter The original method parameter providing context
+     * @param parameter   The original method parameter providing context
      * @return The converted value
      */
     private static Object convertValue(
@@ -81,15 +80,14 @@ public class ParameterTypeConverter {
     /**
      * Converts a single scalar value using JUnit's DefaultArgumentConverter if needed.
      *
-     * @param value The parsed value to convert
+     * @param value       The parsed value to convert
      * @param nestedTypes Information about the nested types in parameterized types
-     * @param parameter The original method parameter providing context
+     * @param parameter   The original method parameter providing context
      * @return The converted scalar value
      */
-    @SuppressWarnings("DataFlowIssue")
     private static Object convertSingleValue(Object value, NestedTypes nestedTypes, Parameter parameter) {
         return nestedTypes.hasNext()
-               ? DefaultArgumentConverter.INSTANCE.convert(value, nestedTypes.next(), contextOf(parameter))
+               ? implicitConversion(value, nestedTypes.next(), parameter)
                : value;
     }
 
@@ -97,9 +95,9 @@ public class ParameterTypeConverter {
      * Converts each element in a list to the appropriate type based on the parameter's
      * generic type information.
      *
-     * @param list The parsed list containing values to convert
+     * @param list        The parsed list containing values to convert
      * @param nestedTypes Information about nested types for list elements
-     * @param parameter The original method parameter providing context
+     * @param parameter   The original method parameter providing context
      * @return A new list with converted elements
      */
     private static List<?> convertList(
@@ -116,9 +114,9 @@ public class ParameterTypeConverter {
      * Converts each element in a set to the appropriate type based on the parameter's
      * generic type information.
      *
-     * @param set The parsed set containing values to convert
+     * @param set         The parsed set containing values to convert
      * @param nestedTypes Information about nested types for set elements
-     * @param parameter The original method parameter providing context
+     * @param parameter   The original method parameter providing context
      * @return A new set with converted elements
      */
     private static Set<?> convertSet(
@@ -135,9 +133,9 @@ public class ParameterTypeConverter {
      * Converts each value in a map to the appropriate type based on the parameter's
      * generic type information (keys remain unchanged).
      *
-     * @param map The parsed map containing keys and values
+     * @param map         The parsed map containing keys and values
      * @param nestedTypes Information about nested types for map values
-     * @param parameter The original method parameter providing context
+     * @param parameter   The original method parameter providing context
      * @return A new map with converted values
      */
     private static Map<?, ?> convertMap(
@@ -155,6 +153,24 @@ public class ParameterTypeConverter {
                 )
             ))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private static Object implicitConversion(Object value, Class<?> targetType, Parameter parameter) {
+        if (value == null) {
+            if (targetType.isPrimitive()) {
+                throw new IllegalArgumentException(
+                    "Cannot convert null to primitive value of type " + targetType.getTypeName());
+            }
+            return null;
+        }
+
+        if (targetType.isAssignableFrom(value.getClass())) return value;
+
+        return ConversionSupport.convert(
+            value.toString(),
+            targetType,
+            parameter.getDeclaringExecutable().getClass().getClassLoader()
+        );
     }
 
     /**

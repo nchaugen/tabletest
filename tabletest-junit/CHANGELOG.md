@@ -1,6 +1,8 @@
 # TableTest-Junit Changelog
 
 ## [Unreleased]
+### Added
+- Compatibility with JUnit Jupiter versions 5.11.0 and higher
 
 ## [0.2.0] - 2025-05-22
 ### Added

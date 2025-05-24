@@ -2,7 +2,7 @@ package io.github.nchaugen.tabletest.junit;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.converter.ArgumentConversionException;
+import org.junit.platform.commons.support.conversion.ConversionException;
 
 import java.util.List;
 import java.util.Map;
@@ -84,7 +84,7 @@ class ParameterTypeConverterTest {
             Class<?> type
         ) {
             assertThrows(
-                ArgumentConversionException.class,
+                ConversionException.class,
                 () -> convertValue(value, ParameterFixture.parameter(type))
             );
         }
@@ -163,7 +163,7 @@ class ParameterTypeConverterTest {
                 "java.util.List<java.lang.Byte>", List.of("x")
             ).forEach((String typeName, List<?> parsedListValue) ->
                           assertThrows(
-                              ArgumentConversionException.class,
+                              ConversionException.class,
                               () -> convertValue(parsedListValue, parameter(typeName)),
                               () -> "Expected failure for " + typeName
                           )
@@ -233,7 +233,7 @@ class ParameterTypeConverterTest {
                 "java.util.Map<?, java.lang.Short>", Map.of("key", "x")
             ).forEach((String typeName, Map<?, ?> parsedMapValue) ->
                           assertThrows(
-                              ArgumentConversionException.class,
+                              ConversionException.class,
                               () -> convertValue(parsedMapValue, parameter(typeName)),
                               () -> "Expected failure for " + typeName
                           )
