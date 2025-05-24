@@ -212,7 +212,10 @@ In addition to automatic type conversion, TableTest supports JUnit standard [exp
     [name: Fred, age: 22]  | ADULT
     [name: Wilma, age: 19] | TEEN
     """)
-void testExplicitConversion(@ConvertWith(PersonConverter.class) Person person, AgeCategory expectedAgeCategory) {
+void testExplicitConversion(
+    @ConvertWith(PersonConverter.class) Person person, 
+    AgeCategory expectedAgeCategory
+) {
     assertEquals(expectedAgeCategory, person.ageCategory());
 }
 
@@ -486,6 +489,10 @@ Installing the plugin streamlines the creation and maintenance of data-driven te
 
 ## License
 
-TableTest is licensed under the liberal and business-friendly [Apache Licence, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) and is freely available on [GitHub](https://github.com/nchaugen/tabletest). Additionally, the `tabletest-junit` distribution uses `junit-jupiter-params` which is released under [Eclipse Public License 2.0](https://raw.githubusercontent.com/junit-team/junit5/refs/heads/main/LICENSE.md).
+TableTest is licensed under the liberal and business-friendly [Apache Licence, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) and is freely available on [GitHub](https://github.com/nchaugen/tabletest). 
+
+Additionally, the `tabletest-junit` distribution uses the following modules from JUnit 5 which is released under [Eclipse Public License 2.0](https://raw.githubusercontent.com/junit-team/junit5/refs/heads/main/LICENSE.md):
+- `org.junit.jupiter:junit-jupiter-params`
+- `org.junit.platform:junit-platform-commons`.
 
 TableTest binaries are published to the repositories of Maven Central. The artefacts signatures can be validated against [this PGP public key](https://keyserver.ubuntu.com/pks/lookup?search=nchaugen%40gmail.com).
