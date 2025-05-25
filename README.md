@@ -368,13 +368,13 @@ TableTest requires **Java version 21 or higher** and **JUnit Jupiter version 5.1
 
 To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as a test scope dependency alongside `junit-jupiter`.
 
-#### Maven
+#### Maven (pom.xml)
 ```xml
 <dependencies>
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.1</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -389,7 +389,7 @@ To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as 
 #### Gradle with Groovy DSL (build.gradle)
 ```groovy
 dependencies {
-    testImplementation 'io.github.nchaugen:tabletest-junit:0.2.0'    
+    testImplementation 'io.github.nchaugen:tabletest-junit:0.2.1'    
     testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -401,7 +401,7 @@ tasks.named('test', Test) {
 #### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.2.0")
+    testImplementation("io.github.nchaugen:tabletest-junit:0.2.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.2") 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher") 
 }
@@ -417,14 +417,14 @@ TableTest supports JUnit Jupiter versions 5.11.0 or higher. For projects using J
 
 If you are using a version of JUnit Jupiter prior to 5.11.0 you need to upgrade to use TableTest.
 
-#### Maven
+#### Maven (pom.xml)
 
 ```xml
 <dependencies>
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.1</version>
         <scope>test</scope>
         <exclusions>
             <exclusion>
@@ -449,7 +449,7 @@ If you are using a version of JUnit Jupiter prior to 5.11.0 you need to upgrade 
 #### Gradle with Groovy DSL (build.gradle)
 ```groovy
 dependencies { 
-    testImplementation('io.github.nchaugen:tabletest-junit:0.2.0') { 
+    testImplementation('io.github.nchaugen:tabletest-junit:0.2.1') { 
         exclude group: 'org.junit.jupiter', module: 'junit-jupiter-params' 
         exclude group: 'org.junit.platform', module: 'junit-platform-commons' 
     }
@@ -464,7 +464,7 @@ tasks.named('test', Test) {
 #### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.2.0") {
+    testImplementation("io.github.nchaugen:tabletest-junit:0.2.1") {
         exclude(group = "org.junit.jupiter", module = "junit-jupiter-params") 
         exclude(group = "org.junit.platform", module = "junit-platform-commons") 
     } 
@@ -493,6 +493,6 @@ TableTest is licensed under the liberal and business-friendly [Apache Licence, V
 
 Additionally, the `tabletest-junit` distribution uses the following modules from JUnit 5 which is released under [Eclipse Public License 2.0](https://raw.githubusercontent.com/junit-team/junit5/refs/heads/main/LICENSE.md):
 - `org.junit.jupiter:junit-jupiter-params`
-- `org.junit.platform:junit-platform-commons`.
+- `org.junit.platform:junit-platform-commons`
 
 TableTest binaries are published to the repositories of Maven Central. The artefacts signatures can be validated against [this PGP public key](https://keyserver.ubuntu.com/pks/lookup?search=nchaugen%40gmail.com).
