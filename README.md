@@ -8,7 +8,7 @@ Acting as a parameterized test, a TableTest will run the test method multiple ti
 
 **Requirements**: TableTest requires Java 21 or higher and JUnit Jupiter 5.11.0 or higher.
 
-**IDE Support**: The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for tables.
+**IDE Support**: The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for working with tables.
 
 **Latest Updates**: See the [changelog](https://github.com/nchaugen/tabletest/blob/main/tabletest-junit/CHANGELOG.md) for details on recent releases and changes.
 

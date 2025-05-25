@@ -2,7 +2,12 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-05-25
+### Fixed
+- Added missing entries to changelog
+
 ## [0.2.0] - 2025-05-22
+### Added
 - Support conditionally skip first column in row
 - Support for sets with comma-separated elements
 
