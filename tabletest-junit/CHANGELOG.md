@@ -1,6 +1,8 @@
 # TableTest-Junit Changelog
 
 ## [Unreleased]
+### Added
+- Blank cells and empty quoted values convert to `null` for non-String types
 
 ## [0.2.1] - 2025-05-25
 ### Added

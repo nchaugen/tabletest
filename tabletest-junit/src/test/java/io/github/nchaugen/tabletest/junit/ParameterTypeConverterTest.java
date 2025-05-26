@@ -11,6 +11,7 @@ import static io.github.nchaugen.tabletest.junit.ParameterFixture.parameter;
 import static io.github.nchaugen.tabletest.junit.ParameterTypeConverter.convertValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ParameterTypeConverterTest {
@@ -97,6 +98,26 @@ class ParameterTypeConverterTest {
             """)
         void allow_widening_primitive_conversion(String value, Class<?> type) {
             assertInstanceOf(type, convertValue(value, parameter(type)));
+        }
+
+        @TableTest("""
+            Scenario     | table value | parameter type
+            Empty string | ''          | java.lang.Byte
+            Empty string | ""          | java.lang.Float
+            Blank cell   |             | java.util.List
+            """)
+        void convert_blank_to_null_for_non_string_parameters(String value, Class<?> type) {
+            assertNull(convertValue(value, parameter(type)));
+        }
+
+        @TableTest("""
+            Scenario     | table value | parameter type
+            Empty string | ''          | java.lang.String
+            Empty string | ""          | java.lang.String
+            Blank cell   |             | java.lang.String
+            """)
+        void convert_blank_to_blank_for_string_parameters(String value, Class<?> type) {
+            assertEquals("", convertValue(value, parameter(type)));
         }
 
     }

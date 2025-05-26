@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TableTestTest {
 
@@ -120,6 +121,20 @@ public class TableTestTest {
         """)
     void testScenarioName(int a, int b) {
         assertEquals(b, 2 * a);
+    }
+
+    @TableTest("""
+        Scenario            | String | Integer | List | Map | Set
+        Blank               |        |         |      |     |
+        Empty single quoted | ''     | ''      | ''   | ''  | ''
+        Empty double quoted | ""     | ""      | ""   | ""  | ""
+        """)
+    void testBlankIsNullForNonString(String string, Integer integer, List<?> list, Map<String, ?> map, Set<?> set) {
+        assertEquals("", string);
+        assertNull(integer);
+        assertNull(list);
+        assertNull(map);
+        assertNull(set);
     }
 
     @TableTest("""

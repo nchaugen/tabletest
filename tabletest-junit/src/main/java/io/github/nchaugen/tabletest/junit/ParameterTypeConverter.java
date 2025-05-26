@@ -156,7 +156,7 @@ public class ParameterTypeConverter {
     }
 
     private static Object implicitConversion(Object value, Class<?> targetType, Parameter parameter) {
-        if (value == null) {
+        if (value == null || isBlankValueForNonStringType(value, targetType)) {
             if (targetType.isPrimitive()) {
                 throw new IllegalArgumentException(
                     "Cannot convert null to primitive value of type " + targetType.getTypeName());
@@ -171,6 +171,10 @@ public class ParameterTypeConverter {
             targetType,
             parameter.getDeclaringExecutable().getClass().getClassLoader()
         );
+    }
+
+    private static boolean isBlankValueForNonStringType(Object value, Class<?> targetType) {
+        return value.toString().isBlank() && !targetType.isAssignableFrom(String.class);
     }
 
     /**

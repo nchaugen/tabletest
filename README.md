@@ -41,6 +41,7 @@ TableTest makes your tests more:
     - [Nested Values](#nested-values)
     - [Explicit Argument Conversion](#explicit-argument-conversion)
     - [Scenario Names](#scenario-names)
+    - [Null Values](#null-values)
     - [Expanding Set Values](#expanding-set-values)
     - [Comments and Blank Lines](#comments-and-blank-lines)
     - [Table in External File](#table-in-external-file)
@@ -262,6 +263,26 @@ public void testLeapYear(Year year, boolean expectedResult) {
 
 In test reports, each test case will be identified by its scenario name rather than the default parameter values, improving test readability. Scenario names do not affect the test execution logic.
 
+
+### Null Values
+
+Blank cells and empty quoted values will translate to `null` for all parameter types except String and primitives. For String the value will be the empty string, and for primitives it will cause an exception as they cannot represent a `null` value.
+
+```java
+@TableTest("""
+    Scenario            | String | Integer | List | Map | Set
+    Blank               |        |         |      |     |
+    Empty single quoted | ''     | ''      | ''   | ''  | ''
+    Empty double quoted | ""     | ""      | ""   | ""  | ""
+    """)
+void testBlankMeansNullForNonString(String string, Integer integer, List<?> list, Map<String, ?> map, Set<?> set) {
+    assertEquals("", string);
+    assertNull(integer);
+    assertNull(list);
+    assertNull(map);
+    assertNull(set);
+}
+```
 
 ### Expanding Set Values
 
