@@ -1,10 +1,20 @@
 # TableTest
 
-TableTest is an extension to JUnit 5 for data-driven testing. It allows you to concisely express how the system is expected to behave using multiple concrete examples.  
+TableTest is an [extension to JUnit 5](#installation) for data-driven testing. It allows you to express how the system is expected to behave through multiple examples in a concise table format. This reduces the amount of test code and makes it easier to understand, extend, and maintain your tests.
 
-Variation in behaviour is specified in a concise table format, one row for each example. This reduces the amount of test code and makes it easier to understand, extend, and maintain your tests.
+```java
+@TableTest("""
+    Input | Expected
+    1     | one
+    2     | two
+    3     | three
+    """)
+void testNumberToWord(int number, String word) {
+    assertEquals(word, NumberConverter.toWord(number));
+}
+```
 
-Acting as a parameterized test, a TableTest will run the test method multiple times with the values of each table row provided as arguments. Values are automatically converted to the type of the test method parameter.
+Acting as a [parameterized test](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests), a TableTest will run the test method multiple times with the values of each table row provided as arguments. Values are automatically converted to the type of the test method parameter.
 
 **Requirements**: TableTest requires Java 21 or higher and JUnit Jupiter 5.11.0 or higher.
 
@@ -21,25 +31,8 @@ TableTest makes your tests more:
 - **Self-documenting**: Tables serve as built-in documentation of expected system behaviour
 - **Collaborative**: Non-technical stakeholders can understand and contribute to test cases
 
-## Quick Start
-
-[Add the dependency](#installation), then create your first table test:
-
-```java
-@TableTest("""
-    Input | Expected
-    1     | "one"
-    2     | "two"
-    3     | "three"
-    """)
-void testNumberToWord(int number, String word) {
-    assertEquals(word, NumberConverter.toWord(number));
-}
-```
 
 ## Table of Contents
-- [Why TableTest?](#why-tabletest)
-- [Quick Start](#quick-start)
 - [Usage](#usage)
     - [Single Values](#single-values)
     - [List Values](#list-values)
