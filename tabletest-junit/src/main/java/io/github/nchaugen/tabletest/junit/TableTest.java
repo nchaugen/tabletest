@@ -38,12 +38,14 @@ import java.lang.annotation.Target;
  *   <li><b>Simple values</b> - either unquoted or quoted with single or double quotes</li>
  *   <li><b>Lists</b> - enclosed in [] with comma-separated elements</li>
  *   <li><b>Maps</b> - enclosed in [] with comma-separated key:value pairs</li>
+ *   <li><b>Sets</b> - enclosed in {} with comma-separated elements</li>
  *   <li><b>Comments</b> - lines starting with // are ignored</li>
  *   <li><b>Empty lines</b> - lines with only whitespace are ignored</li>
  * </ul>
  * <p>
  * Values are automatically converted to method parameter types, including nested parameterized types.
- * The number of columns must match the number of parameters in the test method.
+ * The number of columns must match the number of parameters in the test method with one exception:
+ * The first column can be used for display name of each row. In that case it should not have a method parameter.
  * <p>
  * Example:
  * <pre>
