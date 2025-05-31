@@ -1,4 +1,4 @@
-# TableTest-Junit Changelog
+# TableTest Changelog
 
 ## [Unreleased]
 ### Added
@@ -20,3 +20,11 @@
 ### Added
 - `@TableTest` annotation to declare parameterized test with multiline string input in TableTest Format
 - Automatic conversion of column values to method parameter types
+- Table parser for multiline strings with pipe-separated columns
+- Header row for descriptive column names
+- Support for simple values (quoted, unquoted)
+- Support for lists with comma-separated elements
+- Support for maps with key-value pairs
+- Support for nested collections (lists of maps, maps of lists)
+- Comment support with // prefix for documentation
+- Empty line support for better formatting
