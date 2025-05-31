@@ -16,13 +16,13 @@ void testNumberToWord(int number, String word) {
 
 Acting as a [parameterized test](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests), a TableTest will run the test method multiple times with the values of each table row provided as arguments. Values are automatically converted to the type of the test method parameter.
 
-**Requirements**: TableTest requires Java 21 or higher and JUnit Jupiter 5.11.0 or higher.
+**Requirements**: TableTest requires Java 21 or higher and JUnit Jupiter 5.11.0 to 5.12.2.
 
 **Installation**: See the [Installation](#installation) section.
 
 **IDE Support**: The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for working with tables.
 
-**Latest Updates**: See the [changelog](https://github.com/nchaugen/tabletest/blob/main/tabletest-junit/CHANGELOG.md) for details on recent releases and changes.
+**Latest Updates**: See the [changelog](https://github.com/nchaugen/tabletest/blob/CHANGELOG.md) for details on recent releases and changes.
 
 ## Why TableTest?
 TableTest makes your tests more:
@@ -52,7 +52,10 @@ TableTest makes your tests more:
   - [Comments and Blank Lines](#comments-and-blank-lines)
   - [Table in External File](#table-in-external-file)
 - [Installation](#installation)
-  - [Using TableTest with older versions of JUnit Jupiter](#using-tabletest-with-older-versions-of-junit-jupiter)
+  - [Requirements](#requirements)
+  - [Using TableTest with JUnit Jupiter 5.12.2](#using-tabletest-with-junit-jupiter-5122)
+  - [Using TableTest with JUnit Jupiter 5.11.0 to 5.12.1](#using-tabletest-with-junit-jupiter-5110-to-5121)
+  - [Using TableTest with JUnit versions prior to 5.11.0](#using-tabletest-with-junit-versions-prior-to-5110)
 - [IDE Support](#ide-support)
 - [License](#license)
 
@@ -424,8 +427,15 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 ```
 
 ## Installation
-TableTest requires **Java version 21 or higher** and **JUnit Jupiter version 5.11.0 or higher**.
 
+### Requirements
+TableTest requires **Java version 21 or higher**.
+
+TableTest version 0.3.0 is compatible with **JUnit Jupiter versions from 5.11.0 up to and including 5.12.2**.
+
+Please note that **TableTest version 0.3.0 is not compatible with recently released JUnit Jupiter 5.13.0**. This is due to an interface change in AnnotationBasedArgumentsProvider. This will be addressed in a coming version of TableTest.
+
+### Using TableTest with JUnit Jupiter 5.12.2
 To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as a test scope dependency alongside `junit-jupiter`.
 
 #### Maven (pom.xml)
@@ -434,7 +444,7 @@ To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as 
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.2.1</version>
+        <version>0.3.0</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -449,7 +459,7 @@ To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as 
 #### Gradle with Groovy DSL (build.gradle)
 ```groovy
 dependencies {
-    testImplementation 'io.github.nchaugen:tabletest-junit:0.2.1'    
+    testImplementation 'io.github.nchaugen:tabletest-junit:0.3.0'    
     testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -461,7 +471,7 @@ tasks.named('test', Test) {
 #### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.2.1")
+    testImplementation("io.github.nchaugen:tabletest-junit:0.3.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.2") 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher") 
 }
@@ -471,10 +481,8 @@ tasks.named<Test>("test") {
 }
 ```
 
-### Using TableTest with older versions of JUnit Jupiter
-TableTest supports JUnit Jupiter versions 5.11.0 or higher. For projects using JUnit Jupiter versions prior to 5.12.2, you need to exclude the transitive dependencies to avoid conflicts.
-
-If you are using a version of JUnit Jupiter prior to 5.11.0 you need to upgrade to use TableTest.
+### Using TableTest with JUnit Jupiter 5.11.0 to 5.12.1
+TableTest version 0.3.0 supports JUnit Jupiter versions 5.11.0 up to and including 5.12.2. For projects using JUnit Jupiter versions in this range, but prior to 5.12.2, you need to exclude the transitive dependencies to avoid conflicts.
 
 #### Maven (pom.xml)
 ```xml
@@ -482,7 +490,7 @@ If you are using a version of JUnit Jupiter prior to 5.11.0 you need to upgrade 
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.2.1</version>
+        <version>0.3.0</version>
         <scope>test</scope>
         <exclusions>
             <exclusion>
@@ -507,7 +515,7 @@ If you are using a version of JUnit Jupiter prior to 5.11.0 you need to upgrade 
 #### Gradle with Groovy DSL (build.gradle)
 ```groovy
 dependencies { 
-    testImplementation('io.github.nchaugen:tabletest-junit:0.2.1') { 
+    testImplementation('io.github.nchaugen:tabletest-junit:0.3.0') { 
         exclude group: 'org.junit.jupiter', module: 'junit-jupiter-params' 
         exclude group: 'org.junit.platform', module: 'junit-platform-commons' 
     }
@@ -522,7 +530,7 @@ tasks.named('test', Test) {
 #### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.2.1") {
+    testImplementation("io.github.nchaugen:tabletest-junit:0.3.0") {
         exclude(group = "org.junit.jupiter", module = "junit-jupiter-params") 
         exclude(group = "org.junit.platform", module = "junit-platform-commons") 
     } 
@@ -533,6 +541,9 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 ```
+### Using TableTest with JUnit versions prior to 5.11.0
+Unfortunately, TableTest is not supported for JUnit Jupiter versions prior to 5.11.0. If your project is currently using an older version of JUnit you will need to upgrade to a supported version to be able to use TableTest.
+
 
 ## IDE Support
 The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) enhances your development experience when working with TableTest format tables. The plugin provides:
