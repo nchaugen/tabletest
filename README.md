@@ -18,6 +18,8 @@ Acting as a [parameterized test](https://junit.org/junit5/docs/5.12.1/user-guide
 
 **Requirements**: TableTest requires Java 21 or higher and JUnit Jupiter 5.11.0 or higher.
 
+**Installation**: See the [Installation](#installation) section.
+
 **IDE Support**: The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for working with tables.
 
 **Latest Updates**: See the [changelog](https://github.com/nchaugen/tabletest/blob/main/tabletest-junit/CHANGELOG.md) for details on recent releases and changes.
@@ -33,21 +35,24 @@ TableTest makes your tests more:
 
 ## Table of Contents
 - [Usage](#usage)
-    - [Single Values](#single-values)
-    - [List Values](#list-values)
-    - [Set Values](#set-values)
-    - [Map Values](#map-values)
-    - [Nested Values](#nested-values)
-    - [Explicit Argument Conversion](#explicit-argument-conversion)
-    - [Scenario Names](#scenario-names)
-    - [Null Values](#null-values)
-    - [Expanding Set Values](#expanding-set-values)
-    - [Comments and Blank Lines](#comments-and-blank-lines)
-    - [Table in External File](#table-in-external-file)
-
+- [Value Formats](#value-formats)
+  - [Single Values](#single-values)
+  - [List Values](#list-values)
+  - [Set Values](#set-values)
+  - [Map Values](#map-values)
+  - [Nested Values](#nested-values)
+- [Value Conversion](#value-conversion)
+  - [Implicit Type Conversion of Single Values](#implicit-type-conversion-of-single-values) 
+  - [Custom Type Conversion](#custom-type-conversion)
+  - [Explicit Type Conversion](#explicit-type-conversion)
+- [Other Features](#other-features)
+  - [Scenario Names](#scenario-names)
+  - [Null Values](#null-values)
+  - [Set of Applicable Values](#set-of-applicable-values)
+  - [Comments and Blank Lines](#comments-and-blank-lines)
+  - [Table in External File](#table-in-external-file)
 - [Installation](#installation)
-    - [Using TableTest with older versions of JUnit Jupiter](#using-tabletest-with-older-versions-of-junit-jupiter)
-
+  - [Using TableTest with older versions of JUnit Jupiter](#using-tabletest-with-older-versions-of-junit-jupiter)
 - [IDE Support](#ide-support)
 - [License](#license)
 
@@ -67,14 +72,16 @@ public void leapYearCalculation(Year year, boolean expectedResult) {
 }
 ```
 
-Tables use pipe characters (`|`) to separate columns. The first line contains header descriptions, and the following lines represent variations of arguments to the test method. Optionally, the first column may contain a [scenario name](#scenario-names) describing the situation being exemplified by each row.
+Tables use the pipe character (`|`) to separate columns and newline to separate rows. The first row is the header containing column names. The following lines are data rows. 
 
-Column values can be [single values](#single-values), [lists](#list-values), [sets](#set-values), or [maps](#map-values).
+Each data row will invoke the test method with the column values being passed as arguments. Optionally, the first column may contain a [scenario name](#scenario-names) describing the situation being exemplified by each row. There must be a test method parameter for each value column (scenario name column excluded). Columns map to parameters based strictly on order, so the first value column maps to the first parameter, the second value column to the second parameter, etc. The column header names and parameter names can be different, but keeping them aligned improves readability. 
 
-There must be a test method parameter for each value column (scenario name column excluded). Columns map to parameters based strictly on order, so the first value column maps to the first parameter, the second value column to the second parameter, etc. The column header names and parameter names can be different, but keeping them aligned improves readability. Values are automatically converted to the type of the corresponding test parameter.
+Column values can be [single values](#single-values), [lists](#list-values), [sets](#set-values), or [maps](#map-values). Values are automatically converted to the type of the corresponding test parameter.
 
 Technically `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
 
+## Value Formats
+TableTest supports three types of values: [single values](#single-values), [lists](#list-values), [sets](#set-values), or [maps](#map-values).
 
 ### Single Values
 Single values can appear with or without quotes. Unquoted values must not contain `[`, `|`, `,`, or `:` characters. These special characters require single or double quotes.
@@ -95,30 +102,8 @@ void testString(String value, int expectedLength) {
 }
 ```
 
-#### Implicit Type Conversion of Single Values
-TableTest leverages [JUnit Jupiter's built-in implicit type converters](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion) for automatic conversion of single values to various types.
-
-For example:
-- String `"42"` converts to `int`, `long`, or Integer value `42`
-- String `"true"` converts to `boolean` or `Boolean` value `true`
-- String `"2024-01-15"` converts to `LocalDate` for January 15, 2024
-
-```java
-@TableTest("""
-    Number | Text | Date       | Class
-    1      | abc  | 2025-01-20 | java.lang.Integer
-    """)
-void singleValues(short number, String text, LocalDate date, Class<?> type) {
-    // test implementation
-}
-```
-
 ### List Values
 Lists are enclosed in square brackets with comma-separated elements. Lists can contain single values or compound values (nested lists/maps). Empty lists are represented by `[]`.
-
-List elements benefit from implicit conversion to match parameterized types. For example, `[1, 2, 3]` becomes `List<Integer>` when the parameter is declared as such.
-
-Without parameter type information, single values default to the String type.
 
 ```java
 @TableTest("""
@@ -136,8 +121,6 @@ void integerList(List<Integer> list, int expectedSize, int expectedSum) {
 ### Set Values
 Sets are enclosed in curly braces with comma-separated elements. Sets can contain single values or compound values (nested lists/sets/maps). Empty sets are represented by `{}`.
 
-Like lists, sets also benefit from implicit conversion to match parameterized types. Without parameter type information, single values default to the String type.
-
 ```java
 @TableTest("""
     Set              | Size?
@@ -151,9 +134,7 @@ void testSet(Set<String> set, int expectedSize) {
 ```
 
 ### Map Values
-Maps use square brackets with comma-separated key-value pairs. Keys and values are separated by colons. Keys must be unquoted single values, while values can be single or compound. Empty maps are represented by `[:]`.
-
-Map values benefit from implicit conversion to match parameterized types. Map keys remain as a String type and are not converted.
+Maps use square brackets with comma-separated key-value pairs. Colons separate keys and values. Keys must be unquoted single values, while values can be single or compound. Empty maps are represented by `[:]`.
 
 ```java
 
@@ -168,7 +149,7 @@ void testMap(Map<String, Integer> map, int expectedSize) {
 ```
 
 ### Nested Values
-TableTest supports conversion of nested compound types (lists, sets, maps). Nested values also benefit from implicit conversion to match parameterized types.
+TableTest supports nesting compound types (lists, sets, maps). 
 
 ```java
 @TableTest("""
@@ -183,15 +164,91 @@ void testNestedParameterizedTypes(
     double expectedAverageGrade,
     int expectedPassCount
 ) {
-    Students students = parse(studentGrades);
+    Students students = fromGradesMap(studentGrades);
     assertEquals(expectedHighestGrade, students.highestGrade());
     assertEquals(expectedAverageGrade, students.averageGrade(), 0.1);
     assertEquals(expectedPassCount, students.passCount());
 }
 ```
 
-### Explicit Argument Conversion
+## Value Conversion
+After parsing, compound values are represented as `List`, `Set`, and `Map` according the the value specification, but all single values are represented as a `String` type. TableTest will then attempt to convert the value to the type required by the method parameter.
+
+### Implicit Type Conversion of Single Values
+TableTest leverages [JUnit Jupiter's built-in implicit type converters](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion) for automatic conversion of single values to various types.
+
+For example:
+- String `"42"` converts to `int`, `long`, or Integer value `42`
+- String `"true"` converts to `boolean` or `Boolean` value `true`
+- String `"2024-01-15"` converts to `LocalDate` for January 15, 2024
+
+```java
+@TableTest("""
+    Number | Text | Date       | Class
+    1      | abc  | 2025-01-20 | java.lang.Integer
+    """)
+void singleValues(short number, String text, LocalDate date, Class<?> type) {
+    // test implementation
+}
+```
+
+Compound values like list, set, and map also benefit from implicit conversion to match parameterized types. For example, `[1, 2, 3]` becomes `List<Integer>` when the parameter is declared as such. Even nested values are traversed and converted to match parameterized types. Map keys remain String type and are not converted.
+
+### Custom Type Conversion
+TableTest supports using static conversion methods defined in your test class to help convert table values to declared parameter types. This eliminates the need for manual conversion in your test method, keeping tests focused on invoking the system under test and asserting the results.
+
+#### How It Works
+Custom type converters are static methods in your test class that:
+1. Accept one parameter
+2. Return an object of the parameter type
+3. Are accessible (public, protected, or package-private)
+
+There is no specific naming pattern for custom type converters, any static method fulfilling the requirements above will be considered. However only one converter method per return type is possible. If TableTest finds multiple it will throw an error. 
+
+When a converted value is not directly assignable to the parameter type, TableTest searches for an applicable custom converter method and if found will use it for the conversion. This happens before implicit conversion, so it is possible to override the JUnit type converters to convert the same format Strings to another type. If no applicable type converter is found, TableTest will fallback to try JUnit implicit conversion.
+
+#### Example
+Building on the previous "Nested Values" example, we can create a custom type converter to directly accept a `Students` parameter instead of manually converting it in the test method:
+
+```java
+@TableTest("""
+    Student grades                                                  | Highest Grade? | Average Grade? | Pass Count?
+    [Alice: [95, 87, 92], Bob: [78, 85, 90], Charlie: [98, 89, 91]] | 98             | 89.4           | 3
+    [David: [45, 60, 70], Emma: [65, 70, 75], Frank: [82, 78, 60]]  | 82             | 67.2           | 2
+    [:]                                                             | 0              | 0.0            | 0
+    """)
+void testWithCustomConverter(
+    Students students,  // Now using the custom type directly
+    int expectedHighestGrade,
+    double expectedAverageGrade,
+    int expectedPassCount
+) {
+    assertEquals(expectedHighestGrade, students.highestGrade());
+    assertEquals(expectedAverageGrade, students.averageGrade(), 0.1);
+    assertEquals(expectedPassCount, students.passCount());
+}
+
+// This static method serves as a custom converter
+static Students fromGradesMap(Map<String, List<Integer>> input) {
+  // mapping implementation  
+}
+```
+
+In this example:
+1. The first parameter is now directly of type `Students` instead of `Map<String, List<Integer>>`
+2. TableTest starts converting the parsed value of type `Map<String, List<String>>` to the parameter type
+3. Seeing the required type `Students`, TableTest searches for a customer converter method returning this type
+4. Finding `fromGradesMap` it sees that this requires a parameter of type `Map<String, List<Integer>>`
+5. TableTest then converts the parsed value `Map<String, List<String>>` to `Map<String, List<Integer>>`
+6. When converting the list elements, TableTest looks for a custom converter method returning type `Integer`
+7. Finding none, it falls back to using JUnit implicit conversion
+8. Having successfully converted the value to `Map<String, List<Integer>>`, TableTest invokes the custom converter `fromGradesMap` it found earlier with the converted value
+9. The custom converter method turns this into a `Students` object that TableTest can pass on to the test
+
+### Explicit Type Conversion
 In addition to automatic type conversion, TableTest supports JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit) or [argument aggregation](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-aggregation). This can be used for conversion to custom types not supported by implicit conversion.
+
+The custom ArgumentConverters will receive the parsed value, so compound types have been converted but all single values are of type `String`. In the example below, the value of the `source` parameter received by `PersonConvert.convert` will be of type `Map<String, String>`. However, since the `ArgumentConverter` interface specifies `source` parameter as type `Object`, the value needs to be inspected and processed using `instanceof`.  
 
 ```java
 @TableTest("""
@@ -237,6 +294,9 @@ private static class PersonConverter implements ArgumentConverter {
 }
 ```
 
+## Other Features
+TableTest contains a number of other useful features for expressing examples in a table format.
+
 ### Scenario Names
 TableTest supports providing a scenario name describing the situation being exemplified by each row. This makes the tests easier to understand and failures easier to diagnose. For scenario naming, add one extra column at the beginning of your table. This column's values will be used as test case names and won't be mapped to any method parameters.
 
@@ -254,7 +314,6 @@ public void testLeapYear(Year year, boolean expectedResult) {
 ```
 
 In test reports, each test case will be identified by its scenario name rather than the default parameter values, improving test readability. Scenario names do not affect the test execution logic.
-
 
 ### Null Values
 Blank cells and empty quoted values will translate to `null` for all parameter types except String and primitives. For String the value will be the empty string, and for primitives it will cause an exception as they cannot represent a `null` value.

@@ -141,7 +141,7 @@ public class TableTestTest {
         Scenario                      | a                | b | c | d         | e
         Anything multiplied by 0 is 0 | {-1, 0, 1, 1000} | 0 | 0 | {1, 2, 3} | 3
         """)
-    void testSetOfApplicableValues(int a, int b, int c, Set<Integer> d, int e) {
+    void testApplicableValueSet(int a, int b, int c, Set<Integer> d, int e) {
         assertEquals(c, a * b);
         assertEquals(e, d.size());
     }
@@ -151,7 +151,7 @@ public class TableTestTest {
         [name: Fred, age: 22]  | ADULT
         [name: Wilma, age: 19] | TEEN
         """)
-    void testMapToObject(@ConvertWith(PersonConverter.class) Person person, AgeCategory expectedAgeCategory) {
+    void testConvertWith(@ConvertWith(PersonConverter.class) Person person, AgeCategory expectedAgeCategory) {
         assertEquals(expectedAgeCategory, person.ageCategory());
     }
 
@@ -185,4 +185,5 @@ public class TableTestTest {
             throw new ArgumentConversionException("Cannot convert " + source.getClass().getSimpleName() + " to Person");
         }
     }
+
 }

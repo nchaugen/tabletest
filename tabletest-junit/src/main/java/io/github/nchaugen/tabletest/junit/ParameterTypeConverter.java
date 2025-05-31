@@ -15,13 +15,22 @@
  */
 package io.github.nchaugen.tabletest.junit;
 
+import org.junit.jupiter.params.converter.ConvertWith;
+import org.junit.platform.commons.support.conversion.ConversionException;
 import org.junit.platform.commons.support.conversion.ConversionSupport;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static io.github.nchaugen.tabletest.junit.ParameterUtil.nestedElementTypesOf;
 
 /**
  * A utility class that handles conversion of parsed table values to the appropriate parameter types
@@ -29,10 +38,12 @@ import java.util.stream.Collectors;
  * <p>
  * This converter handles various data structures, including:
  * <ul>
- *   <li>Basic scalar values (using JUnit's DefaultArgumentConverter)</li>
- *   <li>Lists of values with automatic element type conversion</li>
- *   <li>Maps with automatic value type conversion</li>
+ *   <li>Null values</li>
+ *   <li>Basic scalar values</li>
+ *   <li>Lists, sets, and maps</li>
  *   <li>Nested collections with complex generic type parameters</li>
+ *   <li>Custom types, either implicitly through converter methods in test class
+ *       or explicitly using the {@link ConvertWith} annotation</li>
  * </ul>
  * <p>
  * The class works recursively to handle deeply nested data structures like lists of lists
@@ -48,47 +59,92 @@ public class ParameterTypeConverter {
      * various data structures and performs recursive conversion as needed.
      *
      * @param value     The value from parsed table data that needs to be converted
-     * @param parameter The method parameter that defines the target type
+     * @param parameter The test method parameter that defines the target type
      * @return The converted value matching the parameter's expected type
      */
     public static Object convertValue(Object value, Parameter parameter) {
-        return convertValue(value, NestedTypes.of(parameter), parameter);
+        Class<?> targetType = parameter.getType();
+        Class<?> testClass = parameter.getDeclaringExecutable().getDeclaringClass();
+
+        if (value == null || isBlankForNonStringType(value, targetType)) {
+            if (targetType.isPrimitive()) {
+                throw new ConversionException(
+                    "Cannot convert null to primitive value of type " + targetType.getTypeName());
+            }
+            return null;
+        }
+
+        // Let JUnit handle explicit converters
+        if (parameter.isAnnotationPresent(ConvertWith.class)) {
+            return value;
+        }
+
+        return convert(value, NestedTypes.of(parameter), testClass);
+    }
+
+    /**
+     * Determines if the cell was blank for a non-string type
+     *
+     * @param value      converted cell value
+     * @param targetType type of parameter
+     */
+    private static boolean isBlankForNonStringType(Object value, Class<?> targetType) {
+        return value.toString().isBlank() && !targetType.isAssignableFrom(String.class);
     }
 
     /**
      * Recursively converts values based on their parsed type and the expected parameter type.
-     * Handles Lists, Maps, and scalar values differently.
      *
      * @param value       The parsed value to convert
      * @param nestedTypes Information about the nested types in parameterized types
-     * @param parameter   The original method parameter providing context
+     * @param testClass   The test class to search for custom converters
      * @return The converted value
      */
-    private static Object convertValue(
+    private static Object convert(
         Object value,
         NestedTypes nestedTypes,
-        Parameter parameter
+        Class<?> testClass
     ) {
-        return switch (value) {
-            case List<?> list -> convertList(list, nestedTypes.skipNext(), parameter);
-            case Set<?> set -> convertSet(set, nestedTypes.skipNext(), parameter);
-            case Map<?, ?> map -> convertMap(map, nestedTypes.skipNext(), parameter);
-            default -> convertSingleValue(value, nestedTypes, parameter);
-        };
+        Class<?> targetType = nestedTypes.next();
+
+        if (isTargetMatchingTypeOfParsedValue(value, targetType)) {
+            return switch (value) {
+                case List<?> list -> convertList(list, nestedTypes.skipNext(), testClass);
+                case Set<?> set -> convertSet(set, nestedTypes, testClass);
+                case Map<?, ?> map -> convertMap(map, nestedTypes.skipNext(), testClass);
+                default -> value;
+            };
+        }
+
+        // Types don't match - look for a converter
+        return findConverter(testClass, targetType)
+            .map(converter -> invokeConverter(
+                converter,
+                // Convert value to match converter input
+                convert(value, NestedTypes.of(converter.getParameters()[0]), testClass),
+                targetType
+            ))
+
+            // Fallback to JUnit conversion
+            .orElseGet(() -> ConversionSupport.convert(
+                value.toString(),
+                targetType,
+                testClass.getClassLoader()
+            ));
     }
 
     /**
-     * Converts a single scalar value using JUnit's DefaultArgumentConverter if needed.
+     * Checks if the given parsed value is matching the specified target type.
      *
-     * @param value       The parsed value to convert
-     * @param nestedTypes Information about the nested types in parameterized types
-     * @param parameter   The original method parameter providing context
-     * @return The converted scalar value
+     * @param value      The parsed value to be checked.
+     * @param targetType The class representing the target type to check against.
+     * @return true if the value is matching the target type; false otherwise.
      */
-    private static Object convertSingleValue(Object value, NestedTypes nestedTypes, Parameter parameter) {
-        return nestedTypes.hasNext()
-               ? implicitConversion(value, nestedTypes.next(), parameter)
-               : value;
+    private static boolean isTargetMatchingTypeOfParsedValue(Object value, Class<?> targetType) {
+        return targetType == null
+               || targetType.isAssignableFrom(value.getClass())
+               // for applicable value sets the target will be the element type
+               || Set.class.isAssignableFrom(value.getClass());
     }
 
     /**
@@ -97,16 +153,16 @@ public class ParameterTypeConverter {
      *
      * @param list        The parsed list containing values to convert
      * @param nestedTypes Information about nested types for list elements
-     * @param parameter   The original method parameter providing context
+     * @param testClass   The test class to search for custom converters
      * @return A new list with converted elements
      */
     private static List<?> convertList(
         List<?> list,
         NestedTypes nestedTypes,
-        Parameter parameter
+        Class<?> testClass
     ) {
         return list.stream()
-            .map(it -> convertValue(it, nestedTypes, parameter))
+            .map(it -> convert(it, nestedTypes, testClass))
             .collect(Collectors.toList());
     }
 
@@ -116,16 +172,19 @@ public class ParameterTypeConverter {
      *
      * @param set         The parsed set containing values to convert
      * @param nestedTypes Information about nested types for set elements
-     * @param parameter   The original method parameter providing context
+     * @param testClass   The test class to search for custom converters
      * @return A new set with converted elements
      */
     private static Set<?> convertSet(
         Set<?> set,
         NestedTypes nestedTypes,
-        Parameter parameter
+        Class<?> testClass
     ) {
+        // if this is an applicable value set, the target type will be the element type
+        NestedTypes types = nestedTypes.nextIsSet() ? nestedTypes.skipNext() : nestedTypes;
+
         return set.stream()
-            .map(it -> convertValue(it, nestedTypes, parameter))
+            .map(it -> convert(it, types, testClass))
             .collect(Collectors.toSet());
     }
 
@@ -135,46 +194,76 @@ public class ParameterTypeConverter {
      *
      * @param map         The parsed map containing keys and values
      * @param nestedTypes Information about nested types for map values
-     * @param parameter   The original method parameter providing context
+     * @param testClass   The test class to search for custom converters
      * @return A new map with converted values
      */
     private static Map<?, ?> convertMap(
         Map<?, ?> map,
         NestedTypes nestedTypes,
-        Parameter parameter
+        Class<?> testClass
     ) {
         return map.entrySet().stream()
             .map(entry -> Map.entry(
                 entry.getKey(),
-                convertValue(
-                    entry.getValue(),
-                    nestedTypes,
-                    parameter
-                )
+                convert(entry.getValue(), nestedTypes, testClass)
             ))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private static Object implicitConversion(Object value, Class<?> targetType, Parameter parameter) {
-        if (value == null || isBlankValueForNonStringType(value, targetType)) {
-            if (targetType.isPrimitive()) {
-                throw new IllegalArgumentException(
-                    "Cannot convert null to primitive value of type " + targetType.getTypeName());
-            }
-            return null;
-        }
+    /**
+     * Searches for a custom converter method in the test class for converting a parsed value to the parameter type.
+     * <p>
+     * The converter method must be static and accessible and must take a single parameter.
+     * The return type of the converter method must be the target type.
+     *
+     * @param testClass The test class to search for custom converters
+     * @param toType    The target type of the conversion
+     * @return An Optional with the converter method if found, otherwise an empty Optional
+     */
+    static Optional<Method> findConverter(Class<?> testClass, Class<?> toType) {
+        List<Method> applicableMethods = Arrays.stream(testClass.getDeclaredMethods())
+            .filter(it -> Modifier.isStatic(it.getModifiers()))
+            .filter(it -> it.canAccess(null))
+            .filter(it -> it.getParameterCount() == 1)
+            .filter(it -> toType.isAssignableFrom(it.getReturnType()))
+            .toList();
 
-        if (targetType.isAssignableFrom(value.getClass())) return value;
+        if (applicableMethods.size() > 1)
+            throw new ConversionException(
+                String.format(
+                    "Found multiple methods in %s converting to type %s: %s",
+                    testClass,
+                    toType,
+                    applicableMethods.stream()
+                        .map(Method::getName)
+                        .collect(Collectors.joining(", "))
+                )
+            );
 
-        return ConversionSupport.convert(
-            value.toString(),
-            targetType,
-            parameter.getDeclaringExecutable().getClass().getClassLoader()
-        );
+        return applicableMethods.stream().findFirst();
     }
 
-    private static boolean isBlankValueForNonStringType(Object value, Class<?> targetType) {
-        return value.toString().isBlank() && !targetType.isAssignableFrom(String.class);
+    /**
+     * Invokes a custom converter method to convert a parsed value to the parameter type.
+     *
+     * @param converter The converter method to invoke
+     * @param value     The parsed value to convert
+     * @param targetType The target type of the conversion
+     * @return The converted value
+     */
+    private static Object invokeConverter(Method converter, Object value, Class<?> targetType) {
+        try {
+            return converter.invoke(null, value);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new ConversionException(
+                String.format(
+                    "Failed to convert %s \"%s\" to type %s",
+                    value.getClass().getTypeName(),
+                    value,
+                    targetType.getTypeName()
+                ), e
+            );
+        }
     }
 
     /**
@@ -199,7 +288,7 @@ public class ParameterTypeConverter {
         static NestedTypes of(Parameter parameter) {
             return parameter.isAnnotationPresent(org.junit.jupiter.params.converter.ConvertWith.class)
                    ? new NestedTypes(List.of())
-                   : new NestedTypes(ParameterUtil.nestedElementTypesOf(parameter));
+                   : new NestedTypes(nestedElementTypesOf(parameter));
         }
 
         /**
@@ -231,6 +320,11 @@ public class ParameterTypeConverter {
             return elementTypes.isEmpty()
                    ? this
                    : new NestedTypes(elementTypes.subList(1, elementTypes.size()));
+        }
+
+        @SuppressWarnings("DataFlowIssue")
+        boolean nextIsSet() {
+            return hasNext() && Set.class.isAssignableFrom(next());
         }
     }
 }

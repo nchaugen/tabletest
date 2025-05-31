@@ -4,8 +4,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.support.conversion.ConversionException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.github.nchaugen.tabletest.junit.ParameterFixture.parameter;
 import static io.github.nchaugen.tabletest.junit.ParameterTypeConverter.convertValue;
@@ -70,7 +72,7 @@ class ParameterTypeConverterTest {
             2017-03                              | java.time.YearMonth
             --03-14                              | java.time.MonthDay
             """)
-        void are_implicitly_converted_according_to_junit_rules(String value, Class<?> type) {
+        void converts_according_to_junit_rules(String value, Class<?> type) {
             assertInstanceOf(type, convertValue(value, parameter(type)));
         }
 
@@ -80,13 +82,13 @@ class ParameterTypeConverterTest {
             256         | java.lang.Byte
             abc         | java.lang.Character
             """)
-        void fail_implicit_conversion_for_values_outside_type_range(
+        void fails_conversion_for_values_outside_type_range(
             String value,
             Class<?> type
         ) {
             assertThrows(
                 ConversionException.class,
-                () -> convertValue(value, ParameterFixture.parameter(type))
+                () -> convertValue(value, parameter(type))
             );
         }
 
@@ -96,27 +98,25 @@ class ParameterTypeConverterTest {
             123         | java.lang.Float
             123         | java.lang.Double
             """)
-        void allow_widening_primitive_conversion(String value, Class<?> type) {
+        void allows_widening_primitive_conversion(String value, Class<?> type) {
             assertInstanceOf(type, convertValue(value, parameter(type)));
         }
 
         @TableTest("""
             Scenario     | table value | parameter type
-            Empty string | ''          | java.lang.Byte
             Empty string | ""          | java.lang.Float
             Blank cell   |             | java.util.List
             """)
-        void convert_blank_to_null_for_non_string_parameters(String value, Class<?> type) {
+        void converts_blank_to_null_for_non_string_parameters(String value, Class<?> type) {
             assertNull(convertValue(value, parameter(type)));
         }
 
         @TableTest("""
             Scenario     | table value | parameter type
             Empty string | ''          | java.lang.String
-            Empty string | ""          | java.lang.String
             Blank cell   |             | java.lang.String
             """)
-        void convert_blank_to_blank_for_string_parameters(String value, Class<?> type) {
+        void converts_blank_to_blank_for_string_parameters(String value, Class<?> type) {
             assertEquals("", convertValue(value, parameter(type)));
         }
 
@@ -125,61 +125,32 @@ class ParameterTypeConverterTest {
     @Nested
     class ListValues {
 
-        @Test
-        void are_implicitly_converted_according_to_parameterized_parameter_type() {
-            List.of(
-                List.of(
-                    "java.util.List<?>",
-                    List.of(),
-                    List.of()
-                ),
-                List.of(
-                    "java.util.List<java.lang.Byte>",
-                    List.of("1"),
-                    List.of((byte) 1)
-                ),
-                List.of(
-                    "java.util.List<java.lang.Integer>",
-                    List.of("2"),
-                    List.of(2)
-                ),
-                List.of(
-                    "java.util.List<java.lang.Long>",
-                    List.of("3"),
-                    List.of(3L)
-                ),
-                List.of(
-                    "java.util.List<java.lang.Double>",
-                    List.of("4"),
-                    List.of(4.0)
-                ),
-                List.of(
-                    "java.util.List<java.lang.String>",
-                    List.of("5"),
-                    List.of("5")
-                ),
-                List.of(
-                    "java.util.List<java.util.List<java.lang.Short>>",
-                    List.of(List.of("6")),
-                    List.of(List.of((short) 6))
-                ),
-                List.of(
-                    "java.util.List<java.util.Map<java.lang.String, java.lang.Long>>",
-                    List.of(Map.of("1", "7")),
-                    List.of(Map.of("1", 7L))
-                )
-            ).forEach((testCase) -> {
-                          String typeName = (String) testCase.get(0);
-                          List<?> parsedListValue = (List<?>) testCase.get(1);
-                          List<?> expectedValue = (List<?>) testCase.get(2);
-                          Object actualValue = convertValue(parsedListValue, parameter(typeName));
-                          assertEquals(expectedValue, actualValue, () -> "Failed for " + typeName);
-                      }
-            );
+        @TableTest("""
+        Empty | Byte | Integer | Long | Double | String | List  | Map
+        []    | [1]  | [2]     | [3]  | [4]    | [5]    | [[6]] | [[1:7]]
+        """)
+        void converts_to_parameterized_parameter_type(
+            List<?> emptyList,
+            List<Byte> byteList,
+            List<Integer> integerList,
+            List<Long> longList,
+            List<Double> doubleList,
+            List<String> stringList,
+            List<List<Short>> listList,
+            List<Map<?, Long>> mapList
+        ) {
+            assertEquals(List.of(), emptyList);
+            assertEquals(List.of((byte) 1), byteList);
+            assertEquals(List.of(2), integerList);
+            assertEquals(List.of(3L), longList);
+            assertEquals(List.of(4.0), doubleList);
+            assertEquals(List.of("5"), stringList);
+            assertEquals(List.of(List.of((short) 6)), listList);
+            assertEquals(List.of(Map.of("1", 7L)), mapList);
         }
 
         @Test
-        void fail_when_conversion_according_to_parameterized_parameter_type_not_possible() {
+        void fails_when_conversion_not_possible() {
             Map.of(
                 "java.util.List<java.lang.Byte>", List.of("x")
             ).forEach((String typeName, List<?> parsedListValue) ->
@@ -195,61 +166,32 @@ class ParameterTypeConverterTest {
     @Nested
     class MapValues {
 
-        @Test
-        void are_implicitly_converted_according_to_parameterized_parameter_type() {
-            List.of(
-                List.of(
-                    "java.util.Map<?, ?>",
-                    Map.of(),
-                    Map.of()
-                ),
-                List.of(
-                    "java.util.Map<java.lang.String, java.lang.Byte>",
-                    Map.of("key", "1"),
-                    Map.of("key", (byte) 1)
-                ),
-                List.of(
-                    "java.util.Map<?, java.lang.Integer>",
-                    Map.of("key", "2"),
-                    Map.of("key", 2)
-                ),
-                List.of(
-                    "java.util.Map<?, java.lang.Long>",
-                    Map.of("key", "3"),
-                    Map.of("key", 3L)
-                ),
-                List.of(
-                    "java.util.Map<?, java.lang.Double>",
-                    Map.of("key", "4"),
-                    Map.of("key", 4.0)
-                ),
-                List.of(
-                    "java.util.Map<?, java.lang.String>",
-                    Map.of("key", "5"),
-                    Map.of("key", "5")
-                ),
-                List.of(
-                    "java.util.Map<?, java.util.List<java.lang.Short>>",
-                    Map.of("key", List.of("6")),
-                    Map.of("key", List.of((short) 6))
-                ),
-                List.of(
-                    "java.util.Map<?, java.util.Map<?, java.lang.Long>>",
-                    Map.of("key", Map.of("1", "7")),
-                    Map.of("key", Map.of("1", 7L))
-                )
-            ).forEach((testCase) -> {
-                          String typeName = (String) testCase.get(0);
-                          Map<?, ?> parsedListValue = (Map<?, ?>) testCase.get(1);
-                          Map<?, ?> expectedValue = (Map<?, ?>) testCase.get(2);
-                          Object actualValue = convertValue(parsedListValue, parameter(typeName));
-                          assertEquals(expectedValue, actualValue, () -> "Failed for " + typeName);
-                      }
-            );
+        @TableTest("""
+        Empty | Byte    | Integer | Long    | Double  | String  | List      | Map
+        [:]   | [key:1] | [key:2] | [key:3] | [key:4] | [key:5] | [key:[6]] | [key:[1:7]]
+        """)
+        void converts_to_parameterized_parameter_type(
+            Map<?, ?> emptyMap,
+            Map<String, Byte> byteMap,
+            Map<?, Integer> integerMap,
+            Map<?, Long> longMap,
+            Map<?, Double> doubleMap,
+            Map<?, String> stringMap,
+            Map<?, List<Short>> listMap,
+            Map<?, Map<?, Long>> mapMap
+        ) {
+            assertEquals(Map.of(), emptyMap);
+            assertEquals(Map.of("key", (byte) 1), byteMap);
+            assertEquals(Map.of("key", 2), integerMap);
+            assertEquals(Map.of("key", 3L), longMap);
+            assertEquals(Map.of("key", 4.0), doubleMap);
+            assertEquals(Map.of("key", "5"), stringMap);
+            assertEquals(Map.of("key", List.of((short) 6)), listMap);
+            assertEquals(Map.of("key", Map.of("1", 7L)), mapMap);
         }
 
         @Test
-        void fail_when_conversion_according_to_parameterized_parameter_type_not_possible() {
+        void fails_when_conversion_not_possible() {
             Map.of(
                 "java.util.Map<?, java.lang.Short>", Map.of("key", "x")
             ).forEach((String typeName, Map<?, ?> parsedMapValue) ->
@@ -262,4 +204,71 @@ class ParameterTypeConverterTest {
         }
     }
 
+    @Nested
+    class CustomConversion {
+
+        @TableTest("""
+            String | List | Set  | Applicable Value Set | Map         | Nested           | Nested Ages
+            16     | [16] | {16} | {16}                 | [value: 16] | [value: [16,16]] | [value: [16,16]]
+            """)
+        void uses_factory_method_in_test_class(
+            Age fromString,
+            List<Age> inList,
+            Set<Age> inSet,
+            Age fromApplicableSet,
+            Map<String, Age> inMap,
+            Map<String, List<Age>> inNested,
+            Ages inCustom
+        ) {
+            Age expected = new Age(16);
+            assertEquals(expected, fromString);
+            assertEquals(List.of(expected), inList);
+            assertEquals(Set.of(expected), inSet);
+            assertEquals(expected, fromApplicableSet);
+            assertEquals(Map.of("value", expected), inMap);
+            assertEquals(Map.of("value", List.of(expected, expected)), inNested);
+            assertEquals(new Ages(List.of(expected, expected)), inCustom);
+        }
+
+        @SuppressWarnings("unused")
+        static Age parseAge(int age) {
+            return new Age(age);
+        }
+
+        @SuppressWarnings("unused")
+        static Ages parseAges(Map<String, List<Age>> age) {
+            return new Ages(age.get("value"));
+        }
+
+        record Age(int age) {}
+        record Ages(List<Age> ages) {}
+
+        @TableTest("""
+            JUnit convert | Constructor convert | Factory method convert | List of factory method convert
+            2025-05-27    | 2025-05-27          | 2025-05-27             | [2025-05-27]
+            """)
+        void factory_methods_takes_priority_over_junit_conversion(
+            LocalDate date,
+            ConstructorDate date1,
+            FactoryMethodDate date2,
+            List<FactoryMethodDate> list
+        ) {
+            assertEquals(date, date1.date);
+            assertEquals(date, date2.date);
+            assertEquals(date, list.getFirst().date);
+        }
+
+        record ConstructorDate(LocalDate date) {
+            @SuppressWarnings("unused")
+            ConstructorDate(String date) {
+                this(LocalDate.parse(date));
+            }
+        }
+        record FactoryMethodDate(LocalDate date) {}
+
+        @SuppressWarnings("unused")
+        static FactoryMethodDate parseDate(String date) {
+            return new FactoryMethodDate(LocalDate.parse(date));
+        }
+    }
 }

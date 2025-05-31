@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 - Blank cells and empty quoted values convert to `null` for non-String types
+- Support for custom type conversion methods in test class
 
 ## [0.2.1] - 2025-05-25
 ### Added

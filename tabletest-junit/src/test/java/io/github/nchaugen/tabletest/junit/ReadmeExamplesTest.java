@@ -1,5 +1,6 @@
 package io.github.nchaugen.tabletest.junit;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -72,21 +73,24 @@ public class ReadmeExamplesTest {
         [:]                                                             | 0              | 0.0            | 0
         """)
     void testNestedParameterizedTypes(
-        Map<String, List<Integer>> studentGrades,
+        Students students,
         int expectedHighestGrade,
         double expectedAverageGrade,
         int expectedPassCount
     ) {
-        Students students = parse(studentGrades);
         assertEquals(expectedHighestGrade, students.highestGrade());
         assertEquals(expectedAverageGrade, students.averageGrade(), 0.1);
         assertEquals(expectedPassCount, students.passCount());
     }
 
+    @SuppressWarnings("unused")
     static Students parse(Map<String, List<Integer>> input) {
         return new Students(
             input.entrySet().stream()
-                .map(entry -> new Student(entry.getKey(), entry.getValue()))
+                .map(entry -> new Student(
+                    entry.getKey(),
+                    entry.getValue()
+                ))
                 .toList()
         );
     }
@@ -118,8 +122,7 @@ public class ReadmeExamplesTest {
     private record Student(String name, List<Integer> grades) {
         int findHighestGrade() {
             return grades.stream()
-                .mapToInt(Integer::intValue)
-                .max()
+                .max(Comparator.naturalOrder())
                 .orElse(0);
         }
 
