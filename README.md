@@ -22,7 +22,7 @@ Acting as a [parameterized test](https://junit.org/junit5/docs/5.12.1/user-guide
 
 **IDE Support**: The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for working with tables.
 
-**Latest Updates**: See the [changelog](https://github.com/nchaugen/tabletest/blob/CHANGELOG.md) for details on recent releases and changes.
+**Latest Updates**: See the [changelog](https://github.com/nchaugen/tabletest/blob/main/CHANGELOG.md) for details on recent releases and changes.
 
 ## Why TableTest?
 TableTest makes your tests more:
