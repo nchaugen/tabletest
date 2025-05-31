@@ -187,7 +187,7 @@ TableTest supports three types of cell values:
 3. **Sets**: Values enclosed in curly braces like `{item1, item2}`. Represented as `Set<Object>`.
 4. **Maps**: Key-value pairs like `[key1: value1, key2: value2]`. Represented as `Map<String, Object>`.
 
-Lists, sets and maps can contain nested structures of any type, allowing for complex data representation.
+Lists, sets, and maps can contain nested structures of any type, allowing for complex data representation.
 
 ### Special Features
 

@@ -23,7 +23,6 @@ Acting as a [parameterized test](https://junit.org/junit5/docs/5.12.1/user-guide
 **Latest Updates**: See the [changelog](https://github.com/nchaugen/tabletest/blob/main/tabletest-junit/CHANGELOG.md) for details on recent releases and changes.
 
 ## Why TableTest?
-
 TableTest makes your tests more:
 - **Readable**: Structured tables clearly show inputs and expected outputs
 - **Maintainable**: Add or modify test cases by simply adding or changing table rows
@@ -53,7 +52,6 @@ TableTest makes your tests more:
 - [License](#license)
 
 ## Usage
-
 TableTest-style test methods are declared using the `@TableTest` annotation. The annotation accepts a table of data as a multi-line string or as an external resource. 
 
 ```java
@@ -79,7 +77,6 @@ Technically `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a c
 
 
 ### Single Values
-
 Single values can appear with or without quotes. Unquoted values must not contain `[`, `|`, `,`, or `:` characters. These special characters require single or double quotes.
 
 Whitespace around unquoted values is trimmed. To preserve leading or trailing whitespace, use quotes. Empty values are represented by adjacent quote pairs (`""` or `''`).
@@ -98,6 +95,7 @@ void testString(String value, int expectedLength) {
 }
 ```
 
+#### Implicit Type Conversion of Single Values
 TableTest leverages [JUnit Jupiter's built-in implicit type converters](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion) for automatic conversion of single values to various types.
 
 For example:
@@ -116,7 +114,6 @@ void singleValues(short number, String text, LocalDate date, Class<?> type) {
 ```
 
 ### List Values
-
 Lists are enclosed in square brackets with comma-separated elements. Lists can contain single values or compound values (nested lists/maps). Empty lists are represented by `[]`.
 
 List elements benefit from implicit conversion to match parameterized types. For example, `[1, 2, 3]` becomes `List<Integer>` when the parameter is declared as such.
@@ -137,7 +134,6 @@ void integerList(List<Integer> list, int expectedSize, int expectedSum) {
 ```
 
 ### Set Values
-
 Sets are enclosed in curly braces with comma-separated elements. Sets can contain single values or compound values (nested lists/sets/maps). Empty sets are represented by `{}`.
 
 Like lists, sets also benefit from implicit conversion to match parameterized types. Without parameter type information, single values default to the String type.
@@ -155,7 +151,6 @@ void testSet(Set<String> set, int expectedSize) {
 ```
 
 ### Map Values
-
 Maps use square brackets with comma-separated key-value pairs. Keys and values are separated by colons. Keys must be unquoted single values, while values can be single or compound. Empty maps are represented by `[:]`.
 
 Map values benefit from implicit conversion to match parameterized types. Map keys remain as a String type and are not converted.
@@ -173,7 +168,6 @@ void testMap(Map<String, Integer> map, int expectedSize) {
 ```
 
 ### Nested Values
-
 TableTest supports conversion of nested compound types (lists, sets, maps). Nested values also benefit from implicit conversion to match parameterized types.
 
 ```java
@@ -197,7 +191,6 @@ void testNestedParameterizedTypes(
 ```
 
 ### Explicit Argument Conversion
-
 In addition to automatic type conversion, TableTest supports JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit) or [argument aggregation](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-aggregation). This can be used for conversion to custom types not supported by implicit conversion.
 
 ```java
@@ -245,7 +238,6 @@ private static class PersonConverter implements ArgumentConverter {
 ```
 
 ### Scenario Names
-
 TableTest supports providing a scenario name describing the situation being exemplified by each row. This makes the tests easier to understand and failures easier to diagnose. For scenario naming, add one extra column at the beginning of your table. This column's values will be used as test case names and won't be mapped to any method parameters.
 
 ```java
@@ -265,7 +257,6 @@ In test reports, each test case will be identified by its scenario name rather t
 
 
 ### Null Values
-
 Blank cells and empty quoted values will translate to `null` for all parameter types except String and primitives. For String the value will be the empty string, and for primitives it will cause an exception as they cannot represent a `null` value.
 
 ```java
@@ -284,9 +275,8 @@ void testBlankMeansNullForNonString(String string, Integer integer, List<?> list
 }
 ```
 
-### Expanding Set Values
-
-TableTest automatically expands rows containing set values into multiple test invocations when the corresponding parameter isn't declared as a `Set` type. Each value in the set becomes a separate test case, maintaining all other parameter values.
+### Set of Applicable Values
+TableTest automatically recognizes when a set represents alternative applicable values for a test parameter. When a cell contains a set (enclosed in curly braces) and the corresponding parameter isn't declared as a `Set` type, TableTest will expand that row into multiple test invocations — one for each value in the set, while maintaining all other parameter values. 
 
 In this example, the test method is run 12 times, three times for each row, once for each value in the set in column `Example years`.
 
@@ -302,9 +292,9 @@ public void testLeapYear(Year year, boolean expectedResult) {
     assertEquals(expectedResult, year.isLeap(), "Year " + year);
 }
 ```
-Set expansion works with scenario names and preserves the original scenario name for all generated test invocations. This allows grouping related test cases under a descriptive heading while still testing multiple values.
+This feature works with scenario names and preserves the original scenario name for all generated test invocations. This allows grouping related test cases under a descriptive heading while still testing multiple specific values.
 
-When multiple cells in the same row contain expandable sets, TableTest performs a cartesian product, generating test cases for all possible combinations of values. This powerful feature enables testing multiple scenarios without redundant table entries.
+When multiple cells in the same row contain applicable value sets, TableTest performs a cartesian product, generating test cases for all possible combinations of values. This powerful feature enables testing multiple scenarios without redundant table entries.
 
 ```java
 @TableTest("""
@@ -335,7 +325,6 @@ void testSetParameter(Set<String> values, int expectedSize) {
 ```
 
 ### Comments and Blank Lines
-
 Lines starting with `//` (ignoring leading whitespace) are treated as comments and ignored during parsing. Comments allow adding explanations or temporarily disabling data rows.
 
 Blank lines are also ignored and can be used to visually group related rows.
@@ -359,7 +348,6 @@ void testComment(String string, int expectedLength) {
 ```
 
 ### Table in External File
-
 As an alternative to specifying the table as a multi-line string in the annotation, you can load it from an external file using the `resource` attribute. The file is located as a resource relative to the test class and is typically stored in the test `resources` directory or one of its subdirectories.
 
 By default, the file is assumed to use UTF-8 encoding. If your file uses a different encoding, specify it with the `encoding` attribute.
@@ -377,7 +365,6 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 ```
 
 ## Installation
-
 TableTest requires **Java version 21 or higher** and **JUnit Jupiter version 5.11.0 or higher**.
 
 To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as a test scope dependency alongside `junit-jupiter`.
@@ -426,13 +413,11 @@ tasks.named<Test>("test") {
 ```
 
 ### Using TableTest with older versions of JUnit Jupiter
-
 TableTest supports JUnit Jupiter versions 5.11.0 or higher. For projects using JUnit Jupiter versions prior to 5.12.2, you need to exclude the transitive dependencies to avoid conflicts.
 
 If you are using a version of JUnit Jupiter prior to 5.11.0 you need to upgrade to use TableTest.
 
 #### Maven (pom.xml)
-
 ```xml
 <dependencies>
     <dependency>
@@ -491,7 +476,6 @@ tasks.named<Test>("test") {
 ```
 
 ## IDE Support
-
 The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) enhances your development experience when working with TableTest format tables. The plugin provides:
 
 - Code assistance for table formatting
@@ -502,7 +486,6 @@ Installing the plugin streamlines the creation and maintenance of data-driven te
 
 
 ## License
-
 TableTest is licensed under the liberal and business-friendly [Apache Licence, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) and is freely available on [GitHub](https://github.com/nchaugen/tabletest). 
 
 Additionally, the `tabletest-junit` distribution uses the following modules from JUnit 5 which is released under [Eclipse Public License 2.0](https://raw.githubusercontent.com/junit-team/junit5/refs/heads/main/LICENSE.md):
