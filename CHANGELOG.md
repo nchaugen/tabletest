@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [0.3.1]
+## [0.3.1] - 2025-06-03
 ### Added
 - Searching Kotlin test file for top-level converter functions
 ### Fixed
