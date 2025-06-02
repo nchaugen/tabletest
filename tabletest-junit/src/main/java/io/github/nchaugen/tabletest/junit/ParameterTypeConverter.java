@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.github.nchaugen.tabletest.junit.ParameterUtil.nestedElementTypesOf;
 import static java.util.stream.Collectors.toUnmodifiableMap;
@@ -236,7 +237,10 @@ public class ParameterTypeConverter {
      * @return An Optional with the converter method if found, otherwise an empty Optional
      */
     static Optional<Method> findConverter(Class<?> testClass, Class<?> toType) {
-        List<Method> applicableMethods = Arrays.stream(testClass.getDeclaredMethods())
+        List<Method> applicableMethods = Stream.concat(
+                javaConverters(testClass),
+                kotlinConverters(testClass)
+            )
             .filter(it -> Modifier.isStatic(it.getModifiers()))
             .filter(it -> it.canAccess(null))
             .filter(it -> it.getParameterCount() == 1)
@@ -256,6 +260,21 @@ public class ParameterTypeConverter {
             );
 
         return applicableMethods.stream().findFirst();
+    }
+
+    private static Stream<Method> javaConverters(Class<?> testClass) {
+        return Arrays.stream(testClass.getDeclaredMethods());
+    }
+
+    private static Stream<Method> kotlinConverters(Class<?> testClass) {
+        try {
+            return Arrays.stream(testClass
+                    .getClassLoader()
+                    .loadClass(testClass.getTypeName() + "Kt")
+                    .getDeclaredMethods());
+        } catch (ClassNotFoundException e) {
+            return Stream.empty();
+        }
     }
 
     /**

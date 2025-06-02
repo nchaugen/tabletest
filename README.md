@@ -175,7 +175,7 @@ void testNestedParameterizedTypes(
 ```
 
 ## Value Conversion
-After parsing, compound values are represented as `List`, `Set`, and `Map` according the the value specification, but all single values are represented as a `String` type. TableTest will then attempt to convert the value to the type required by the method parameter.
+After parsing, compound values are represented as `List`, `Set`, and `Map` according to the value specification, but all single values are represented as a `String` type. TableTest will then attempt to convert the value to the type required by the method parameter.
 
 ### Implicit Type Conversion of Single Values
 TableTest leverages [JUnit Jupiter's built-in implicit type converters](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion) for automatic conversion of single values to various types.
@@ -195,20 +195,22 @@ void singleValues(short number, String text, LocalDate date, Class<?> type) {
 }
 ```
 
-Compound values like list, set, and map also benefit from implicit conversion to match parameterized types. For example, `[1, 2, 3]` becomes `List<Integer>` when the parameter is declared as such. Even nested values are traversed and converted to match parameterized types. Map keys remain String type and are not converted.
+Compound values like List, Set, and Map also benefit from implicit conversion to match parameterized types. For example, `[1, 2, 3]` becomes `List<Integer>` when the parameter is declared as such. Even nested values are traversed and converted to match parameterized types. Map keys remain String type and are not converted.
 
 ### Custom Type Conversion
-TableTest supports using static conversion methods defined in your test class to help convert table values to declared parameter types. This eliminates the need for manual conversion in your test method, keeping tests focused on invoking the system under test and asserting the results.
+TableTest supports using static conversion methods defined in your test class/file to help convert table values to declared parameter types. This eliminates the need for manual conversion in your test method, keeping tests focused on invoking the system under test and asserting the results.
 
 #### How It Works
-Custom type converters are static methods in your test class that:
+Custom type converters are functions that:
 1. Accept one parameter
 2. Return an object of the parameter type
 3. Are accessible (public, protected, or package-private)
 
-There is no specific naming pattern for custom type converters, any static method fulfilling the requirements above will be considered. However only one converter method per return type is possible. If TableTest finds multiple it will throw an error. 
+In Java, custom type converters are defined as static methods in your test class. When using Kotlin, converters are functions defined outside the test class, but in the same file as the test class (top-level functions).
 
-When a converted value is not directly assignable to the parameter type, TableTest searches for an applicable custom converter method and if found will use it for the conversion. This happens before implicit conversion, so it is possible to override the JUnit type converters to convert the same format Strings to another type. If no applicable type converter is found, TableTest will fallback to try JUnit implicit conversion.
+There is no specific naming pattern for custom type converters, any static method fulfilling the requirements above will be considered. However, only one converter method per return type is possible. If TableTest finds more than one, it will throw an error. 
+
+When a converted value is not directly assignable to the parameter type, TableTest searches for an applicable custom converter method and if found will use it for the conversion. This happens before implicit conversion, so it is possible to override the JUnit type converters to convert the same format Strings to another type. If no applicable type converter is found, TableTest will fall back to try JUnit implicit conversion.
 
 #### Example
 Building on the previous "Nested Values" example, we can create a custom type converter to directly accept a `Students` parameter instead of manually converting it in the test method:
@@ -433,9 +435,9 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 ### Requirements
 TableTest requires **Java version 21 or higher**.
 
-TableTest version 0.3.0 is compatible with **JUnit Jupiter versions from 5.11.0 up to and including 5.12.2**.
+TableTest version 0.3.1 is compatible with **JUnit Jupiter versions from 5.11.0 up to and including 5.12.2**.
 
-Please note that **TableTest version 0.3.0 is not compatible with recently released JUnit Jupiter 5.13.0**. This is due to an interface change in AnnotationBasedArgumentsProvider. This will be addressed in a coming version of TableTest.
+Please note that **TableTest version 0.3.1 is not compatible with recently released JUnit Jupiter 5.13.0**. This is due to an interface change in AnnotationBasedArgumentsProvider. This will be addressed in a coming version of TableTest.
 
 ### Using TableTest with JUnit Jupiter 5.12.2
 To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as a test scope dependency alongside `junit-jupiter`.
@@ -446,7 +448,7 @@ To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as 
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.3.0</version>
+        <version>0.3.1</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -461,7 +463,7 @@ To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as 
 #### Gradle with Groovy DSL (build.gradle)
 ```groovy
 dependencies {
-    testImplementation 'io.github.nchaugen:tabletest-junit:0.3.0'    
+    testImplementation 'io.github.nchaugen:tabletest-junit:0.3.1'    
     testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -473,7 +475,7 @@ tasks.named('test', Test) {
 #### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.3.0")
+    testImplementation("io.github.nchaugen:tabletest-junit:0.3.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.2") 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher") 
 }
@@ -484,7 +486,7 @@ tasks.named<Test>("test") {
 ```
 
 ### Using TableTest with JUnit Jupiter 5.11.0 to 5.12.1
-TableTest version 0.3.0 supports JUnit Jupiter versions 5.11.0 up to and including 5.12.2. For projects using JUnit Jupiter versions in this range, but prior to 5.12.2, you need to exclude the transitive dependencies to avoid conflicts.
+TableTest version 0.3.1 supports JUnit Jupiter versions 5.11.0 up to and including 5.12.2. For projects using JUnit Jupiter versions in this range, but prior to 5.12.2, you need to exclude the transitive dependencies to avoid conflicts.
 
 #### Maven (pom.xml)
 ```xml
@@ -492,7 +494,7 @@ TableTest version 0.3.0 supports JUnit Jupiter versions 5.11.0 up to and includi
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.3.0</version>
+        <version>0.3.1</version>
         <scope>test</scope>
         <exclusions>
             <exclusion>
@@ -517,7 +519,7 @@ TableTest version 0.3.0 supports JUnit Jupiter versions 5.11.0 up to and includi
 #### Gradle with Groovy DSL (build.gradle)
 ```groovy
 dependencies { 
-    testImplementation('io.github.nchaugen:tabletest-junit:0.3.0') { 
+    testImplementation('io.github.nchaugen:tabletest-junit:0.3.1') { 
         exclude group: 'org.junit.jupiter', module: 'junit-jupiter-params' 
         exclude group: 'org.junit.platform', module: 'junit-platform-commons' 
     }
@@ -532,7 +534,7 @@ tasks.named('test', Test) {
 #### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.3.0") {
+    testImplementation("io.github.nchaugen:tabletest-junit:0.3.1") {
         exclude(group = "org.junit.jupiter", module = "junit-jupiter-params") 
         exclude(group = "org.junit.platform", module = "junit-platform-commons") 
     } 
@@ -544,7 +546,7 @@ tasks.named<Test>("test") {
 }
 ```
 ### Using TableTest with JUnit versions prior to 5.11.0
-Unfortunately, TableTest is not supported for JUnit Jupiter versions prior to 5.11.0. If your project is currently using an older version of JUnit you will need to upgrade to a supported version to be able to use TableTest.
+Unfortunately, TableTest is not supported for JUnit Jupiter versions prior to 5.11.0. If your project is currently using an older version of JUnit, you will need to upgrade to a supported version to be able to use TableTest.
 
 
 ## IDE Support

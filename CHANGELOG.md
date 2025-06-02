@@ -1,6 +1,10 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [0.3.1]
+### Added
+- Searching Kotlin test file for top-level converter functions
 ### Fixed
 - Collection types passed to tests are no longer mutable
 - An empty applicable value set will translate to `null` to avoid row to be unintentionally ignored
