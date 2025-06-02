@@ -26,7 +26,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.Collections.*;
 import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.*;
 
 /**
  * Represents the result of a parsing operation. Abstract sealed class
@@ -83,7 +85,7 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
         private Success(String value, String rest, List<Object> captures) {
             this.value = value;
             this.rest = rest;
-            this.captures = captures;
+            this.captures = List.copyOf(captures);
         }
 
         @Override
@@ -104,7 +106,7 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
         ParseResult.Success capture() {
             ArrayList<Object> nextCaptures = new ArrayList<>(captures);
             nextCaptures.add(value);
-            return new Success(value, rest, unmodifiableList(nextCaptures));
+            return new Success(value, rest, nextCaptures);
         }
 
         ParseResult.Success captureGroup() {
@@ -123,9 +125,9 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
                 IntStream.range(0, captures.size())
                     .filter(i -> i % 2 == 0)
                     .mapToObj(i -> Map.entry((String) captures.get(i), captures.get(i + 1)))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .collect(toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
 
-            return new Success(value, rest, List.of(Collections.unmodifiableMap(captureGroup)));
+            return new Success(value, rest, List.of(unmodifiableMap(captureGroup)));
         }
 
         private ParseResult.Success append(ParseResult.Success nextResult) {

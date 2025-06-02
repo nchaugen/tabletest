@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.support.conversion.ConversionException;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class ParameterTypeConverterTest {
 
@@ -161,6 +163,43 @@ class ParameterTypeConverterTest {
                           )
             );
         }
+
+        @TableTest("""
+        list | nested list | nested set | nested map
+        []   | [[]]        | [{}]       | [[:]]
+        """)
+        void passes_immutable_lists_to_test(
+            List<String> list,
+            List<List<String>> nestedList,
+            List<Set<String>> nestedSet,
+            List<Map<String, String>> nestedMap
+        ) {
+            try {
+                list.add("x");
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+            try {
+                nestedList.getFirst().add("x");
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+            try {
+                nestedSet.getFirst().add("x");
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+            try {
+                nestedMap.getFirst().put("x", "y");
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+        }
+
     }
 
     @Nested
@@ -202,6 +241,108 @@ class ParameterTypeConverterTest {
                           )
             );
         }
+
+        @TableTest("""
+        map | nested list | nested set  | nested map
+        [:] | [empty: []] | [empty: {}] | [empty: [:]]
+        """)
+        void passes_immutable_maps_to_test(
+            Map<String, String> map,
+            Map<String, List<String>> nestedList,
+            Map<String, Set<String>> nestedSet,
+            Map<String, Map<String, String>> nestedMap
+        ) {
+            try {
+                map.put("x", "y");
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+            try {
+                nestedList.get("empty").add("x");
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+            try {
+                nestedSet.get("empty").add("x");
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+            try {
+                nestedMap.get("empty").put("x", "y");
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+        }
+
+
+    }
+
+    @Nested
+    class SetValues {
+        @TableTest("""
+        Scenario                  | adding any of | to set    | makes size? | is set null? | contains null?
+        Adding existing values    | {1, 2, 3}     | {1, 2, 3} | 3           | false        | false
+        Adding other values       | {4, 5, 6}     | {1, 2, 3} | 4           | false        | false
+        Adding no values          | {}            | {1, 2, 3} | 4           | false        | true
+        Adding nothing to nothing |               |           |             | true         | false
+        """)
+        void applicable_value_sets(
+            Integer a,
+            Set<Integer> b,
+            Integer expectedSize,
+            boolean expectedNull,
+            boolean containsNull
+        ) {
+            if (expectedNull) {
+                assertNull(b);
+            } else {
+                Set<Integer> result = new HashSet<>(b);
+                result.add(a);
+                assertEquals(expectedSize, result.size());
+                assertEquals(containsNull, result.contains(null));
+            }
+        }
+
+        @TableTest("""
+        set | nested list | nested set | nested map
+        {}  | {[]}        | {{}}       | {[:]}
+        """)
+        void passes_immutable_sets_to_test(
+            Set<String> set,
+            Set<List<String>> nestedList,
+            Set<Set<String>> nestedSet,
+            Set<Map<String, String>> nestedMap
+        ) {
+            try {
+                set.add("x");
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+            try {
+                nestedList.forEach(it -> it.add("x"));
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+            try {
+                nestedSet.forEach(it -> it.add("x"));
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+            try {
+                nestedMap.forEach(it -> it.put("x", "y"));
+                fail("modifying collections from the table should fail");
+            } catch (Exception e) {
+                // expected
+            }
+        }
+
     }
 
     @Nested

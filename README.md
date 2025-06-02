@@ -321,6 +321,8 @@ In test reports, each test case will be identified by its scenario name rather t
 ### Null Values
 Blank cells and empty quoted values will translate to `null` for all parameter types except String and primitives. For String the value will be the empty string, and for primitives it will cause an exception as they cannot represent a `null` value.
 
+The built-in conversion will **not** translate empty quoted values to `null` when they appear as elements inside lists, sets, and maps, even when the parameterized value of the collection is not String. This will instead cause a `ConversionException`. Consider writing a [custom type converter](#custom-type-conversion) if you need this.
+
 ```java
 @TableTest("""
     Scenario            | String | Integer | List | Map | Set

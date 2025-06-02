@@ -178,7 +178,7 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
         List<Object> convertedValues = row
             .skipFirstIf(scenarioName.isPresent())
             .mapIndexed((index, cell) -> convertValue(cell, parameters[index]))
-            .collect(Collectors.toList());
+            .toList();
 
         return generateValueCombinations(convertedValues, parameters, 0)
             .map(values ->
@@ -231,7 +231,7 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
         int position
     ) {
         if (position >= arguments.size()) {
-            return Stream.of(new ArrayList<>(arguments));
+            return Stream.of(arguments);
         }
 
         Object currentArgument = arguments.get(position);

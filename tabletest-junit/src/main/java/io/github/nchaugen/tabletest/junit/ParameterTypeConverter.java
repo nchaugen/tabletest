@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.github.nchaugen.tabletest.junit.ParameterUtil.nestedElementTypesOf;
+import static java.util.stream.Collectors.toUnmodifiableMap;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
 /**
  * A utility class that handles conversion of parsed table values to the appropriate parameter types
@@ -66,7 +68,10 @@ public class ParameterTypeConverter {
         Class<?> targetType = parameter.getType();
         Class<?> testClass = parameter.getDeclaringExecutable().getDeclaringClass();
 
-        if (value == null || isBlankForNonStringType(value, targetType)) {
+        if (value == null
+            || isBlankForNonStringType(value, targetType)
+            || isEmptyApplicableValueSet(value, targetType)
+        ) {
             if (targetType.isPrimitive()) {
                 throw new ConversionException(
                     "Cannot convert null to primitive value of type " + targetType.getTypeName());
@@ -90,6 +95,16 @@ public class ParameterTypeConverter {
      */
     private static boolean isBlankForNonStringType(Object value, Class<?> targetType) {
         return value.toString().isBlank() && !targetType.isAssignableFrom(String.class);
+    }
+
+    /**
+     * Determines if the cell is an applicable value set with no values
+     *
+     * @param value converted cell value
+     * @param targetType type of parameter
+     */
+    private static boolean isEmptyApplicableValueSet(Object value, Class<?> targetType) {
+        return value instanceof Set<?> set && set.isEmpty() && !targetType.isAssignableFrom(Set.class);
     }
 
     /**
@@ -163,7 +178,7 @@ public class ParameterTypeConverter {
     ) {
         return list.stream()
             .map(it -> convert(it, nestedTypes, testClass))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**
@@ -185,7 +200,7 @@ public class ParameterTypeConverter {
 
         return set.stream()
             .map(it -> convert(it, types, testClass))
-            .collect(Collectors.toSet());
+            .collect(toUnmodifiableSet());
     }
 
     /**
@@ -207,7 +222,7 @@ public class ParameterTypeConverter {
                 entry.getKey(),
                 convert(entry.getValue(), nestedTypes, testClass)
             ))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .collect(toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /**
@@ -246,8 +261,8 @@ public class ParameterTypeConverter {
     /**
      * Invokes a custom converter method to convert a parsed value to the parameter type.
      *
-     * @param converter The converter method to invoke
-     * @param value     The parsed value to convert
+     * @param converter  The converter method to invoke
+     * @param value      The parsed value to convert
      * @param targetType The target type of the conversion
      * @return The converted value
      */
