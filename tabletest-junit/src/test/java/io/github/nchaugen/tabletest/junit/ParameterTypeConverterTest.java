@@ -1,5 +1,9 @@
 package io.github.nchaugen.tabletest.junit;
 
+import io.github.nchaugen.tabletest.junit.exampledomain.Age;
+import io.github.nchaugen.tabletest.junit.exampledomain.Ages;
+import io.github.nchaugen.tabletest.junit.exampledomain.ConstructorDate;
+import io.github.nchaugen.tabletest.junit.exampledomain.FactoryMethodDate;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.support.conversion.ConversionException;
@@ -18,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+@TableTestConverters(ExampleDomainConverters.class)
 class ParameterTypeConverterTest {
 
     @Nested
@@ -381,9 +386,6 @@ class ParameterTypeConverterTest {
             return new Ages(age.get("value"));
         }
 
-        record Age(int age) {}
-        record Ages(List<Age> ages) {}
-
         @TableTest("""
             JUnit convert | Constructor convert | Factory method convert | List of factory method convert
             2025-05-27    | 2025-05-27          | 2025-05-27             | [2025-05-27]
@@ -394,22 +396,11 @@ class ParameterTypeConverterTest {
             FactoryMethodDate date2,
             List<FactoryMethodDate> list
         ) {
-            assertEquals(date, date1.date);
-            assertEquals(date, date2.date);
-            assertEquals(date, list.getFirst().date);
+            assertEquals(date, date1.date());
+            assertEquals(date, date2.date());
+            assertEquals(date, list.getFirst().date());
         }
 
-        record ConstructorDate(LocalDate date) {
-            @SuppressWarnings("unused")
-            ConstructorDate(String date) {
-                this(LocalDate.parse(date));
-            }
-        }
-        record FactoryMethodDate(LocalDate date) {}
-
-        @SuppressWarnings("unused")
-        static FactoryMethodDate parseDate(String date) {
-            return new FactoryMethodDate(LocalDate.parse(date));
-        }
     }
+
 }

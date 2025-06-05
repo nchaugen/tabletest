@@ -1,6 +1,10 @@
 package io.github.nchaugen.tabletest.junit
 
 import io.github.nchaugen.tabletest.junit.ParameterFixture.parameter
+import io.github.nchaugen.tabletest.junit.exampledomain.Age
+import io.github.nchaugen.tabletest.junit.exampledomain.Ages
+import io.github.nchaugen.tabletest.junit.exampledomain.ConstructorDate
+import io.github.nchaugen.tabletest.junit.exampledomain.FactoryMethodDate
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertNull
@@ -407,17 +411,6 @@ class ParameterTypeConverterKotlinTest {
     }
 
 }
-
-data class Age(val age: Int)
-
-data class Ages(val ages: kotlin.collections.List<Age>)
-
-data class ConstructorDate(val date: LocalDate?) {
-    @Suppress("unused")
-    constructor(date: String) : this(LocalDate.parse(date))
-}
-
-data class FactoryMethodDate(val date: LocalDate?)
 
 @Suppress("unused")
 fun parseAge(age: Int): Age {

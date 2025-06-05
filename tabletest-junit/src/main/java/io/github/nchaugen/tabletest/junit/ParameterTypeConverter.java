@@ -26,9 +26,9 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.github.nchaugen.tabletest.junit.ParameterUtil.nestedElementTypesOf;
@@ -101,7 +101,7 @@ public class ParameterTypeConverter {
     /**
      * Determines if the cell is an applicable value set with no values
      *
-     * @param value converted cell value
+     * @param value      converted cell value
      * @param targetType type of parameter
      */
     private static boolean isEmptyApplicableValueSet(Object value, Class<?> targetType) {
@@ -227,54 +227,74 @@ public class ParameterTypeConverter {
     }
 
     /**
-     * Searches for a custom converter method in the test class for converting a parsed value to the parameter type.
+     * Searches for a custom converter method for mapping a parsed value to the parameter type.
      * <p>
      * The converter method must be static and accessible and must take a single parameter.
      * The return type of the converter method must be the target type.
+     * <p>
+     * Searches in priority order and stops at the first suitable method found:
+     * 1. Methods in test class
+     * 2. Methods in classes listed in @TableTestConverters annotation for test class (in listed order)
+     * 3. Methods in classes listed in @TableTestConverters for enclosing classes (in inside-out order)
      *
      * @param testClass The test class to search for custom converters
      * @param toType    The target type of the conversion
      * @return An Optional with the converter method if found, otherwise an empty Optional
      */
     static Optional<Method> findConverter(Class<?> testClass, Class<?> toType) {
-        List<Method> applicableMethods = Stream.concat(
-                javaConverters(testClass),
-                kotlinConverters(testClass)
-            )
+        return Stream.concat(
+                Stream.of(testClass, kotlinTestFile(testClass)),
+                tableTestConverters(testClass))
+            .filter(Objects::nonNull)
+            .map(it -> findMatchingConverterInClass(it, toType))
+            .filter(Optional::isPresent)
+            .flatMap(Optional::stream)
+            .findFirst();
+    }
+
+    /**
+     * Helper method to find a converter in a class
+     */
+    private static Optional<Method> findMatchingConverterInClass(Class<?> clazz, Class<?> toType) {
+        return Arrays.stream(clazz.getDeclaredMethods())
             .filter(it -> Modifier.isStatic(it.getModifiers()))
             .filter(it -> it.canAccess(null))
             .filter(it -> it.getParameterCount() == 1)
             .filter(it -> toType.isAssignableFrom(it.getReturnType()))
-            .toList();
-
-        if (applicableMethods.size() > 1)
-            throw new ConversionException(
-                String.format(
-                    "Found multiple methods in %s converting to type %s: %s",
-                    testClass,
-                    toType,
-                    applicableMethods.stream()
-                        .map(Method::getName)
-                        .collect(Collectors.joining(", "))
-                )
-            );
-
-        return applicableMethods.stream().findFirst();
+            .findFirst();
     }
 
-    private static Stream<Method> javaConverters(Class<?> testClass) {
-        return Arrays.stream(testClass.getDeclaredMethods());
-    }
-
-    private static Stream<Method> kotlinConverters(Class<?> testClass) {
+    /**
+     * Helper method to load the Kotlin file class holding top-level, static functions
+     * @param testClass the current test class
+     * @return the Kotlin file class, or null if not found
+     */
+    private static Class<?> kotlinTestFile(Class<?> testClass) {
         try {
-            return Arrays.stream(testClass
-                    .getClassLoader()
-                    .loadClass(testClass.getTypeName() + "Kt")
-                    .getDeclaredMethods());
+            return testClass.getClassLoader().loadClass(testClass.getTypeName() + "Kt");
         } catch (ClassNotFoundException e) {
-            return Stream.empty();
+            return null;
         }
+    }
+
+    /**
+     * Recursive method to create stream of classes listed in TableTestConverters annotation
+     * for test class and any enclosing classes of a nested test class
+     * @param testClass the test class with possible TableTestConverters annotation
+     * @return stream of classes listed in found annotations
+     */
+    private static Stream<Class<?>> tableTestConverters(Class<?> testClass) {
+        if (testClass == null) return Stream.empty();
+
+        Stream<Class<?>> converters =
+            testClass.isAnnotationPresent(TableTestConverters.class)
+            ? Arrays.stream(testClass.getAnnotation(TableTestConverters.class).value())
+            : Stream.empty();
+
+        return Stream.concat(
+            converters,
+            tableTestConverters(testClass.getEnclosingClass())
+        );
     }
 
     /**

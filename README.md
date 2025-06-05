@@ -84,7 +84,7 @@ Column values can be [single values](#single-values), [lists](#list-values), [se
 Technically `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
 
 ## Value Formats
-TableTest supports three types of values: [single values](#single-values), [lists](#list-values), [sets](#set-values), or [maps](#map-values).
+TableTest supports three types of values: [single values](#single-values), [lists](#list-values), [sets](#set-values), and [maps](#map-values).
 
 ### Single Values
 Single values can appear with or without quotes. Unquoted values must not contain `[`, `|`, `,`, or `:` characters. These special characters require single or double quotes.

@@ -6,7 +6,6 @@ import org.junit.jupiter.params.converter.ArgumentConversionException
 import org.junit.jupiter.params.converter.ArgumentConverter
 import org.junit.jupiter.params.converter.ConvertWith
 import java.time.LocalDate
-import kotlin.jvm.javaClass
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
