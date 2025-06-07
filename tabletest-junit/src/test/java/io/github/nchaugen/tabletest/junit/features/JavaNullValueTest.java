@@ -18,13 +18,15 @@ class JavaNullValueTest {
         Empty double quoted | ""     | ""      | ""   | ""  | ""
         """)
     void testBlankIsNullForNonString(
+        String scenario,
         String string,
         Integer integer,
         List<?> list,
         Map<String, ?> map,
         Set<?> set
     ) {
-        assertEquals("", string);
+        if ("Blank".equals(scenario)) assertNull(string);
+        else assertEquals("", string);
         assertNull(integer);
         assertNull(list);
         assertNull(map);

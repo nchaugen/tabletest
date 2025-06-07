@@ -35,7 +35,7 @@ class KotlinMapParsingTest {
         Value with quotes                | [key: "quoted value"]        | 1     | key        | quoted value
         Value with single quotes         | [key: 'single quoted']       | 1     | key        | single quoted
         Value with special chars         | [key: "has, special: chars"] | 1     | key        | has, special: chars
-        Empty quoted value               | [key: ""]                    | 1     | key        |
+        Empty quoted value               | [key: ""]                    | 1     | key        | ""
         Mixed quotes in different values | [a: "double", b: 'single']   | 2     | a          | double
         """)
     fun testQuotedMapValues(map: Map<String, String>, expectedSize: Int, firstKey: String, firstValue: String) {

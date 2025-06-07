@@ -15,13 +15,14 @@ class KotlinNullValueTest {
         """
     )
     fun testBlankIsNullForNonString(
+        scenario: String,
         string: String?,
         integer: Int?,
         list: List<*>?,
         map: Map<String, *>?,
         set: Set<*>?
     ) {
-        assertEquals("", string)
+        if (scenario == "Blank") assertNull(string) else assertEquals("", string)
         assertNull(integer)
         assertNull(list)
         assertNull(map)

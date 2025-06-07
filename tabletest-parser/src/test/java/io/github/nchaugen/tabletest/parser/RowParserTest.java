@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,7 @@ import static io.github.nchaugen.tabletest.parser.StringParser.characterExcept;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RowParserTest {
@@ -205,9 +207,13 @@ class RowParserTest {
     }
 
     @Test
+    void shouldCaptureEmptyUnquotedSingleValueAsNull() {
+        assertNull(singleValue().parse("").captures().getFirst());
+    }
+
+    @Test
     void shouldCaptureSingleValueElement() {
         Map<String, String> testCases1 = Map.of(
-            "", "",                  // Empty input
             "abc", "abc",                // Simple text
             "a b c", "a b c",            // Text with spaces
             "a, b, c", "a, b, c",        // Text with commas
@@ -376,25 +382,25 @@ class RowParserTest {
     void shouldHandleEdgeCases() {
         // Empty cells
         assertEquals(
-            List.of("", "", ""),
+            Arrays.asList(null, null, null),
             trimStringCaptures(row().parse("| |"))
         );
 
         // Trailing pipe
         assertEquals(
-            List.of("a", "b", ""),
+            Arrays.asList("a", "b", null),
             trimStringCaptures(row().parse("a | b |"))
         );
 
         // Leading pipe
         assertEquals(
-            List.of("", "a", "b"),
+            Arrays.asList(null, "a", "b"),
             trimStringCaptures(row().parse("| a | b"))
         );
 
         // Only pipes
         assertEquals(
-            List.of("", "", "", ""),
+            Arrays.asList(null, null, null, null),
             trimStringCaptures(row().parse("|||"))
         );
 

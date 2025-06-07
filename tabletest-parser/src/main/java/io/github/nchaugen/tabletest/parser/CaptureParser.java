@@ -41,7 +41,7 @@ public class CaptureParser {
     }
 
     /**
-     * Creates a parser that captures the matched value on success. The captured value is trimmed, removing any leading and trailing whitespace.
+     * Creates a parser that captures a matched value that should be trimmed.
      *
      * @param parser base parser to use
      * @return parser that captures matched values

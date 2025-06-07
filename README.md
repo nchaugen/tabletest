@@ -145,7 +145,7 @@ Maps use square brackets with comma-separated key-value pairs. Colons separate k
 
 @TableTest("""
     Map                        | Size?
-    [one: 1, two: 2, three: 3] | 2
+    [one: 1, two: 2, three: 3] | 3
     [:]                        | 0
     """)
 void testMap(Map<String, Integer> map, int expectedSize) {
@@ -446,9 +446,9 @@ public void testLeapYear(Year year, boolean expectedResult) {
 In test reports, each test case will be identified by its scenario name rather than the default parameter values, improving test readability. Scenario names do not affect the test execution logic.
 
 ### Null Values
-Blank cells and empty quoted values will translate to `null` for all parameter types except String and primitives. For String the value will be the empty string, and for primitives it will cause an exception as they cannot represent a `null` value.
+Blank cells and empty quoted values will translate to `null` for all parameter types except primitives. For primitives, it will cause an exception as they cannot represent a `null` value.
 
-The built-in conversion will **not** translate empty quoted values to `null` when they appear as elements inside lists, sets, and maps, even when the parameterized value of the collection is not String. This will instead cause a `ConversionException`. Consider writing a [factory method](#factory-method-conversion) if you need this.
+The built-in conversion will **not** translate empty quoted values to `null` when they appear as elements inside lists, sets, and maps. This will instead cause a `ConversionException`. Consider writing a [factory method](#factory-method-conversion) if you need this.
 
 ```java
 @TableTest("""
@@ -457,8 +457,9 @@ The built-in conversion will **not** translate empty quoted values to `null` whe
     Empty single quoted | ''     | ''      | ''   | ''  | ''
     Empty double quoted | ""     | ""      | ""   | ""  | ""
     """)
-void testBlankMeansNullForNonString(String string, Integer integer, List<?> list, Map<String, ?> map, Set<?> set) {
-    assertEquals("", string);
+void testBlankMeansNull(String scenario, String string, Integer integer, List<?> list, Map<String, ?> map, Set<?> set) {
+    if ("Blank".equals(scenario)) assertNull(string);
+    else assertEquals("", string);
     assertNull(integer);
     assertNull(list);
     assertNull(map);

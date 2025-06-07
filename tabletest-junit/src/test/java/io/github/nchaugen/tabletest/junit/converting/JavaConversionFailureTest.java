@@ -33,7 +33,7 @@ class JavaConversionFailureTest {
     @Test
     void fails_when_list_conversion_not_possible() {
         Map.of(
-            "java.util.List<java.lang.Byte>", List.of("x")
+            "java.util.List<java.lang.Byte>", List.of("")
         ).forEach((String typeName, List<?> parsedValue) ->
                       assertThrows(
                           ConversionException.class,
@@ -46,7 +46,7 @@ class JavaConversionFailureTest {
     @Test
     void fails_when_set_conversion_not_possible() {
         Map.of(
-            "java.util.Set<java.lang.Byte>", Set.of("x")
+            "java.util.Set<java.lang.Byte>", Set.of("")
         ).forEach((String typeName, Set<?> parsedValue) ->
                       assertThrows(
                           ConversionException.class,
@@ -59,7 +59,7 @@ class JavaConversionFailureTest {
     @Test
     void fails_when_map_conversion_not_possible() {
         Map.of(
-            "java.util.Map<?, java.lang.Short>", Map.of("key", "x")
+            "java.util.Map<?, java.lang.Short>", Map.of("key", "")
         ).forEach((String typeName, Map<?, ?> parsedValue) ->
                       assertThrows(
                           ConversionException.class,

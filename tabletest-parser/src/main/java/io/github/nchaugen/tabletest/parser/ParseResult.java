@@ -85,7 +85,7 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
         private Success(String value, String rest, List<Object> captures) {
             this.value = value;
             this.rest = rest;
-            this.captures = List.copyOf(captures);
+            this.captures = Collections.unmodifiableList(new ArrayList<>(captures));
         }
 
         @Override
@@ -111,7 +111,7 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
 
         ParseResult.Success captureTrimmed() {
             ArrayList<Object> nextCaptures = new ArrayList<>(captures);
-            nextCaptures.add(value.trim());
+            nextCaptures.add(value.isBlank() ? null : value.trim());
             return new Success(value, rest, nextCaptures);
         }
 
