@@ -19,6 +19,7 @@ import static io.github.nchaugen.tabletest.parser.CaptureParser.capture;
 import static io.github.nchaugen.tabletest.parser.CaptureParser.captureElementSet;
 import static io.github.nchaugen.tabletest.parser.CaptureParser.captureElements;
 import static io.github.nchaugen.tabletest.parser.CaptureParser.captureNamedElements;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.captureTrimmed;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.atLeast;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.either;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.optional;
@@ -201,10 +202,10 @@ public class RowParser {
     }
 
     private static Parser unquotedValue() {
-        return capture(
+        return captureTrimmed(
             optional(
                 sequence(
-                    characterExcept('[', '|', ','),
+                    characterExcept('[', '{', '|'),
                     zeroOrMore(characterExcept('|'))
                 )
             )

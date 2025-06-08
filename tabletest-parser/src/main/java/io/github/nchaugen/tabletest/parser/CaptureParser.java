@@ -41,6 +41,19 @@ public class CaptureParser {
     }
 
     /**
+     * Creates a parser that captures the matched value on success. The captured value is trimmed, removing any leading and trailing whitespace.
+     *
+     * @param parser base parser to use
+     * @return parser that captures matched values
+     */
+    public static Parser captureTrimmed(Parser parser) {
+        return input -> switch (parser.parse(input)) {
+            case Failure ignored -> failure();
+            case Success success -> success.captureTrimmed();
+        };
+    }
+
+    /**
      * Creates a parser that captures a matched group of values as a list.
      *
      * @param parser base parser to use

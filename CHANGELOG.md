@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Fixed
+- Whitespace at the beginning or end of a quoted string is no longer being trimmed
 
 ## [0.3.1] - 2025-06-03
 ### Added

@@ -252,17 +252,7 @@ public class ParameterTypeConverter {
             .findFirst();
     }
 
-    /**
-     * Helper method to find a converter in a class
-     */
-    private static Optional<Method> findMatchingConverterInClass(Class<?> clazz, Class<?> toType) {
-        return Arrays.stream(clazz.getDeclaredMethods())
-            .filter(it -> Modifier.isStatic(it.getModifiers()))
-            .filter(it -> it.canAccess(null))
-            .filter(it -> it.getParameterCount() == 1)
-            .filter(it -> toType.isAssignableFrom(it.getReturnType()))
-            .findFirst();
-    }
+    //TODO find converter functions in enclosing test classes
 
     /**
      * Helper method to load the Kotlin file class holding top-level, static functions
@@ -295,6 +285,18 @@ public class ParameterTypeConverter {
             converters,
             tableTestConverters(testClass.getEnclosingClass())
         );
+    }
+
+    /**
+     * Helper method to find a converter in a class
+     */
+    private static Optional<Method> findMatchingConverterInClass(Class<?> clazz, Class<?> toType) {
+        return Arrays.stream(clazz.getDeclaredMethods())
+            .filter(it -> Modifier.isStatic(it.getModifiers()))
+            .filter(it -> it.canAccess(null))
+            .filter(it -> it.getParameterCount() == 1)
+            .filter(it -> toType.isAssignableFrom(it.getReturnType()))
+            .findFirst();
     }
 
     /**

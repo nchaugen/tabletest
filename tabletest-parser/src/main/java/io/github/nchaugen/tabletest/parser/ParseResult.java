@@ -109,6 +109,12 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
             return new Success(value, rest, nextCaptures);
         }
 
+        ParseResult.Success captureTrimmed() {
+            ArrayList<Object> nextCaptures = new ArrayList<>(captures);
+            nextCaptures.add(value.trim());
+            return new Success(value, rest, nextCaptures);
+        }
+
         ParseResult.Success captureGroup() {
             return new Success(value, rest, List.of(List.copyOf(captures)));
         }

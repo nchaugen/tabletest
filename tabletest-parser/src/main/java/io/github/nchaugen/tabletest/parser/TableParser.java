@@ -46,7 +46,6 @@ public class TableParser {
 
     private static Row parseRow(String line) {
         List<Object> cells = RowParser.parse(line).captures().stream()
-            .map(it -> (it instanceof String s) ? s.trim() : it)
             .toList();
         return cells.isEmpty() ? null : new Row(cells);
     }

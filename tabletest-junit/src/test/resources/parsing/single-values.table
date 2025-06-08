@@ -1,0 +1,115 @@
+Scenario                           | Input String Value                   | Expected Length
+Simple unquoted string             | Hello                                | 5
+Simple unquoted with spaces        | Hello world                          | 11
+Empty string with double quotes    | ""                                   | 0
+Empty string with single quotes    | ''                                   | 0
+String with pipe character quoted  | "|"                                  | 1
+String with comma unquoted         | Hello, world                         | 12
+String with colon unquoted         | key: value                           | 10
+String with square brackets quoted | "[not a list]"                       | 12
+String with curly braces quoted    | "{not a set}"                        | 11
+String with both quote types       | "It's a 'test'"                      | 13
+String with escaped quotes         | 'He said "hello"'                    | 15
+String with leading whitespace     | "  spaces"                           | 8
+String with trailing whitespace    | "spaces  "                           | 8
+String with mixed whitespace       | "  mixed  spaces  "                  | 17
+Unquoted gets trimmed              | unquoted spaces                      | 15
+Unquoted with special chars        | Hello, world: test                   | 18
+Starts with letter then brackets   | a[1,2,3]                             | 8
+Starts with letter then braces     | a{1,2,3}                             | 8
+Starts with number                 | 123abc                               | 6
+Starts with symbol not forbidden   | #hashtag                             | 8
+Single character                   | a                                    | 1
+Single quoted character            | 'a'                                  | 1
+Number as string                   | "123"                                | 3
+Boolean as string                  | "true"                               | 4
+Special chars in single quotes     | '|,[]{}:'                            | 7
+Special chars in double quotes     | "|,[]{}:"                            | 7
+Unicode characters                 | café                                 | 4
+String with multiple commas        | a,b,c,d                              | 7
+String with multiple pipes quoted  | "a|b|c|d"                            | 7
+Empty-looking but quoted           | " "                                  | 1
+Just whitespace quoted             | "   "                                | 3
+Mixed quotes scenario              | 'Say "hi" to me'                     | 14
+Another mixed quotes               | "Don't do that"                      | 13
+Complex unquoted with specials     | abc:def,ghi                          | 11
+Unquoted with many specials        | !@#$%^&*()_+-=                       | 14
+Boolean true value                 | true                                 | 4
+Boolean false value                | false                                | 5
+Byte decimal                       | 15                                   | 2
+Byte hex                           | 0xF                                  | 3
+Byte octal                         | 017                                  | 3
+Integer decimal                    | 42                                   | 2
+Integer hex                        | 0xFF                                 | 4
+Integer octal                      | 0777                                 | 4
+Long value                         | 1234567890                           | 10
+Float value                        | 3.14159                              | 7
+Double value                       | 2.718281828                          | 11
+Scientific notation                | 1.23e4                               | 6
+Big decimal                        | 123.456e789                          | 11
+Big integer                        | 1234567890123456789                  | 19
+File path unix                     | /path/to/file                        | 13
+File path windows                  | C:\Users\test                        | 13
+Java class name                    | java.lang.Integer                    | 17
+Primitive class                    | byte                                 | 4
+Array class                        | "char[]"                             | 6
+URI value                          | https://junit.org/                   | 18
+URL value                          | https://example.com                  | 19
+Charset name                       | UTF-8                                | 5
+ISO date                           | 2017-03-14                           | 10
+Local time                         | 12:34:56.789                         | 12
+Duration ISO                       | PT3S                                 | 4
+Period ISO                         | P2M6D                                | 5
+Year month                         | 2017-03                              | 7
+Year only                          | 2017                                 | 4
+Zone offset                        | +02:30                               | 6
+Currency code                      | JPY                                  | 3
+Locale code                        | en                                   | 2
+UUID string                        | d043e930-7b3b-48e3-bdbe-5a3ccfb833db | 36
+French text                        | Bonjour le monde                     | 16
+German text                        | Hallo Welt                           | 10
+Spanish text                       | Hola mundo                           | 10
+Chinese text                       | 你好世界                             | 4
+Japanese text                      | こんにちは世界                       | 7
+Korean text                        | 안녕하세요                                | 5
+Arabic text                        | مرحبا بالعالم                        | 13
+Russian text                       | Привет мир                           | 10
+Greek text                         | Γεια σου κόσμε                       | 14
+Hebrew text                        | שלום עולם                            | 9
+Thai text                          | สวัสดีโลก                            | 9
+Hindi text                         | नमस्ते संसार                         | 12
+Emoji simple                       | 😀                                    | 2
+Emoji with text                    | Hello 👋 World                        | 14
+Multiple emojis                    | 🌍🌎🌏                                  | 6
+Emoji sequence                     | 👨‍💻                                  | 5
+Flag emoji                         | 🇺🇸                                   | 4
+Mixed unicode and emoji            | Café ☕ tastes good 😋                 | 21
+Accented characters                | naïve résumé                         | 12
+Special symbols                    | α β γ δ ε                            | 9
+Mathematical symbols               | ∑ ∏ ∫ √                              | 7
+Currency symbols                   | $€£¥₹                                | 5
+Punctuation marks                  | «»""''—–                             | 8
+Box drawing                        | ┌─┐│ │└─┘                            | 9
+Tab character unescaped unquoted   | a	b                               | 3
+Tab character unescaped quoted     | "a	b"                             | 3
+Multiple tabs                      | a							b       | 9
+Backslash with path                | path\file                            | 9
+Single backslash                   | "\"                                  | 1
+Double backslash literal           | path\\file                           | 10
+Triple backslash literal           | text\\\more                          | 11
+File path with backslashes         | C:\Program Files                     | 16
+Quoted pipe in content             | "text | more"                        | 11
+Quoted brackets in content         | "text [bracket]"                     | 14
+Quoted braces in content           | "text {brace}"                       | 12
+Windows UNC path                   | \\server\share                       | 14
+Regex pattern like                 | \d+\.\d+                             | 8
+JSON like structure                | '{"key":"value"}'                    | 15
+XML like structure                 | <tag>content</tag>                   | 18
+HTML like structure                | <p>Hello world</p>                   | 18
+CSS like structure                 | .class{color:red}                    | 17
+URL with parameters                | https://site.com?a=1&b=2             | 24
+Email address                      | user@domain.com                      | 15
+Phone number                       | +1-555-123-4567                      | 15
+IPv4 address                       | 192.168.1.1                          | 11
+IPv6 address                       | 2001:db8::1                          | 11
+MAC address                        | 00:1B:44:11:3A:B7                    | 17
