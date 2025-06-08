@@ -28,6 +28,8 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -60,7 +62,7 @@ public class ParameterFixture {
             .flatMap((Method method) -> Arrays.stream(method.getParameters()))
             .collect(Collectors.toMap(Parameter::getType, it -> it));
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
     private void supportedValueParams(
         boolean primitiveBoolean,
         byte primitiveByte,
@@ -80,6 +82,7 @@ public class ParameterFixture {
         BigDecimal bigDecParam,
         Character charParam,
         String stringParam,
+        Object objectParam, // Added Object
         TimeUnit enumParam,
         File fileParam,
         Path pathParam,
@@ -105,7 +108,8 @@ public class ParameterFixture {
         ZoneId zoneIdParam,
         ZoneOffset zoneOffsetParam,
         List<?> list,
-        Map<?, ?> map
+        Set<?> set,
+        Optional<?> optional
     ) {
         // This method is only used to get the parameter types
     }
@@ -135,14 +139,92 @@ public class ParameterFixture {
         Map<String, Byte> byteMap,
         Map<?, Short> shortMap,
         Map<?, Integer> integerMap,
+        Map<String, Integer> mapStringInteger,
         Map<?, Long> longMap,
         Map<?, Double> doubleMap,
         Map<?, List<Short>> mapOfShortList,
         Map<?, List<Long>> mapOfLongList,
+        Map<String, List<Long>> mapStringListLong,
         Map<?, List<List<Byte>>> mapOfListOfByteList,
         Map<?, Map<?, Long>> mapOfLongMap,
-        Map<?, Map<String, List<Long>>> mapOfMapOfLongsList
+        Map<?, Map<String, List<Long>>> mapOfMapOfLongsList,
+        Map<String, Map<String, Byte>> mapStringMapStringByte
     ) {
         // This method is only used to get the parameter type
     }
+
+    @SuppressWarnings("unused")
+    private void parameterizedSetValueParams(
+        Set<Object> objectSet,
+        Set<String> stringSet,
+        Set<Byte> byteSet,
+        Set<Short> shortSet,
+        Set<Integer> integerSet,
+        Set<Long> longSet,
+        Set<Double> doubleSet,
+        Set<List<String>> setOfStringList,
+        Set<List<Integer>> setOfIntegerList,
+        Set<List<Long>> setOfLongList,
+        Set<List<Double>> setOfDoubleList,
+        Set<Set<String>> setOfStringSet,
+        Set<Set<Integer>> setOfIntegerSet,
+        Set<Set<Double>> setOfDoubleSet,
+        Set<Map<String, Integer>> setOfStringIntegerMap,
+        Set<Map<String, List<Long>>> setOfStringListLongMap
+    ) {
+        // This method is only used to get the parameter types
+    }
+
+    @SuppressWarnings("unused")
+    private void mixedCollectionValueParams(
+        List<Set<String>> listOfStringSet,
+        List<Set<Integer>> listOfIntegerSet,
+        List<Set<Double>> listOfDoubleSet,
+        Map<String, Set<String>> mapOfStringSet,
+        Map<String, Set<Integer>> mapOfStringIntegerSet,
+        Map<String, Set<List<Double>>> mapOfStringSetListDouble,
+        List<Map<String, Set<Integer>>> listOfMapStringSetInteger,
+        Map<String, Set<List<Integer>>> mapOfStringSetListInteger
+    ) {
+        // This method is only used to get the parameter types
+    }
+
+    @SuppressWarnings("unused")
+    private void boundedWildcardValueParams(
+        List<? extends Number> listExtendsNumber,
+        List<? super Integer> listSuperInteger,
+        Set<? extends Number> setExtendsNumber,
+        Set<? super Integer> setSuperInteger,
+        Map<? extends String, ? extends Number> mapExtendsStringExtendsNumber,
+        Map<String, ? extends Number> mapStringExtendsNumber,
+        Map<? super String, ? super Number> mapSuperStringSuperNumber
+    ) {
+        // This method is only used to get the parameter types
+    }
+
+    @SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
+    private void otherGenericValueParams(
+        Optional<String> optionalString,
+        Optional<Integer> optionalInteger,
+        Optional<List<String>> optionalListString,
+        Optional<List<Integer>> optionalListInteger,
+        Optional<Set<String>> optionalSetString,
+        Optional<Map<String, Integer>> optionalMapStringInteger
+    ) {
+        // This method is only used to get the parameter types
+    }
+
+    @SuppressWarnings("unused")
+    private void multipleWildcardValueParams(
+        List<List<?>> listOfListWildcard,
+        Set<Set<?>> setOfSetWildcard,
+        Map<?, ?> mapWildcardWildcard,
+        Set<Map<?, ?>> setOfMapWildcard,
+        Map<?, List<?>> mapWildcardListWildcard,
+        Map<String, ?> mapStringWildcard,
+        List<Map<?, ?>> listOfMapWildcard
+    ) {
+        // This method is only used to get the parameter types
+    }
+
 }

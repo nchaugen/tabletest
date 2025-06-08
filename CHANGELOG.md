@@ -1,8 +1,11 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Added
+- New annotation TableTestConverters to declare classes with custom factory methods
+- Improved support for conversion to parameterized test parameters
 ### Fixed
-- Whitespace at the beginning or end of a quoted string is no longer being trimmed
+- Explicit leading and trailing whitespace in a quoted string is no longer being removed
 
 ## [0.3.1] - 2025-06-03
 ### Added

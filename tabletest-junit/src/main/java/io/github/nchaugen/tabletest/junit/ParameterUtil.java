@@ -16,9 +16,14 @@
 package io.github.nchaugen.tabletest.junit;
 
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Utility class providing helper methods for parameter conversion.
@@ -43,48 +48,84 @@ public class ParameterUtil {
      * {@code List<Map<String, Integer>>}, it would return [List.class, Map.class, Integer.class].
      * <p>
      * The method handles primitive types by returning their corresponding wrapper classes.
+     * For Map types, only the value type is included (key types are skipped).
      *
      * @param parameter The parameter whose nested types should be extracted
      * @return A list of Class objects representing the nested types in the parameter
      */
     public static List<? extends Class<?>> nestedElementTypesOf(Parameter parameter) {
-        return Arrays.stream(parameter.getParameterizedType().getTypeName().split("<"))
-            .map(it -> it.replaceAll(">", ""))
-            .map(it -> it.split(","))
-            .map(it -> it.length > 1 ? it[1] : it[0])
-            .map(String::trim)
-            .map(ParameterUtil::findClass)
-            .filter(Objects::nonNull)
+        return collectTypes(parameter.getParameterizedType())
+            .map(ParameterUtil::toWrapperClass)
             .toList();
     }
 
     /**
-     * Resolves a type name string to its corresponding Class object.
-     * <p>
-     * This method handles both primitive types (converting them to their wrapper types)
-     * and regular class names. For primitive types, it returns the corresponding wrapper class.
-     * For class names, it attempts to load the class using Class.forName().
-     * <p>
-     * If the class cannot be found, this method returns null.
-     *
-     * @param typeName The name of the type to resolve
-     * @return The Class object corresponding to the given type name, or null if not found
+     * Recursively collects all Class types from a Type, excluding Map key types.
      */
-    private static Class<?> findClass(String typeName) {
-        try {
-            return switch (typeName) {
-                case "boolean" -> Boolean.class;
-                case "byte" -> Byte.class;
-                case "char" -> Character.class;
-                case "short" -> Short.class;
-                case "int" -> Integer.class;
-                case "long" -> Long.class;
-                case "float" -> Float.class;
-                case "double" -> Double.class;
-                default -> Class.forName(typeName);
-            };
-        } catch (ClassNotFoundException e) {
-            return null;
-        }
+    private static Stream<Class<?>> collectTypes(Type type) {
+        return switch (type) {
+            case Class<?> clazz -> Stream.of(clazz);
+
+            case ParameterizedType paramType when paramType.getRawType() instanceof Class<?> rawClass -> Stream.concat(
+                Stream.<Class<?>>of(rawClass),
+                Map.class.isAssignableFrom(rawClass) ? collectMapValueTypes(paramType)
+                                                     : collectAllTypeArguments(paramType)
+            );
+
+            case WildcardType wildcardType -> Stream.concat(
+                collectBounds(wildcardType.getUpperBounds()),
+                collectBounds(wildcardType.getLowerBounds())
+            );
+
+            case TypeVariable<?> typeVar -> collectBounds(typeVar.getBounds());
+
+            default -> Stream.empty();
+        };
     }
+
+    /**
+     * Collects types from Map value type only (skips key type).
+     */
+    private static Stream<Class<?>> collectMapValueTypes(ParameterizedType mapType) {
+        Type[] typeArgs = mapType.getActualTypeArguments();
+        return typeArgs.length >= 2
+               ? collectTypes(typeArgs[1])  // Skip key (index 0), process value (index 1)
+               : Stream.empty();
+    }
+
+    /**
+     * Collects types from all type arguments.
+     */
+    private static Stream<Class<?>> collectAllTypeArguments(ParameterizedType paramType) {
+        return Arrays.stream(paramType.getActualTypeArguments())
+            .flatMap(ParameterUtil::collectTypes);
+    }
+
+    /**
+     * Collects types from bounds, filtering out Object.class.
+     */
+    private static Stream<Class<?>> collectBounds(Type[] bounds) {
+        return Arrays.stream(bounds)
+            .filter(bound -> !bound.equals(Object.class))
+            .flatMap(ParameterUtil::collectTypes);
+    }
+
+    /**
+     * Converts primitive types to their wrapper classes.
+     */
+    private static Class<?> toWrapperClass(Class<?> clazz) {
+        return clazz.isPrimitive() ? switch (clazz.getName()) {
+            case "boolean" -> Boolean.class;
+            case "byte" -> Byte.class;
+            case "char" -> Character.class;
+            case "short" -> Short.class;
+            case "int" -> Integer.class;
+            case "long" -> Long.class;
+            case "float" -> Float.class;
+            case "double" -> Double.class;
+            default -> clazz; // Fallback, shouldn't happen for primitives
+        } : clazz;
+
+    }
+
 }

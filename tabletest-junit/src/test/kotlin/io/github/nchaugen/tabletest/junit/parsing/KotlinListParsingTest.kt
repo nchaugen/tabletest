@@ -20,7 +20,7 @@ class KotlinListParsingTest {
         Single-quoted is not trimmed | ['   quoted text   '] | "   quoted text   "
         """
     )
-    fun testElementTrimming(input: List<String?>, expectedFirstElement: String?) {
+    fun testElementTrimming(input: List<String>, expectedFirstElement: String) {
         assertEquals(1, input.size)
         assertEquals(expectedFirstElement, input.first())
     }
