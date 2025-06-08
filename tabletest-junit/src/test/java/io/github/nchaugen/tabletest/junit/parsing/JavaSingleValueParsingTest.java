@@ -1,8 +1,10 @@
-package io.github.nchaugen.tabletest.junit;
+package io.github.nchaugen.tabletest.junit.parsing;
+
+import io.github.nchaugen.tabletest.junit.TableTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JavaValueParsingTest {
+public class JavaSingleValueParsingTest {
 
     @TableTest("""
         Scenario                                | Input      | Length?

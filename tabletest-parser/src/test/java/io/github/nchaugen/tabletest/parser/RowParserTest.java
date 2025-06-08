@@ -199,7 +199,7 @@ class RowParserTest {
 
         // Test maps with whitespace
         assertEquals(
-            List.of(Map.of("key  ", "value  ")),
+            List.of(Map.of("key", "value")),
             mapValue().parse("[  key  :  value  ]").captures()
         );
     }
@@ -258,7 +258,7 @@ class RowParserTest {
         );
 
         // Test whitespace handling
-        assertEquals(List.of("abc  "), cell().parse("  abc  ").captures());
+        assertEquals(List.of("abc"), cell().parse("  abc  ").captures());
         assertEquals(List.of(List.of("a", "b")), cell().parse("  [a, b]  ").captures());
     }
 

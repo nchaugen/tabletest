@@ -115,11 +115,14 @@ public class RowParser {
     }
 
     private static Parser mapKey() {
-        return sequence(anyWhitespace(), capture(mapKeyName()), anyWhitespace());
-    }
-
-    private static Parser mapKeyName() {
-        return atLeast(1, characterExcept(',', '[', ']', ':'));
+        return sequence(
+            anyWhitespace(),
+            captureTrimmed(sequence(
+                characterExcept(',', ':', '|', '[', ']', '{', '}', '\'', '"'),
+                atLeast(0, characterExcept(',', ':', '|', '[', ']'))
+            )),
+            anyWhitespace()
+        );
     }
 
     /**
@@ -164,7 +167,10 @@ public class RowParser {
                 either(
                     singleQuotedValue(),
                     doubleQuotedValue(),
-                    capture(atLeast(1, characterExcept(',', ']', '}')))
+                    captureTrimmed(sequence(
+                        characterExcept(',', ':', '|', '[', ']', '{', '}', '\'', '"'),
+                        atLeast(0, characterExcept(',', ':', '|', ']', '}'))
+                    ))
                 )
             ),
             anyWhitespace()

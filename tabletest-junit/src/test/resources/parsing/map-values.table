@@ -1,0 +1,25 @@
+Scenario                                 | Input Map Value                                        | Size? | Value Type?
+Empty map                                | [:]                                                    | 0     | java.lang.Object
+Single key-value pair                    | [key: value]                                           | 1     | java.lang.String
+Multiple key-value pairs                 | [a: 1, b: 2, c: 3]                                     | 3     | java.lang.String
+Alphanumeric keys allowed                | [abc123: value1, key_name: value2]                     | 2     | java.lang.String
+Underscore and dash in keys              | [key_name: val1, key-name: val2]                       | 2     | java.lang.String
+Dot in key allowed                       | [config.host: localhost]                               | 1     | java.lang.String
+Quoted values with restricted chars      | [key: "val, with: special| chars"]                     | 1     | java.lang.String
+Values with quotes themselves            | [key1: "quoted", key2: 'also quoted']                  | 2     | java.lang.String
+Empty strings as values                  | [key1: "", key2: '']                                   | 2     | java.lang.String
+Whitespace handling                      | [key: value, b: c]                                     | 2     | java.lang.String
+Numeric-looking keys                     | [123: value, 456: other]                               | 2     | java.lang.String
+Numeric-looking values                   | [key1: 123, key2: 45.6]                                | 2     | java.lang.String
+Special chars allowed in unquoted values | [key1: !@#$%^, key2: &*()_+=]                          | 2     | java.lang.String
+List values                              | [items: [a, b], tags: [x, y]]                          | 2     | java.util.List
+Empty list values                        | [empty: [], data: [item]]                              | 2     | java.util.List
+Set values                               | [active: {true}, ids: {1, 2, 3}]                       | 2     | java.util.Set
+Empty set values                         | [empty: {}, data: {item}]                              | 2     | java.util.Set
+Nested map values                        | [config: [host: local], env: [dev: x]]                 | 2     | java.util.Map
+Empty nested maps                        | [empty: [:], config: [key: val]]                       | 2     | java.util.Map
+Mixed compound values                    | [list: [a], set: {b}, map: [c: d]]                     | 3     | java.lang.Object
+Complex nested structure                 | [users: [alice: [admin: true]], data: [items: {x, y}]] | 2     | java.util.Map
+Deep nesting                             | [level1: [level2: [level3: value]]]                    | 1     | java.util.Map
+Map with list of maps                    | [configs: [[a: 1], [b: 2]]]                            | 1     | java.util.List
+Map with set of maps                     | [options: {[x: 1], [y: 2]}]                            | 1     | java.util.Set

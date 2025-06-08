@@ -1,9 +1,10 @@
-package io.github.nchaugen.tabletest.junit
+package io.github.nchaugen.tabletest.junit.parsing
 
+import io.github.nchaugen.tabletest.junit.TableTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 
-class KotlinValueParsingTest {
+class KotlinSingleValueParsingTest {
 
     @TableTest(
         """    

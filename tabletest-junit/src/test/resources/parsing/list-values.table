@@ -1,0 +1,24 @@
+Scenario                           | Input List Value                       | Size? | Element Type?
+Empty list                         | []                                     | 0     | java.lang.Object
+Single element                     | [hello]                                | 1     | java.lang.String
+Multiple elements                  | [hello, world, test]                   | 3     | java.lang.String
+Opening bracket unquoted           | [=[>, test]                            | 2     | java.lang.String
+Opening brace unquoted             | [={o, test]                            | 2     | java.lang.String
+Comma in quoted element            | ["hello, world", test]                 | 2     | java.lang.String
+Closing bracket in quoted element  | ["path[index]", test]                  | 2     | java.lang.String
+Closing brace in quoted element    | ["object{prop}", test]                 | 2     | java.lang.String
+Mixed quote styles                 | ["hello", 'world', test]               | 3     | java.lang.String
+Empty strings in list              | ["", '', test]                         | 3     | java.lang.String
+Whitespace handling                | [hello, world, test]                   | 3     | java.lang.String
+Special chars unquoted in elements | [!@#$%^, &*()_, +={]                   | 3     | java.lang.String
+Nested list simple                 | [[a], [b, c]]                          | 2     | java.util.List
+Nested list empty                  | [[], [a]]                              | 2     | java.util.List
+Nested list deep                   | [[[a]], [[b, c]]]                      | 2     | java.util.List
+List with maps                     | [[a: 1], [b: 2, c: 3]]                 | 2     | java.util.Map
+List with empty map                | [[:], [a: 1]]                          | 2     | java.util.Map
+List with sets                     | [{a}, {b, c}]                          | 2     | java.util.Set
+List with empty set                | [{}, {a}]                              | 2     | java.util.Set
+Mixed compound types               | [[a: 1], [b], {c}]                     | 3     | java.lang.Object
+Complex nested structure           | [[items: [x, y]], [data: {a, b}]]      | 2     | java.util.Map
+Map values as lists                | [[users: [alice, bob]], [tags: [new]]] | 2     | java.util.Map
+Set values as lists                | [[active: {true}], [ids: {1, 2, 3}]]   | 2     | java.util.Map
