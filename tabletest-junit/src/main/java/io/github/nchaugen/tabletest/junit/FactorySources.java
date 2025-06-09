@@ -22,6 +22,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TableTestConverters {
+public @interface FactorySources {
     Class<?>[] value();
 }

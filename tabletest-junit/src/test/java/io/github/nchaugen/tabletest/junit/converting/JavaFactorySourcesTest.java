@@ -1,11 +1,12 @@
 package io.github.nchaugen.tabletest.junit.converting;
 
 import io.github.nchaugen.tabletest.junit.TableTest;
-import io.github.nchaugen.tabletest.junit.TableTestConverters;
+import io.github.nchaugen.tabletest.junit.FactorySources;
+import io.github.nchaugen.tabletest.junit.javafactories.FirstTierFactorySource;
+import io.github.nchaugen.tabletest.junit.javafactories.SecondTierFactorySource;
 import io.github.nchaugen.tabletest.junit.javadomain.Age;
 import io.github.nchaugen.tabletest.junit.javadomain.Ages;
-import io.github.nchaugen.tabletest.junit.javaconverters.FirstTierConverters;
-import io.github.nchaugen.tabletest.junit.javaconverters.SecondTierConverters;
+import io.github.nchaugen.tabletest.junit.kotlinfactories.KotlinFactorySourceForNestedClass;
 import org.junit.jupiter.api.Nested;
 
 import java.time.LocalDate;
@@ -15,14 +16,14 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@TableTestConverters({FirstTierConverters.class, SecondTierConverters.class})
-public class JavaFactoryMethodInAnnotationClassConversionTest {
+@FactorySources({FirstTierFactorySource.class, SecondTierFactorySource.class})
+public class JavaFactorySourcesTest {
 
     @TableTest("""
         Int | List | Set  | AVS  | Map       | Nested           | Ages
         16  | [16] | {16} | {16} | [age: 16] | [ages: [16, 16]] | [ages: [16, 16]]
         """)
-    void using_factory_methods_in_annotation_class(
+    void using_factory_methods_in_factory_source(
         Age fromInt,
         List<Age> inList,
         Set<Age> inSet,
@@ -47,7 +48,7 @@ public class JavaFactoryMethodInAnnotationClassConversionTest {
         today      | yesterday  | false
         2024-02-29 | 2024-03-01 | true
         """)
-    void overriding_annotation_conversion(LocalDate thisDate, LocalDate otherDate, boolean expectedIsBefore) {
+    void overriding_factory_source(LocalDate thisDate, LocalDate otherDate, boolean expectedIsBefore) {
         assertEquals(expectedIsBefore, thisDate.isBefore(otherDate));
     }
 
@@ -61,23 +62,20 @@ public class JavaFactoryMethodInAnnotationClassConversionTest {
         };
     }
 
+    @FactorySources(KotlinFactorySourceForNestedClass.class)
     @Nested
     public class NestedTestClass {
 
         @TableTest("""
-        Age | Ages             | Expected
-        16  | [ages: [16, 16]] | 17
-        """)
-        void factory_method_in_nested_class_takes_precedence_over_annotation_method(
+            Age | Expected
+            16  | 17
+            """)
+        void factory_method_in_nested_class_takes_precedence_over_factory_source(
             Age fromFactoryMethodInThisClass,
-            Ages fromFactoryMethodInEnclosingClass,
             int expectedAgeAfterConversion
         ) {
             Age expected = new Age(expectedAgeAfterConversion);
             assertEquals(expected, fromFactoryMethodInThisClass);
-            assertEquals(
-                new Ages(List.of(expected, expected)),
-                fromFactoryMethodInEnclosingClass);
         }
 
         @SuppressWarnings("unused")
@@ -85,29 +83,52 @@ public class JavaFactoryMethodInAnnotationClassConversionTest {
             return new Age(age + 1);
         }
 
+        @TableTest("""
+            This Date | Other Date | Is Before?
+            today     | tomorrow   | true
+            today     | yesterday  | false
+            """)
+        void factory_method_in_outer_class_takes_precedence_over_factory_source(
+            LocalDate thisDate,
+            LocalDate otherDate,
+            boolean expectedIsBefore
+        ) {
+            assertEquals(expectedIsBefore, thisDate.isBefore(otherDate));
+        }
+
 
         @Nested
         public class DeeplyNestedTestClass {
 
             @TableTest("""
-                Age | Ages             | Expected
-                16  | [ages: [16, 16]] | 18
+                Age | Expected
+                16  | 18
                 """)
             void factory_method_in_deeply_nested_class_takes_precedence(
                 Age fromFactoryMethodInThisClass,
-                Ages fromFactoryMethodInEnclosingClass,
                 int expectedAgeAfterConversion
             ) {
                 Age expected = new Age(expectedAgeAfterConversion);
                 assertEquals(expected, fromFactoryMethodInThisClass);
-                assertEquals(
-                    new Ages(List.of(expected, expected)),
-                    fromFactoryMethodInEnclosingClass);
             }
 
             @SuppressWarnings("unused")
             public static Age parseAgePlusTwo(int age) {
                 return new Age(age + 2);
+            }
+
+            @TableTest("""
+                Ages             | Expected
+                [ages: [16, 16]] | 28
+                """)
+            void factory_method_in_closest_outer_factory_source_takes_precedence_over_outermost_factory_source(
+                Ages fromFactoryMethodInAnnotationClass,
+                int expectedAgeAfterConversion
+            ) {
+                Age expected = new Age(expectedAgeAfterConversion);
+                assertEquals(
+                    new Ages(List.of(expected, expected)),
+                    fromFactoryMethodInAnnotationClass);
             }
 
         }

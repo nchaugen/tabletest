@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 ### Added
-- TableTest will search classes listed in new annotation `@TableTestConverters` for factory methods
+- TableTest will search classes listed in new annotation `@FactorySources` for factory methods
 - For `@Nested` test classes, TableTest will search enclosing classes for factory methods 
 ### Fixed
 - Explicit leading and trailing whitespace in a quoted string is no longer removed

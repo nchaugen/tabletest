@@ -189,7 +189,7 @@ TableTest will try one of the following strategies to perform the required conve
 
 1. Using explicit argument converter specified with JUnit `@ConvertWith` annotation on parameter 
 2. Using a factory method found in the test class
-3. Using a factory method found via `@TableTestConverters` annotation on test class
+3. Using a factory method found via `@FactorySources` annotation on test class
 4. Using JUnit built-in type conversion
 
 Let us look into how each of these strategies works, starting from the bottom.
@@ -247,7 +247,7 @@ void testParameterizedTypes(Map<String, List<Integer>> grades, int expectedHighe
 
 
 ### Factory Method Conversion
-Before falling back to [JUnit built-in conversion](#junit-built-in-conversion), TableTest will look for a factory method present in either the test class or in one of the classes listed in a `@TableTestConverters` annotation. If found, TableTest will use this factory method to convert the parsed value to the required test parameter type. 
+Before falling back to [JUnit built-in conversion](#junit-built-in-conversion), TableTest will look for a factory method present in either the test class or in one of the classes listed in a `@FactorySources` annotation. If found, TableTest will use this factory method to convert the parsed value to the required test parameter type. 
 
 #### How It Works
 A custom converter is a factory method that:
@@ -258,15 +258,15 @@ A custom converter is a factory method that:
 
 There is no specific naming pattern for factory methods, any method fulfilling the requirements above will be considered.
 
-TableTest will use factory methods available in the test class or in a class listed by a `@TableTestConverters` annotation on the test class.
+TableTest will use factory methods available in the test class or in a class listed by a `@FactorySources` annotation on the test class.
 
 #### Factory Method Search Strategy in Java
 TableTest uses the following strategy to search for factory methods in Java test classes: 
 
 1. Search current test class
-2. In case of a `@Nested` test class, search enclosing classes, starting with the immediate parent
-3. Search classes in the order they are listed by a `@TableTestConverters` annotation on current test class
-4. In case of a `@Nested` test class, search classes listed by `@TableTestConverters` of enclosing classes, starting with immediate parent
+2. In case of a `@Nested` test class, search enclosing classes, starting with the direct outer
+3. Search classes in the order they are listed by a `@FactorySources` annotation on current test class
+4. In case of a `@Nested` test class, search classes listed by `@FactorySources` of enclosing classes, starting with direct outer
 
 It will stop searching as soon as it finds a matching factory method and use this for the conversion.
 
@@ -278,15 +278,35 @@ For tests written in Kotlin, static factory methods can be declared in two ways:
 
 In Kotlin, a `@Nested` test class must be declared `inner class` and these are not allowed to have companion objects. Hence, all test class factory methods must be either declared in the companion object of the outer class (with `@JvmStatic`) or at package level in the same file as the test class.
 
-Kotlin files with package-level factory methods can be listed in a `@TableTestConverters` annotation using the JVM name of the file: `<package name>.<capitalised file name>Kt`. So to reference a file `app.kt` inside package `org.example`, use `org.example.AppKt.class`
-
 So for Kotlin, the search strategy becomes as follows:
 
 1. Search the current file (methods declared at package-level or in outer class companion object)
-2. Search classes in the order they are listed by a `@TableTestConverters` annotation on current test class
-3. In case of a `@Nested` test class, search classes listed by `@TableTestConverters` of enclosing classes, starting with immediate parent
+2. Search classes in the order they are listed by a `@FactorySources` annotation on current test class
+3. In case of a `@Nested` test class, search classes listed by `@FactorySources` of enclosing classes, starting with direct outer
 
 As for Java, TableTest will stop searching as soon as it finds a matching factory method and use this for the conversion.
+
+#### Factory Sources in Kotlin
+
+The recommended solution for implementing factory sources in Kotlin is to define them as `object` and annotate factory methods with `@JvmStatic`:
+
+```kotlin
+object KotlinFactorySource { 
+    @JvmStatic
+    fun toAges(input: Map<String, List<Int>>): Ages {
+        // implementation
+    }
+}
+```
+
+Usage:
+
+```kotlin
+@FactorySources(KotlinFactorySource::class)
+```
+
+Alternatively, regular Kotlin classes can also be referenced, with factory methods defined in a companion object. These methods must also be annotated with `@JvmStatic`.
+
 
 #### Overriding Built-In Conversion
 As TableTest will prefer an external factory method over the built-in conversion, it is possible to override the built-in conversion of specific types.

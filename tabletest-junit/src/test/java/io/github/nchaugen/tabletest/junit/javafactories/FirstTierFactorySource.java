@@ -1,4 +1,4 @@
-package io.github.nchaugen.tabletest.junit.javaconverters;
+package io.github.nchaugen.tabletest.junit.javafactories;
 
 import io.github.nchaugen.tabletest.junit.javadomain.Age;
 import io.github.nchaugen.tabletest.junit.javadomain.Ages;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unused")
-public class FirstTierConverters {
+public class FirstTierFactorySource {
 
     public static ExternalFactoryDate parseDate(String date) {
         return new ExternalFactoryDate(LocalDate.parse(date));
@@ -30,10 +30,6 @@ public class FirstTierConverters {
 
     public static Ages parseAges(Map<String, List<Age>> age) {
         return new Ages(age.get("ages"));
-    }
-
-    public static LocalDate parseLocalDate(String input) {
-        throw new RuntimeException("Should not be called, another converter should take precedence");
     }
 
 }

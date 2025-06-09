@@ -45,7 +45,8 @@ import static java.util.stream.Collectors.toUnmodifiableSet;
  *   <li>Basic scalar values</li>
  *   <li>Lists, sets, and maps</li>
  *   <li>Nested collections with complex generic type parameters</li>
- *   <li>Custom types, either implicitly through converter methods in test class
+ *   <li>Custom types, either implicitly through either factory methods in test class
+ *       or factory methods found via {@link FactorySources} annotation,
  *       or explicitly using the {@link ConvertWith} annotation</li>
  * </ul>
  * <p>
@@ -113,7 +114,7 @@ public class ParameterTypeConverter {
      *
      * @param value       The parsed value to convert
      * @param nestedTypes Information about the nested types in parameterized types
-     * @param testClass   The test class to search for custom converters
+     * @param testClass   The test class to search for factory methods
      * @return The converted value
      */
     private static Object convert(
@@ -132,12 +133,12 @@ public class ParameterTypeConverter {
             };
         }
 
-        // Types don't match - look for a converter
-        return findConverter(testClass, targetType)
-            .map(converter -> invokeConverter(
-                converter,
-                // Convert value to match converter input
-                convert(value, NestedTypes.of(converter.getParameters()[0]), testClass),
+        // Types don't match - look for a factory method
+        return findFactoryMethod(testClass, targetType)
+            .map(factoryMethod -> invokeFactoryMethod(
+                factoryMethod,
+                // Convert value to match factory method input
+                convert(value, NestedTypes.of(factoryMethod.getParameters()[0]), testClass),
                 targetType
             ))
 
@@ -169,7 +170,7 @@ public class ParameterTypeConverter {
      *
      * @param list        The parsed list containing values to convert
      * @param nestedTypes Information about nested types for list elements
-     * @param testClass   The test class to search for custom converters
+     * @param testClass   The test class to search for factory methods
      * @return A new list with converted elements
      */
     private static List<?> convertList(
@@ -188,7 +189,7 @@ public class ParameterTypeConverter {
      *
      * @param set         The parsed set containing values to convert
      * @param nestedTypes Information about nested types for set elements
-     * @param testClass   The test class to search for custom converters
+     * @param testClass   The test class to search for factory methods
      * @return A new set with converted elements
      */
     private static Set<?> convertSet(
@@ -210,7 +211,7 @@ public class ParameterTypeConverter {
      *
      * @param map         The parsed map containing keys and values
      * @param nestedTypes Information about nested types for map values
-     * @param testClass   The test class to search for custom converters
+     * @param testClass   The test class to search for factory methods
      * @return A new map with converted values
      */
     private static Map<?, ?> convertMap(
@@ -227,30 +228,31 @@ public class ParameterTypeConverter {
     }
 
     /**
-     * Searches for a custom converter method for mapping a parsed value to the parameter type.
+     * Searches for a factory method for mapping a parsed value to the parameter type.
      * <p>
-     * The converter method must be static and accessible and must take a single parameter.
-     * The return type of the converter method must be the target type.
+     * The factory method must be static and public and must take a single parameter.
+     * The return type of the factory method must be the target type.
      * <p>
      * Searches in priority order and stops at the first suitable method found:
      * 1. Methods in test class
-     * 2. Methods in classes listed in @TableTestConverters annotation for test class (in listed order)
-     * 3. Methods in classes listed in @TableTestConverters for enclosing classes (in inside-out order)
+     * 2. Methods in enclosing classes
+     * 2. Methods in classes listed in @FactorySources annotation for test class (in listed order)
+     * 3. Methods in classes listed in @FactorySources for enclosing classes (in inside-out order)
      *
-     * @param testClass The test class to search for custom converters
+     * @param testClass The test class to search for factory methods
      * @param toType    The target type of the conversion
-     * @return An Optional with the converter method if found, otherwise an empty Optional
+     * @return An Optional with the factory method if found, otherwise an empty Optional
      */
-    static Optional<Method> findConverter(Class<?> testClass, Class<?> toType) {
+    static Optional<Method> findFactoryMethod(Class<?> testClass, Class<?> toType) {
         return Stream.concat(
                 Stream.concat(
-                    testClassConverters(testClass),
+                    testClasses(testClass),
                     kotlinTestFile(testClass)
                 ),
-                tableTestAnnotationConverters(testClass)
+                factorySources(testClass)
             )
             .filter(Objects::nonNull)
-            .map(it -> findMatchingConverterInClass(it, toType))
+            .map(it -> findMatchingFactoryMethodInClass(it, toType))
             .filter(Optional::isPresent)
             .flatMap(Optional::stream)
             .findFirst();
@@ -263,11 +265,11 @@ public class ParameterTypeConverter {
      * @param testClass the test class
      * @return stream of test class and enclosing classes
      */
-    private static Stream<Class<?>> testClassConverters(Class<?> testClass) {
+    private static Stream<Class<?>> testClasses(Class<?> testClass) {
         if (testClass == null) return Stream.empty();
         return Stream.concat(
             Stream.of(testClass),
-            testClassConverters(testClass.getEnclosingClass())
+            testClasses(testClass.getEnclosingClass())
         );
     }
 
@@ -301,66 +303,68 @@ public class ParameterTypeConverter {
     }
 
     /**
-     * Recursive method to create stream of classes listed in TableTestConverters annotation
+     * Recursive method to create a stream of classes listed in FactorySources annotation
      * for test class and any enclosing classes of a nested test class
      *
-     * @param testClass the test class with possible TableTestConverters annotation
+     * @param testClass the test class with possible FactorySources annotation
      * @return stream of classes listed in found annotations
      */
-    private static Stream<Class<?>> tableTestAnnotationConverters(Class<?> testClass) {
+    private static Stream<Class<?>> factorySources(Class<?> testClass) {
         if (testClass == null) return Stream.empty();
 
-        Stream<Class<?>> converters =
-            testClass.isAnnotationPresent(TableTestConverters.class)
-            ? Arrays.stream(testClass.getAnnotation(TableTestConverters.class).value())
+        Stream<Class<?>> factorySources =
+            testClass.isAnnotationPresent(FactorySources.class)
+            ? Arrays.stream(testClass.getAnnotation(FactorySources.class).value())
             : Stream.empty();
 
         return Stream.concat(
-            converters,
-            tableTestAnnotationConverters(testClass.getEnclosingClass())
+            factorySources,
+            factorySources(testClass.getEnclosingClass())
         );
     }
 
     /**
-     * Helper method to find a converter in a class
+     * Helper method to find a factory method for a target type in a class
      */
-    private static Optional<Method> findMatchingConverterInClass(Class<?> clazz, Class<?> toType) {
-        List<Method> matchingConverters = Arrays.stream(clazz.getDeclaredMethods())
+    private static Optional<Method> findMatchingFactoryMethodInClass(Class<?> clazz, Class<?> toType) {
+        List<Method> matchingMethods = Arrays.stream(clazz.getDeclaredMethods())
             .filter(it -> Modifier.isStatic(it.getModifiers()))
             .filter(it -> it.canAccess(null))
             .filter(it -> it.getParameterCount() == 1)
             .filter(it -> toType.isAssignableFrom(it.getReturnType()))
             .toList();
 
-        if (matchingConverters.size() > 1) {
+        if (matchingMethods.size() > 1) {
             throw new ConversionException(
-                "Multiple converters found for type %s in class %s".formatted(
+                "Multiple factory methods found for type %s in class %s".formatted(
                     toType.getTypeName(),
                     clazz.getTypeName()
                 ));
         }
 
-        return matchingConverters.stream().findFirst();
+        return matchingMethods.stream().findFirst();
     }
 
     /**
-     * Invokes a custom converter method to convert a parsed value to the parameter type.
+     * Invokes a factory method to convert a parsed value to the parameter type.
      *
-     * @param converter  The converter method to invoke
+     * @param factoryMethod  The factory method to invoke
      * @param value      The parsed value to convert
      * @param targetType The target type of the conversion
      * @return The converted value
      */
-    private static Object invokeConverter(Method converter, Object value, Class<?> targetType) {
+    private static Object invokeFactoryMethod(Method factoryMethod, Object value, Class<?> targetType) {
         try {
-            return converter.invoke(null, value);
+            return factoryMethod.invoke(null, value);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ConversionException(
                 String.format(
-                    "Failed to convert %s \"%s\" to type %s",
+                    "Failed to convert %s \"%s\" to type %s with factory method %s.%s()",
                     value.getClass().getTypeName(),
                     value,
-                    targetType.getTypeName()
+                    targetType.getTypeName(),
+                    factoryMethod.getDeclaringClass().getTypeName(),
+                    factoryMethod.getName()
                 ), e
             );
         }
@@ -379,10 +383,10 @@ public class ParameterTypeConverter {
          * Creates a NestedTypes instance from a parameter.
          * <p>
          * If the parameter has a @ConvertWith annotation, returns an empty list
-         * since conversion will be handled by the custom converter.
+         * since conversion will be handled by the argument converter.
          * Otherwise, extracts the nested element types from the parameter.
          *
-         * @param parameter The method parameter to analyze
+         * @param parameter The method parameter to analyse
          * @return A NestedTypes instance containing type information
          */
         static NestedTypes of(Parameter parameter) {
