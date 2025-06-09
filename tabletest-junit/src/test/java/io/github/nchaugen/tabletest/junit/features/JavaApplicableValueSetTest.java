@@ -1,8 +1,6 @@
 package io.github.nchaugen.tabletest.junit.features;
 
-import io.github.nchaugen.tabletest.junit.ExampleDomainConverters;
 import io.github.nchaugen.tabletest.junit.TableTest;
-import io.github.nchaugen.tabletest.junit.TableTestConverters;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +8,6 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@TableTestConverters(ExampleDomainConverters.class)
 class JavaApplicableValueSetTest {
 
     @TableTest("""
@@ -36,6 +33,15 @@ class JavaApplicableValueSetTest {
             assertEquals(expectedSize, result.size());
             assertEquals(containsNull, result.contains(null));
         }
+    }
+
+    @TableTest("""
+        Scenario                      | a                | b | c | d         | e
+        Anything multiplied by 0 is 0 | {-1, 0, 1, 1000} | 0 | 0 | {1, 2, 3} | 3
+        """)
+    void testApplicableValueSet(int a, int b, int c, Set<Integer> d, int e) {
+        assertEquals(c, a * b);
+        assertEquals(e, d.size());
     }
 
 }

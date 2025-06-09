@@ -1,9 +1,10 @@
 package io.github.nchaugen.tabletest.junit.converting
 
 import io.github.nchaugen.tabletest.junit.TableTest
+import io.github.nchaugen.tabletest.junit.javadomain.ConstructorDate
+import io.github.nchaugen.tabletest.junit.javadomain.TypeFactoryDate
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Duration
@@ -22,7 +23,7 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
-class KotlinSingleValueConversionTest {
+class KotlinFallbackConversionTest {
 
     @TableTest(
         """    
@@ -47,10 +48,10 @@ class KotlinSingleValueConversionTest {
 
     @TableTest(
         """    
-        Float Value | Double Value | BigDecimal Value | BigInteger Value
-        3.14159     | 2.718281828  | 123.456e789      | 1234567890123456789
-        0.1         | 0.1          | 1                | 15
-        1.23e4      | 1.23e4       | 1.23e4           | 123
+        Float   | Double      | BigDecimal  | BigInteger
+        3.14159 | 2.718281828 | 123.456e789 | 1234567890123456789
+        0.1     | 0.1         | 1           | 15
+        1.23e4  | 1.23e4      | 1.23e4      | 123
         """
     )
     fun converts_decimal_types(
@@ -211,15 +212,19 @@ class KotlinSingleValueConversionTest {
 
     @TableTest(
         """    
-        Scenario     | String | Float | List
-        Empty string | ""     | ""    | ""
-        Blank cell   |        |       | 
+        String     | Constructor | Factory method in type | List with fallback
+        2025-05-27 | 2025-05-27  | 2025-05-27             | [2025-05-27]
         """
     )
-    fun converts_blank_to_null_for_non_string_parameters(stringVal: String, floatVal: Float?, listVal: List<*>?) {
-        assertNotNull(stringVal)
-        assertNull(floatVal)
-        assertNull(listVal)
+    fun converts_custom_types_with_constructor_or_type_internal_factory(
+        stringToLocalDate: LocalDate,
+        withConstructor: ConstructorDate,
+        withFactoryMethodInsideType: TypeFactoryDate,
+        listWithFallbackConversion: List<TypeFactoryDate>
+    ) {
+        assertEquals(stringToLocalDate, withConstructor.date)
+        assertEquals(stringToLocalDate, withFactoryMethodInsideType.date)
+        assertEquals(stringToLocalDate, listWithFallbackConversion.first().date)
     }
 
 }

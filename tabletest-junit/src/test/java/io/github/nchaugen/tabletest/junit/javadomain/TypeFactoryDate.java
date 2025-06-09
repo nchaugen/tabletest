@@ -1,4 +1,4 @@
-package io.github.nchaugen.tabletest.junit.exampledomain;
+package io.github.nchaugen.tabletest.junit.javadomain;
 
 import java.time.LocalDate;
 

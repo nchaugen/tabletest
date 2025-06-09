@@ -279,10 +279,25 @@ public class ParameterTypeConverter {
      */
     private static Stream<Class<?>> kotlinTestFile(Class<?> testClass) {
         try {
-            return Stream.of(testClass.getClassLoader().loadClass(testClass.getTypeName() + "Kt"));
+            return Stream.of(
+                testClass.getClassLoader()
+                    .loadClass(findOuterClass(testClass).getTypeName() + "Kt")
+            );
         } catch (ClassNotFoundException e) {
             return Stream.empty();
         }
+    }
+
+    /**
+     * Recursive method to find the outermost class of a nested class
+     * @param testClass possibly nested testClass
+     * @return outermost class, or the given class if not nested
+     */
+    private static Class<?> findOuterClass(Class<?> testClass) {
+        if (testClass == null) return null;
+        return testClass.getEnclosingClass() == null
+               ? testClass
+               : findOuterClass(testClass.getEnclosingClass());
     }
 
     /**

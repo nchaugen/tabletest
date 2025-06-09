@@ -1,8 +1,8 @@
 package io.github.nchaugen.tabletest.junit.converting;
 
 import io.github.nchaugen.tabletest.junit.TableTest;
-import io.github.nchaugen.tabletest.junit.exampledomain.ConstructorDate;
-import io.github.nchaugen.tabletest.junit.exampledomain.TypeFactoryDate;
+import io.github.nchaugen.tabletest.junit.javadomain.ConstructorDate;
+import io.github.nchaugen.tabletest.junit.javadomain.TypeFactoryDate;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

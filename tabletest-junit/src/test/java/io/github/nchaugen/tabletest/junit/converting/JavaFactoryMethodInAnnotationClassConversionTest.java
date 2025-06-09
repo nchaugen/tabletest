@@ -1,10 +1,12 @@
 package io.github.nchaugen.tabletest.junit.converting;
 
 import io.github.nchaugen.tabletest.junit.TableTest;
+import io.github.nchaugen.tabletest.junit.TableTestConverters;
 import io.github.nchaugen.tabletest.junit.javadomain.Age;
 import io.github.nchaugen.tabletest.junit.javadomain.Ages;
+import io.github.nchaugen.tabletest.junit.javaconverters.FirstTierConverters;
+import io.github.nchaugen.tabletest.junit.javaconverters.SecondTierConverters;
 import org.junit.jupiter.api.Nested;
-import org.junit.platform.commons.support.conversion.ConversionException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,13 +15,14 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JavaFactoryMethodInTestClassConversionTest {
+@TableTestConverters({FirstTierConverters.class, SecondTierConverters.class})
+public class JavaFactoryMethodInAnnotationClassConversionTest {
 
     @TableTest("""
         Int | List | Set  | AVS  | Map       | Nested           | Ages
         16  | [16] | {16} | {16} | [age: 16] | [ages: [16, 16]] | [ages: [16, 16]]
         """)
-    void using_factory_method_in_test_class(
+    void using_factory_methods_in_annotation_class(
         Age fromInt,
         List<Age> inList,
         Set<Age> inSet,
@@ -38,33 +41,13 @@ public class JavaFactoryMethodInTestClassConversionTest {
         assertEquals(new Ages(List.of(expected, expected)), inOtherFactoryMethod);
     }
 
-    @SuppressWarnings("unused")
-    public static Age parseAge(int age) {
-        return new Age(age);
-    }
-
-    @SuppressWarnings("unused")
-    public Age parseAge(Integer age) {
-        throw new ConversionException("Factory method not static, should not be called");
-    }
-
-    @SuppressWarnings("unused")
-    static Age parseAge(Long age) {
-        throw new ConversionException("Factory method not accessible, should not be called");
-    }
-
-    @SuppressWarnings("unused")
-    public static Ages parseAges(Map<String, List<Age>> age) {
-        return new Ages(age.get("ages"));
-    }
-
     @TableTest("""
         This Date  | Other Date | Is Before?
         today      | tomorrow   | true
         today      | yesterday  | false
         2024-02-29 | 2024-03-01 | true
         """)
-    void overriding_fallback_conversion(LocalDate thisDate, LocalDate otherDate, boolean expectedIsBefore) {
+    void overriding_annotation_conversion(LocalDate thisDate, LocalDate otherDate, boolean expectedIsBefore) {
         assertEquals(expectedIsBefore, thisDate.isBefore(otherDate));
     }
 
@@ -82,24 +65,10 @@ public class JavaFactoryMethodInTestClassConversionTest {
     public class NestedTestClass {
 
         @TableTest("""
-            This Date  | Other Date | Is Before?
-            today      | tomorrow   | true
-            today      | yesterday  | false
-            2024-02-29 | 2024-03-01 | true
-            """)
-        void finding_factory_method_from_nested_class(
-            LocalDate thisDate,
-            LocalDate otherDate,
-            boolean expectedIsBefore
-        ) {
-            assertEquals(expectedIsBefore, thisDate.isBefore(otherDate));
-        }
-
-        @TableTest("""
-        Age | Ages | Expected
+        Age | Ages             | Expected
         16  | [ages: [16, 16]] | 17
         """)
-        void factory_method_in_nested_class_takes_precedence(
+        void factory_method_in_nested_class_takes_precedence_over_annotation_method(
             Age fromFactoryMethodInThisClass,
             Ages fromFactoryMethodInEnclosingClass,
             int expectedAgeAfterConversion
@@ -121,24 +90,10 @@ public class JavaFactoryMethodInTestClassConversionTest {
         public class DeeplyNestedTestClass {
 
             @TableTest("""
-            This Date  | Other Date | Is Before?
-            today      | tomorrow   | true
-            today      | yesterday  | false
-            2024-02-29 | 2024-03-01 | true
-            """)
-            void finding_factory_method_from_deeply_nested_class(
-                LocalDate thisDate,
-                LocalDate otherDate,
-                boolean expectedIsBefore
-            ) {
-                assertEquals(expectedIsBefore, thisDate.isBefore(otherDate));
-            }
-
-            @TableTest("""
                 Age | Ages             | Expected
                 16  | [ages: [16, 16]] | 18
                 """)
-            void factory_method_in_nested_class_takes_precedence(
+            void factory_method_in_deeply_nested_class_takes_precedence(
                 Age fromFactoryMethodInThisClass,
                 Ages fromFactoryMethodInEnclosingClass,
                 int expectedAgeAfterConversion

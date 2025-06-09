@@ -1,30 +1,34 @@
 package io.github.nchaugen.tabletest.junit.features;
 
-import io.github.nchaugen.tabletest.junit.ExampleDomainConverters;
 import io.github.nchaugen.tabletest.junit.TableTest;
-import io.github.nchaugen.tabletest.junit.TableTestConverters;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@TableTestConverters(ExampleDomainConverters.class)
 class JavaNullValueTest {
 
     @TableTest("""
-        Scenario     | String | Float | List
-        Empty string | ""     | ""    | ""
-        Blank cell   |        |       |
+        Scenario            | String | Integer | List | Map | Set
+        Blank               |        |         |      |     |
+        Empty single quoted | ''     | ''      | ''   | ''  | ''
+        Empty double quoted | ""     | ""      | ""   | ""  | ""
         """)
-    void converts_blank_to_null_for_non_string_parameters(
-        String stringVal,
-        Float floatVal,
-        List<?> listVal
+    void testBlankIsNullForNonString(
+        String string,
+        Integer integer,
+        List<?> list,
+        Map<String, ?> map,
+        Set<?> set
     ) {
-        assertNotNull(stringVal);
-        assertNull(floatVal);
-        assertNull(listVal);
+        assertEquals("", string);
+        assertNull(integer);
+        assertNull(list);
+        assertNull(map);
+        assertNull(set);
     }
 
 }

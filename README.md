@@ -260,21 +260,33 @@ There is no specific naming pattern for factory methods, any method fulfilling t
 
 TableTest will use factory methods available in the test class or in a class listed by a `@TableTestConverters` annotation on the test class.
 
-It uses the following strategy to search for factory methods, taking the first matching method it finds:
-1. Search test class
-2. Recursively search enclosing classes of a nested test class, starting with the immediate parent
-3. Search classes listed by a `@TableTestConverters` annotation on test class, in the order they are listed
-4. Recursively search classes listed by a `@TableTestConverters` annotation of an enclosing class, starting with immediate parent
+#### Factory Method Search Strategy in Java
+TableTest uses the following strategy to search for factory methods in Java test classes: 
 
-#### Static methods in Kotlin
+1. Search current test class
+2. In case of a `@Nested` test class, search enclosing classes, starting with the immediate parent
+3. Search classes in the order they are listed by a `@TableTestConverters` annotation on current test class
+4. In case of a `@Nested` test class, search classes listed by `@TableTestConverters` of enclosing classes, starting with immediate parent
+
+It will stop searching as soon as it finds a matching factory method and use this for the conversion.
+
+#### Factory Method Search Strategy in Kotlin
 For tests written in Kotlin, static factory methods can be declared in two ways:
+
 1. In the companion object of a test class using [`@JvmStatic` annotation](https://kotlinlang.org/docs/java-to-kotlin-interop.html#static-methods)
 2. At [package-level](https://kotlinlang.org/docs/java-to-kotlin-interop.html#package-level-functions) in the file containing the test class.
 
-When searching a Kotlin test class for factory methods, TableTest will first search the companion object of the test class, then the companion objects of any enclosing classes, and finally the package-level functions of the test file.
+In Kotlin, a `@Nested` test class must be declared `inner class` and these are not allowed to have companion objects. Hence, all test class factory methods must be either declared in the companion object of the outer class (with `@JvmStatic`) or at package level in the same file as the test class.
 
-For Kotlin classes listed in a `@TableTestConverters` annotation only [package-level functions](https://kotlinlang.org/docs/java-to-kotlin-interop.html#package-level-functions) are searched for.
+Kotlin files with package-level factory methods can be listed in a `@TableTestConverters` annotation using the JVM name of the file: `<package name>.<capitalised file name>Kt`. So to reference a file `app.kt` inside package `org.example`, use `org.example.AppKt.class`
 
+So for Kotlin, the search strategy becomes as follows:
+
+1. Search the current file (methods declared at package-level or in outer class companion object)
+2. Search classes in the order they are listed by a `@TableTestConverters` annotation on current test class
+3. In case of a `@Nested` test class, search classes listed by `@TableTestConverters` of enclosing classes, starting with immediate parent
+
+As for Java, TableTest will stop searching as soon as it finds a matching factory method and use this for the conversion.
 
 #### Overriding Built-In Conversion
 As TableTest will prefer an external factory method over the built-in conversion, it is possible to override the built-in conversion of specific types.
