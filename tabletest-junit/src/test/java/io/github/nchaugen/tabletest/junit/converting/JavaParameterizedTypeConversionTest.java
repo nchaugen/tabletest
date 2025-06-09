@@ -8,7 +8,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JavaParameterizedTypeBuiltInConversionTest {
+public class JavaParameterizedTypeConversionTest {
 
     @TableTest("""
         Empty | Byte | Integer | Long | Double | String | List  | Map

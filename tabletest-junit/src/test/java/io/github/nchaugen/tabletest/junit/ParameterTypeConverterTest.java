@@ -1,23 +1,15 @@
 package io.github.nchaugen.tabletest.junit;
 
-import io.github.nchaugen.tabletest.junit.exampledomain.Age;
-import io.github.nchaugen.tabletest.junit.exampledomain.Ages;
-import io.github.nchaugen.tabletest.junit.exampledomain.ConstructorDate;
-import io.github.nchaugen.tabletest.junit.exampledomain.FactoryMethodDate;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.support.conversion.ConversionException;
 
-import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static io.github.nchaugen.tabletest.junit.ParameterFixture.parameter;
 import static io.github.nchaugen.tabletest.junit.ParameterTypeConverter.convertValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -62,9 +54,9 @@ class ParameterTypeConverterTest {
         }
 
         @TableTest("""
-        list | nested list | nested set | nested map
-        []   | [[]]        | [{}]       | [[:]]
-        """)
+            list | nested list | nested set | nested map
+            []   | [[]]        | [{}]       | [[:]]
+            """)
         void passes_immutable_lists_to_test(
             List<String> list,
             List<List<String>> nestedList,
@@ -116,9 +108,9 @@ class ParameterTypeConverterTest {
         }
 
         @TableTest("""
-        map | nested list | nested set  | nested map
-        [:] | [empty: []] | [empty: {}] | [empty: [:]]
-        """)
+            map | nested list | nested set  | nested map
+            [:] | [empty: []] | [empty: {}] | [empty: [:]]
+            """)
         void passes_immutable_maps_to_test(
             Map<String, String> map,
             Map<String, List<String>> nestedList,
@@ -151,40 +143,15 @@ class ParameterTypeConverterTest {
             }
         }
 
-
     }
 
     @Nested
     class SetValues {
 
         @TableTest("""
-        Scenario                  | adding any of | to set    | makes size? | is set null? | contains null?
-        Adding existing values    | {1, 2, 3}     | {1, 2, 3} | 3           | false        | false
-        Adding other values       | {4, 5, 6}     | {1, 2, 3} | 4           | false        | false
-        Adding no values          | {}            | {1, 2, 3} | 4           | false        | true
-        Adding nothing to nothing |               |           |             | true         | false
-        """)
-        void applicable_value_sets(
-            Integer a,
-            Set<Integer> b,
-            Integer expectedSize,
-            boolean expectedNull,
-            boolean containsNull
-        ) {
-            if (expectedNull) {
-                assertNull(b);
-            } else {
-                Set<Integer> result = new HashSet<>(b);
-                result.add(a);
-                assertEquals(expectedSize, result.size());
-                assertEquals(containsNull, result.contains(null));
-            }
-        }
-
-        @TableTest("""
-        set | nested list | nested set | nested map
-        {}  | {[]}        | {{}}       | {[:]}
-        """)
+            set | nested list | nested set | nested map
+            {}  | {[]}        | {{}}       | {[:]}
+            """)
         void passes_immutable_sets_to_test(
             Set<String> set,
             Set<List<String>> nestedList,
@@ -215,59 +182,6 @@ class ParameterTypeConverterTest {
             } catch (Exception e) {
                 // expected
             }
-        }
-
-    }
-
-    @Nested
-    class CustomConversion {
-
-        @TableTest("""
-            String | List | Set  | Applicable Value Set | Map         | Nested           | Nested Ages
-            16     | [16] | {16} | {16}                 | [value: 16] | [value: [16,16]] | [value: [16,16]]
-            """)
-        void uses_factory_method_in_test_class(
-            Age fromString,
-            List<Age> inList,
-            Set<Age> inSet,
-            Age fromApplicableSet,
-            Map<String, Age> inMap,
-            Map<String, List<Age>> inNested,
-            Ages inCustom
-        ) {
-            Age expected = new Age(16);
-            assertEquals(expected, fromString);
-            assertEquals(List.of(expected), inList);
-            assertEquals(Set.of(expected), inSet);
-            assertEquals(expected, fromApplicableSet);
-            assertEquals(Map.of("value", expected), inMap);
-            assertEquals(Map.of("value", List.of(expected, expected)), inNested);
-            assertEquals(new Ages(List.of(expected, expected)), inCustom);
-        }
-
-        @SuppressWarnings("unused")
-        static Age parseAge(int age) {
-            return new Age(age);
-        }
-
-        @SuppressWarnings("unused")
-        static Ages parseAges(Map<String, List<Age>> age) {
-            return new Ages(age.get("value"));
-        }
-
-        @TableTest("""
-            JUnit convert | Constructor convert | Factory method convert | List of factory method convert
-            2025-05-27    | 2025-05-27          | 2025-05-27             | [2025-05-27]
-            """)
-        void factory_methods_takes_priority_over_junit_conversion(
-            LocalDate date,
-            ConstructorDate date1,
-            FactoryMethodDate date2,
-            List<FactoryMethodDate> list
-        ) {
-            assertEquals(date, date1.date());
-            assertEquals(date, date2.date());
-            assertEquals(date, list.getFirst().date());
         }
 
     }

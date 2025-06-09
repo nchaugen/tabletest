@@ -1,7 +1,6 @@
 package io.github.nchaugen.tabletest.junit.converting
 
 import io.github.nchaugen.tabletest.junit.TableTest
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -23,7 +22,7 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
-class KotlinSingleValueBuiltInConversionTest {
+class KotlinSingleValueConversionTest {
 
     @TableTest(
         """    
@@ -108,7 +107,7 @@ class KotlinSingleValueBuiltInConversionTest {
         """    
         File            | Path            | URI                 | URL                 | Class Name
         /path/to/file   | /path/to/file   | https://junit.org/  | https://junit.org/  | java.lang.Integer
-        C:\Users\test   | C:\Users\test   | file:///tmp/test    | https://example.com | java.lang.String
+        C:\Users\test   | C:\Users\test   | file:///tmp/test    | https://example.com | java.lang.Thread${'$'}State
         ./relative/path | ./relative/path | urn:isbn:1234567890 | file:///tmp/test    | byte
         """
     )

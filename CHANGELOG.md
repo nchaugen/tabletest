@@ -2,10 +2,11 @@
 
 ## [Unreleased]
 ### Added
-- New annotation TableTestConverters to declare classes with custom factory methods
-- Improved support for conversion to parameterized test parameters
+- TableTest will search classes listed in new annotation `@TableTestConverters` for factory methods
+- For `@Nested` test classes, TableTest will search enclosing classes for factory methods 
 ### Fixed
-- Explicit leading and trailing whitespace in a quoted string is no longer being removed
+- Explicit leading and trailing whitespace in a quoted string is no longer removed
+- More robust analysis of parameterized target types
 
 ## [0.3.1] - 2025-06-03
 ### Added

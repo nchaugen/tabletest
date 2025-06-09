@@ -250,16 +250,17 @@ void testParameterizedTypes(Map<String, List<Integer>> grades, int expectedHighe
 Before falling back to [JUnit built-in conversion](#junit-built-in-conversion), TableTest will look for a factory method present in either the test class or in one of the classes listed in a `@TableTestConverters` annotation. If found, TableTest will use this factory method to convert the parsed value to the required test parameter type. 
 
 #### How It Works
-Custom converters are factory methods that:
-1. Are defined as static methods
-2. Accept one parameter of any type
-3. Return an object of the target parameter type
-4. Are accessible (not private)
-5. Either located in the test class, or in a class listed in a `@TableTestConverters` annotation
+A custom converter is a factory method that:
+1. Is defined as a public static method in a public class
+2. Accepts exactly one parameter
+3. Returns an object of the target parameter type
+4. Is the only method matching the above criteria in the class
 
-There is no specific naming pattern for factory methods, any function fulfilling the requirements above will be considered.
+There is no specific naming pattern for factory methods, any method fulfilling the requirements above will be considered.
 
-TableTest uses the following strategy to search for factory methods in Java test code, taking the first matching method it finds:
+TableTest will use factory methods available in the test class or in a class listed by a `@TableTestConverters` annotation on the test class.
+
+It uses the following strategy to search for factory methods, taking the first matching method it finds:
 1. Search test class
 2. Recursively search enclosing classes of a nested test class, starting with the immediate parent
 3. Search classes listed by a `@TableTestConverters` annotation on test class, in the order they are listed
@@ -281,8 +282,6 @@ As TableTest will prefer an external factory method over the built-in conversion
 The example below demonstrates this, allowing conversion to LocalDate to understand some custom constant values.
 
 ```java
-import java.time.LocalDate;
-
 @TableTest("""
     This Date  | Other Date | Is Before?
     today      | tomorrow   | true
@@ -298,7 +297,7 @@ static LocalDate parseLocalDate(String input) {
         case "yesterday" -> LocalDate.parse("2025-06-06");
         case "today" -> LocalDate.parse("2025-06-07");
         case "tomorrow" -> LocalDate.parse("2025-06-08");
-        case default -> LocalDate.parse(input);
+        default -> LocalDate.parse(input);
     };
 }
 ```

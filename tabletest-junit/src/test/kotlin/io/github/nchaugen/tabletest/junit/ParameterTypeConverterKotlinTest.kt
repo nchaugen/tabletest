@@ -4,9 +4,8 @@ import io.github.nchaugen.tabletest.junit.ParameterFixture.parameter
 import io.github.nchaugen.tabletest.junit.exampledomain.Age
 import io.github.nchaugen.tabletest.junit.exampledomain.Ages
 import io.github.nchaugen.tabletest.junit.exampledomain.ConstructorDate
-import io.github.nchaugen.tabletest.junit.exampledomain.FactoryMethodDate
+import io.github.nchaugen.tabletest.junit.exampledomain.ExternalFactoryDate
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.fail
@@ -22,65 +21,6 @@ class ParameterTypeConverterKotlinTest {
 
     @Nested
     internal inner class SingleValues {
-        @TableTest(
-            """    
-        table value                          | parameter type
-        15                                   | java.lang.Byte
-        0xF                                  | java.lang.Byte
-        017                                  | java.lang.Byte
-        15                                   | java.lang.Short
-        0xF                                  | java.lang.Short
-        017                                  | java.lang.Short
-        15                                   | java.lang.Integer
-        0xF                                  | java.lang.Integer
-        017                                  | java.lang.Integer
-        15                                   | java.lang.Long
-        0xF                                  | java.lang.Long
-        017                                  | java.lang.Long
-        15                                   | java.math.BigInteger
-        1234567890123456789                  | java.math.BigInteger
-        0.1                                  | java.lang.Float
-        0.1                                  | java.lang.Double
-        1                                    | java.math.BigDecimal
-        0.1                                  | java.math.BigDecimal
-        123.456e789                          | java.math.BigDecimal
-        a                                    | java.lang.Character
-        abc                                  | java.lang.String
-        SECONDS                              | java.util.concurrent.TimeUnit
-        /path/to/file                        | java.io.File
-        /path/to/file                        | java.nio.file.Path
-        "https://junit.org/"                 | java.net.URI
-        "https://junit.org/"                 | java.net.URL
-        java.lang.Integer                    | java.lang.Class
-        java.lang.Thread${'$'}State             | java.lang.Class
-        byte                                 | java.lang.Class
-        "char[]"                             | java.lang.Class
-        UTF-8                                | java.nio.charset.Charset
-        NOK                                  | java.util.Currency
-        en                                   | java.util.Locale
-        d043e930-7b3b-48e3-bdbe-5a3ccfb833db | java.util.UUID
-        PT3S                                 | java.time.Duration
-        "1977-08-17T18:19:20Z"               | java.time.Instant
-        "2017-03-14T12:34:56.789"            | java.time.LocalDateTime
-        2017-03-14                           | java.time.LocalDate
-        "12:34:56.789"                       | java.time.LocalTime
-        "2017-03-14T12:34:56.789Z"           | java.time.OffsetDateTime
-        "12:34:56.789Z"                      | java.time.OffsetTime
-        "2017-03-14T12:34:56.789Z"           | java.time.ZonedDateTime
-        Europe/Berlin                        | java.time.ZoneId
-        "+02:30"                             | java.time.ZoneOffset
-        P2M6D                                | java.time.Period
-        2017                                 | java.time.Year
-        2017-03                              | java.time.YearMonth
-        --03-14                              | java.time.MonthDay
-            """
-        )
-        fun converts_according_to_junit_rules(value: String?, type: Class<*>) {
-            assertInstanceOf(
-                type,
-                ParameterTypeConverter.convertValue(value, parameter(type))
-            )
-        }
 
         @TableTest(
             """    
@@ -99,72 +39,10 @@ class ParameterTypeConverterKotlinTest {
             }
         }
 
-        @TableTest(
-            """    
-        table value | parameter type
-        123         | java.lang.Byte
-        123         | java.lang.Float
-        123         | java.lang.Double
-            """
-        )
-        fun allows_widening_primitive_conversion(value: String?, type: Class<*>) {
-            assertInstanceOf(
-                type,
-                ParameterTypeConverter.convertValue(value, parameter(type))
-            )
-        }
-
-        @TableTest(
-            """    
-        Scenario     | table value | parameter type
-        Empty string | ""          | java.lang.Float
-        Blank cell   |             | java.util.List
-            """
-        )
-        fun converts_blank_to_null_for_non_string_parameters(value: String?, type: Class<*>?) {
-            assertNull(ParameterTypeConverter.convertValue(value, parameter(type)))
-        }
-
-        @TableTest(
-            """    
-        Scenario     | table value | parameter type
-        Empty string | ''          | java.lang.String
-        Blank cell   |             | java.lang.String
-            """
-        )
-        fun converts_blank_to_blank_for_string_parameters(value: String?, type: Class<*>?) {
-            assertEquals("", ParameterTypeConverter.convertValue(value, parameter(type)))
-        }
     }
 
     @Nested
     internal inner class ListValues {
-        @TableTest(
-            """    
-        Empty | Byte | Integer | Long | Double | String | List  | Map
-        []    | [1]  | [2]     | [3]  | [4]    | [5]    | [[6]] | [[1:7]]
-        """
-        )
-        fun converts_to_parameterized_parameter_type(
-            emptyList: List<*>,
-            byteList: List<Byte>,
-            integerList: List<Int>,
-            longList: List<Long>,
-            doubleList: List<Double>,
-            stringList: List<String>,
-            listList: List<List<Short>>,
-            mapList: List<Map<*, Long>>
-        ) {
-            assertEquals(emptyList<Any>(), emptyList)
-            assertEquals(listOf(1.toByte()), byteList)
-            assertEquals(listOf(2), integerList)
-            assertEquals(listOf(3L), longList)
-            assertEquals(listOf(4.0), doubleList)
-            assertEquals(listOf("5"), stringList)
-            assertEquals(listOf(listOf(6.toShort())), listList)
-            assertEquals(listOf(mapOf("1" to 7L)), mapList)
-        }
-
         @Test
         fun fails_when_conversion_not_possible() {
             mapOf(
@@ -223,31 +101,6 @@ class ParameterTypeConverterKotlinTest {
 
     @Nested
     internal inner class MapValues {
-        @TableTest(
-            """    
-        Empty | Byte    | Integer | Long    | Double  | String  | List      | Map
-        [:]   | [key:1] | [key:2] | [key:3] | [key:4] | [key:5] | [key:[6]] | [key:[1:7]]
-        """
-        )
-        fun converts_to_parameterized_parameter_type(
-            emptyMap: Map<*, *>,
-            byteMap: Map<String, Byte>,
-            integerMap: Map<*, Int>,
-            longMap: Map<*, Long>,
-            doubleMap: Map<*, Double>,
-            stringMap: Map<*, String>,
-            listMap: Map<*, List<Short>>,
-            mapMap: Map<*, Map<*, Long>>
-        ) {
-            assertEquals(emptyMap<Any?, Any?>(), emptyMap)
-            assertEquals(mapOf("key" to 1.toByte()), byteMap)
-            assertEquals(mapOf("key" to 2), integerMap)
-            assertEquals(mapOf("key" to 3L), longMap)
-            assertEquals(mapOf("key" to 4.0), doubleMap)
-            assertEquals(mapOf("key" to "5"), stringMap)
-            assertEquals(mapOf("key" to listOf(6.toShort())), listMap)
-            assertEquals(mapOf("key" to mapOf("1" to 7L)), mapMap)
-        }
 
         @Test
         fun fails_when_conversion_not_possible() {
@@ -266,7 +119,7 @@ class ParameterTypeConverterKotlinTest {
             """    
         map | nested list | nested set  | nested map
         [:] | [empty: []] | [empty: {}] | [empty: [:]]
-        """
+            """
         )
         fun passes_immutable_maps_to_test(
             map: Map<String?, String?>,
@@ -402,8 +255,8 @@ class ParameterTypeConverterKotlinTest {
     fun factory_methods_takes_priority_over_junit_conversion(
         date: LocalDate?,
         date1: ConstructorDate,
-        date2: FactoryMethodDate,
-        list: List<FactoryMethodDate>
+        date2: ExternalFactoryDate,
+        list: List<ExternalFactoryDate>
     ) {
         assertEquals(date, date1.date)
         assertEquals(date, date2.date)
@@ -423,6 +276,6 @@ fun parseAges(age: Map<String, kotlin.collections.List<Age>>): Ages {
 }
 
 @Suppress("unused")
-fun parseDate(date: String): FactoryMethodDate {
-    return FactoryMethodDate(LocalDate.parse(date))
+fun parseDate(date: String): ExternalFactoryDate {
+    return ExternalFactoryDate(LocalDate.parse(date))
 }

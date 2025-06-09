@@ -1,6 +1,8 @@
 package io.github.nchaugen.tabletest.junit.converting;
 
 import io.github.nchaugen.tabletest.junit.TableTest;
+import io.github.nchaugen.tabletest.junit.exampledomain.ConstructorDate;
+import io.github.nchaugen.tabletest.junit.exampledomain.TypeFactoryDate;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -23,9 +25,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class JavaSingleValueBuiltInConversionTest {
+public class JavaFallbackConversionTest {
 
     @TableTest("""
         Format  | Byte | Short | Integer | Long | Expected
@@ -129,7 +130,7 @@ public class JavaSingleValueBuiltInConversionTest {
     @TableTest("""
         File            | Path            | URI                 | URL                 | Class Name
         /path/to/file   | /path/to/file   | https://junit.org/  | https://junit.org/  | java.lang.Integer
-        C:\\Users\\test | C:\\Users\\test | file:///tmp/test    | https://example.com | java.lang.String
+        C:\\Users\\test | C:\\Users\\test | file:///tmp/test    | https://example.com | java.lang.Thread$State
         ./relative/path | ./relative/path | urn:isbn:1234567890 | file:///tmp/test    | byte
         """)
     void converts_resource_types(
@@ -223,18 +224,18 @@ public class JavaSingleValueBuiltInConversionTest {
     }
 
     @TableTest("""
-        Scenario     | String | Float | List
-        Empty string | ""     | ""    | ""
-        Blank cell   |        |       |
+        String     | Constructor | Factory method in type | List with fallback
+        2025-05-27 | 2025-05-27  | 2025-05-27             | [2025-05-27]
         """)
-    void converts_blank_to_null_for_non_string_parameters(
-        String stringVal,
-        Float floatVal,
-        List<?> listVal
+    void converts_custom_types_with_constructor_or_type_internal_factory(
+        LocalDate stringToLocalDate,
+        ConstructorDate withConstructor,
+        TypeFactoryDate withFactoryMethodInsideType,
+        List<TypeFactoryDate> listWithFallbackConversion
     ) {
-        assertNotNull(stringVal);
-        assertNull(floatVal);
-        assertNull(listVal);
+        assertEquals(stringToLocalDate, withConstructor.date());
+        assertEquals(stringToLocalDate, withFactoryMethodInsideType.date());
+        assertEquals(stringToLocalDate, listWithFallbackConversion.getFirst().date());
     }
 
 }

@@ -3,7 +3,7 @@ package io.github.nchaugen.tabletest.junit.converting
 import io.github.nchaugen.tabletest.junit.TableTest
 import kotlin.test.assertEquals
 
-class KotlinParameterizedTypeBuiltInConversionTest {
+class KotlinParameterizedTypeConversionTest {
 
     @TableTest(
         """    
