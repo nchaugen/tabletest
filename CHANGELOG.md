@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [0.4.0] - 2025-06-10
 ### Added
 - TableTest will search classes listed in new annotation `@FactorySources` for factory methods
 - For `@Nested` test classes, TableTest will search enclosing test classes for factory methods 
