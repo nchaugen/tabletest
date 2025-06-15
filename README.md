@@ -62,7 +62,7 @@ TableTest makes your tests more:
 - [License](#license)
 
 ## Usage
-TableTest-style test methods are declared using the `@TableTest` annotation. The annotation accepts a table of data as a multi-line string or as an external resource. 
+TableTest-style test methods are declared using the `@TableTest` annotation. The annotation accepts a table of data as a multi-line string or as an [external resource](#table-in-external-file). 
 
 ```java
 @TableTest("""
@@ -79,28 +79,28 @@ public void leapYearCalculation(Year year, boolean expectedResult) {
 
 Tables use the pipe character (`|`) to separate columns and newline to separate rows. The first row is the header containing column names. The following lines are data rows. 
 
-Each data row will invoke the test method with the column values being passed as arguments. Optionally, the first column may contain a [scenario name](#scenario-names) describing the situation being exemplified by each row. There must be a test method parameter for each value column (scenario name column excluded). Columns map to parameters based strictly on order, so the first value column maps to the first parameter, the second value column to the second parameter, etc. The column header names and parameter names can be different, but keeping them aligned improves readability. 
+Each data row will invoke the test method with the cell values being passed as arguments. Optionally, the first column may contain a [scenario name](#scenario-names) describing the situation being exemplified by each row. There must be a test method parameter for each value column (scenario name column excluded). Columns map to parameters based strictly on order, so the first value column maps to the first parameter, the second value column to the second parameter, etc. The column header names and parameter names can be different, but keeping them aligned improves readability. 
 
 Column values can be [single values](#single-values), [lists](#list-values), [sets](#set-values), or [maps](#map-values). Values are automatically converted to the type of the corresponding test parameter.
 
-Technically `@TableTest` is implemented as a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
+Technically `@TableTest` is a JUnit `@ParameterizedTest` with a custom-format argument source. Like regular JUnit test methods, `@TableTest` methods must not be `private` or `static` and must not return a value.
 
 ## Value Formats
-TableTest supports three types of values: [single values](#single-values), [lists](#list-values), [sets](#set-values), and [maps](#map-values).
+The TableTest format supports three types of values: [single values](#single-values), [lists](#list-values), [sets](#set-values), and [maps](#map-values).
 
 ### Single Values
-Single values can appear with or without quotes. Unquoted values must not contain `[`, `|`, `,`, or `:` characters. These special characters require single or double quotes.
+Single values can appear with or without quotes. Surrounding single (`'`) or double (`"`) quotes are required when the value contains a `|` character, or starts with `[` or `{`. For single values appearing as elements in a list, set, or map (see below), the characters `,`, `:`, `]`, and `}` also make the value require quotes.
 
-Whitespace around unquoted values is trimmed. To preserve leading or trailing whitespace, use quotes. Empty values are represented by adjacent quote pairs (`""` or `''`).
+Whitespace around unquoted values is trimmed. To preserve leading or trailing whitespace, use quotes. Empty values are represented by adjacent quote pairs (`""` or `''`). [Null values](#null-values) are represented by a blank cell.
 
 ```java
 
 @TableTest("""
-    Value          | Length?
-    Hello world    | 11
-    "World, hello" | 12
-    "|"            | 1
-    ''             | 0
+    Value                  | Length?
+    Hello, world!          | 13
+    "cat file.txt | wc -l" | 20
+    "[]"                   | 2
+    ''                     | 0
     """)
 void testString(String value, int expectedLength) {
     assertEquals(expectedLength, value.length());
@@ -108,7 +108,7 @@ void testString(String value, int expectedLength) {
 ```
 
 ### List Values
-Lists are enclosed in square brackets with comma-separated elements. Lists can contain single values or compound values (nested lists/maps). Empty lists are represented by `[]`.
+Lists are enclosed in square brackets with comma-separated elements. Lists can contain single values or compound values (nested lists/sets/maps). Empty lists are represented by `[]`.
 
 ```java
 @TableTest("""
@@ -139,7 +139,7 @@ void testSet(Set<String> set, int expectedSize) {
 ```
 
 ### Map Values
-Maps use square brackets with comma-separated key-value pairs. Colons separate keys and values. Keys must be unquoted single values, while values can be single or compound. Empty maps are represented by `[:]`.
+Maps use square brackets with comma-separated key-value pairs. Colons separate keys and values. Keys must be unquoted single values and cannot contain characters `,`, `:`, `|`, `[`, `]`, `{`, or `}`. Values can be single (unquoted/quoted) or compound (list/set/map). Empty maps are represented by `[:]`.
 
 ```java
 
@@ -177,17 +177,17 @@ void testNestedParameterizedTypes(
 ```
 
 ## Value Conversion
-TableTest processes the tables in two steps:
+TableTest processes the table in two steps:
 1. Parsing
 2. Value Conversion
 
-Parsing verifies that the table is formatted according to valid syntax, and picks out the cell values from the table. Compound cell values are captured as their corresponding `List`, `Set`, and `Map` types according to syntax. Single values are represented as type `String`. 
+Parsing verifies that the table is formatted according to valid syntax and collects the cell values from the table. Compound cell values are captured as their corresponding `List`, `Set`, and `Map` types according to syntax. Single values are captured as type `String`. 
 
 TableTest continues to convert the captured cell values to the type required by the test method parameter. This eliminates the need for manual conversion in your test method, keeping tests focused on invoking the system under test and asserting the results.
 
-TableTest will try one of the following strategies to perform the required conversion, in this order:
+TableTest will try one of the following strategies to perform the required conversion (in this order):
 
-1. Using explicit argument converter specified with JUnit `@ConvertWith` annotation on parameter 
+1. Using explicit argument converter specified with JUnit `@ConvertWith` annotation 
 2. Using a factory method found in the test class
 3. Using a factory method found via `@FactorySources` annotation on test class
 4. Using JUnit built-in type conversion
@@ -196,10 +196,10 @@ Let us look into how each of these strategies works, starting from the bottom.
 
 
 ### JUnit Built-In Conversion
-TableTest leverages [JUnit's built-in implicit type converters](https://junit.org/junit5/docs/5.12.2/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit) for automatic conversion of parsed String values to various types.
+TableTest leverages [JUnit's built-in type converters](https://junit.org/junit5/docs/5.12.2/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit) for automatic conversion of parsed String values to various types.
 
 #### How It Works
-TableTest will look at the corresponding test parameter type for a value and automatically convert the parsed String value to any of the following types:
+Using JUnit conversion service, TableTest will automatically convert a single value to any of the following types:
 * Boolean
 * Byte, Character
 * Short, Integer, Long, Float, Double 
@@ -217,7 +217,7 @@ TableTest will look at the corresponding test parameter type for a value and aut
 * java.util.Currency, java.util.Locale
 * java.util.UUID
 
-For any other types, the JUnit conversion service will try to find either a [factory method or factory constructor in the target type](https://junit.org/junit5/docs/5.12.2/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit-fallback) accepting a single String parameter and use this to make the conversion. 
+For any other types it will try to find either a [factory method or factory constructor in the target type](https://junit.org/junit5/docs/5.12.2/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit-fallback) accepting a single String parameter and use this to make the conversion. 
 
 ```java
 @TableTest("""
@@ -247,10 +247,10 @@ void testParameterizedTypes(Map<String, List<Integer>> grades, int expectedHighe
 
 
 ### Factory Method Conversion
-Before falling back to [JUnit built-in conversion](#junit-built-in-conversion), TableTest will look for a factory method present in either the test class or in one of the classes listed in a `@FactorySources` annotation. If found, TableTest will use this factory method to convert the parsed value to the required test parameter type. 
+Before falling back to [JUnit conversion service](#junit-built-in-conversion), TableTest will look for a factory method present in either the test class or in one of the classes listed by a `@FactorySources` annotation. If found, TableTest will use this factory method to convert the parsed value to the required test parameter type. 
 
 #### How It Works
-A custom converter is a factory method that:
+A factory method will be used when it:
 1. Is defined as a public static method in a public class
 2. Accepts exactly one parameter
 3. Returns an object of the target parameter type
@@ -258,25 +258,23 @@ A custom converter is a factory method that:
 
 There is no specific naming pattern for factory methods, any method fulfilling the requirements above will be considered.
 
-TableTest will use factory methods available in the test class or in a class listed by a `@FactorySources` annotation on the test class.
-
 #### Factory Method Search Strategy in Java
 TableTest uses the following strategy to search for factory methods in Java test classes: 
 
 1. Search current test class
-2. In case of a `@Nested` test class, search enclosing classes, starting with the direct outer
+2. In case of a `@Nested` test class, search enclosing classes, starting with the direct outer class
 3. Search classes in the order they are listed by a `@FactorySources` annotation on current test class
-4. In case of a `@Nested` test class, search classes listed by `@FactorySources` of enclosing classes, starting with direct outer
+4. In case of a `@Nested` test class, search classes listed by `@FactorySources` of enclosing classes, starting with the direct outer class
 
-It will stop searching as soon as it finds a matching factory method and use this for the conversion.
+TableTest will stop searching as soon as it finds a matching factory method and use this for the conversion.
 
 #### Factory Method Search Strategy in Kotlin
-For tests written in Kotlin, static factory methods can be declared in two ways:
+For tests written in Kotlin, factory methods can be declared in two ways to become static methods:
 
 1. In the companion object of a test class using [`@JvmStatic` annotation](https://kotlinlang.org/docs/java-to-kotlin-interop.html#static-methods)
 2. At [package-level](https://kotlinlang.org/docs/java-to-kotlin-interop.html#package-level-functions) in the file containing the test class.
 
-In Kotlin, a `@Nested` test class must be declared `inner class` and these are not allowed to have companion objects. Hence, all test class factory methods must be either declared in the companion object of the outer class (with `@JvmStatic`) or at package level in the same file as the test class.
+In Kotlin, a `@Nested` test class must be declared `inner class` and these are not allowed to have companion objects. Hence, test class factory methods must be either declared in the companion object of the outer class (with `@JvmStatic`) or at package level in the same file as the test class.
 
 So for Kotlin, the search strategy becomes as follows:
 
@@ -287,7 +285,6 @@ So for Kotlin, the search strategy becomes as follows:
 As for Java, TableTest will stop searching as soon as it finds a matching factory method and use this for the conversion.
 
 #### Factory Sources in Kotlin
-
 The recommended solution for implementing factory sources in Kotlin is to define them as `object` and annotate factory methods with `@JvmStatic`:
 
 ```kotlin
@@ -305,13 +302,11 @@ Usage:
 @FactorySources(KotlinFactorySource::class)
 ```
 
-Alternatively, regular Kotlin classes can also be referenced, with factory methods defined in a companion object. These methods must also be annotated with `@JvmStatic`.
+Alternatively, regular Kotlin classes with factory methods defined as `@JvmStatic` in a companion object can also be referenced.
 
 
 #### Overriding Built-In Conversion
-As TableTest will prefer an external factory method over the built-in conversion, it is possible to override the built-in conversion of specific types.
-
-The example below demonstrates this, allowing conversion to LocalDate to understand some custom constant values.
+As TableTest will prefer using a factory method over the built-in conversion, it is possible to override the built-in conversion of specific types. The example below demonstrates this, allowing conversion to LocalDate to understand certain custom constant values.
 
 ```java
 @TableTest("""
@@ -324,7 +319,7 @@ void testIsBefore(LocalDate thisDate, LocalDate otherDate, boolean expectedIsBef
   assertEquals(expectedIsBefore, thisDate.isBefore(otherDate));
 }
 
-static LocalDate parseLocalDate(String input) {
+public static LocalDate parseLocalDate(String input) {
     return switch (input) {
         case "yesterday" -> LocalDate.parse("2025-06-06");
         case "today" -> LocalDate.parse("2025-06-07");
@@ -337,7 +332,7 @@ static LocalDate parseLocalDate(String input) {
 #### Conversion to Factory Method Parameter
 Having selected a factory method with a return type matching the test parameter type, TableTest will consider if the parsed value matches the parameter type of the factory method. If not, it will attempt to convert the value to match the parameter type. 
 
-Building on the previous "Nested Values" example, we can create a factory method to directly accept a `Students` parameter instead of manually converting it in the test method:
+Building on the [example from earlier](#nested-values), we can create a factory method to directly accept a `Students` parameter instead of manually converting it in the test method:
 
 ```java
 @TableTest("""
@@ -358,7 +353,7 @@ void testWithCustomConverter(
 }
 
 // Factory method for conversion
-static Students fromGradesMap(Map<String, List<Integer>> input) {
+public static Students fromGradesMap(Map<String, List<Integer>> input) {
   // mapping implementation  
 }
 ```
@@ -366,17 +361,16 @@ static Students fromGradesMap(Map<String, List<Integer>> input) {
 In this example:
 1. The first parameter is now directly of type `Students` instead of `Map<String, List<Integer>>`
 2. TableTest starts converting the parsed value of type `Map<String, List<String>>` to the parameter type
-3. Seeing the required type `Students`, TableTest searches for a factory method returning this type
-4. Finding `fromGradesMap` it sees that this requires a parameter of type `Map<String, List<Integer>>`
-5. TableTest then converts the parsed value `Map<String, List<String>>` to `Map<String, List<Integer>>`
-6. When converting the list elements, TableTest looks for a factory method returning type `Integer`
-7. Finding none, it falls back to the built-in conversion
-8. Having successfully converted the value to `Map<String, List<Integer>>`, TableTest invokes the factory method `fromGradesMap` it found earlier with the converted value
-9. The factory method turns this into a `Students` object that TableTest can pass on to the test
+3. Seeing the required type `Students`, TableTest searches for a factory method returning this type and selects `fromGradesMap` in the test class
+4. Seeing that `fromGradesMap` requires a parameter of type `Map<String, List<Integer>>`, TableTest starts converting the parsed value of type `Map<String, List<String>>` to this type
+5. When converting the list elements, TableTest looks for a factory method returning type `Integer`
+6. Finding none, it falls back to the built-in conversion
+7. Having successfully converted the value to `Map<String, List<Integer>>`, TableTest invokes the factory method `fromGradesMap` it found earlier with the converted value
+8. The factory method turns this into a `Students` object that TableTest can pass on to the test
 
 
 ### Explicit Argument Conversion
-In addition to implicitly called factory methods and built-in conversion, TableTest supports JUnit standard [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit) or [argument aggregation](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-aggregation). This can be used for explicit conversion to custom types.
+In addition to implicitly called factory methods and built-in conversion, TableTest supports JUnit [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit) as well as JUnit [argument aggregation](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-aggregation). This can be used for explicit conversion to custom types.
 
 As there is no parameter type information available in the ArgumentConverter interface, custom ArgumentConverters will receive the [parsed value](#value-conversion). In the example below, the value of the `source` parameter received by `PersonConverter.convert` will be of type `Map<String, String>`. However, since the `ArgumentConverter` interface specifies `source` parameter as type `Object`, the value needs to be inspected and processed using `instanceof`.  
 
@@ -428,7 +422,7 @@ private static class PersonConverter implements ArgumentConverter {
 TableTest contains a number of other useful features for expressing examples in a table format.
 
 ### Scenario Names
-TableTest supports providing a scenario name describing the situation being exemplified by each row. This makes the tests easier to understand and failures easier to diagnose. For scenario naming, add one extra column at the beginning of your table. This column's values will be used as test case names and won't be mapped to any method parameters.
+TableTest supports providing a scenario name describing the situation being exemplified by each row. This makes the tests easier to understand and failures easier to diagnose. For scenario naming, add one extra column at the beginning of your table. This column's values will be used as test case names and will not be mapped to any method parameters.
 
 ```java
 @TableTest("""
@@ -448,7 +442,7 @@ In test reports, each test case will be identified by its scenario name rather t
 ### Null Values
 Blank cells and empty quoted values will translate to `null` for all parameter types except primitives. For primitives, it will cause an exception as they cannot represent a `null` value.
 
-The built-in conversion will **not** translate empty quoted values to `null` when they appear as elements inside lists, sets, and maps. This will instead cause a `ConversionException`. Consider writing a [factory method](#factory-method-conversion) if you need this.
+The built-in conversion will **not** translate empty quoted values to `null` when they appear as elements inside lists, sets, and maps. This will instead cause a `ConversionException`. Consider using a [factory method](#factory-method-conversion) if you need this.
 
 ```java
 @TableTest("""
@@ -468,9 +462,11 @@ void testBlankMeansNull(String scenario, String string, Integer integer, List<?>
 ```
 
 ### Set of Applicable Values
-TableTest automatically recognizes when a set represents alternative applicable values for a test parameter. When a cell contains a set (enclosed in curly braces) and the corresponding parameter isn't declared as a `Set` type, TableTest will expand that row into multiple test invocations — one for each value in the set, while maintaining all other parameter values. 
+TableTest supports using the set format to specify multiple examples of values that are applicable for the current scenario. This is a powerful feature that can be used to contract multiple scenarios that have identical expectations. 
 
-In this example, the test method is run 12 times, three times for each row, once for each value in the set in column `Example years`.
+When a cell contains a set (enclosed in curly braces) and the corresponding parameter isn't declared as a `Set` type, TableTest will invoke this row multiple times — one time for each value in the set — while maintaining all other parameter values. 
+
+In the example below, the test method will be invoked 12 times, three times for each row, once for each value in the set in column `Example years`.
 
 ```java
 @TableTest("""
@@ -484,9 +480,7 @@ public void testLeapYear(Year year, boolean expectedResult) {
     assertEquals(expectedResult, year.isLeap(), "Year " + year);
 }
 ```
-This feature works with scenario names and preserves the original scenario name for all generated test invocations. This allows grouping related test cases under a descriptive heading while still testing multiple specific values.
-
-When multiple cells in the same row contain applicable value sets, TableTest performs a cartesian product, generating test cases for all possible combinations of values. This powerful feature enables testing multiple scenarios without redundant table entries.
+When multiple cells in the same row contain applicable value sets, TableTest will perform a cartesian product, generating test cases for all possible combinations of values. This example will invoke the test method 6 times for each row, with each possible combination of the provided x and y values.
 
 ```java
 @TableTest("""
@@ -500,7 +494,7 @@ void testEvenOddSums(int x, int y, boolean expectedResult) {
 }
 ```
 
-Use expandable sets judiciously. The number of test cases grows multiplicatively with each additional set (two sets of size 10 generate 100 test cases), which can significantly increase test execution time.
+Use applicable value sets judiciously. The number of test cases grows multiplicatively with each additional set (two sets of size 10 generate 100 test invocations), which can significantly increase test execution time.
 
 Sets are only expanded when the parameter type doesn't match `Set<?>`. When the parameter is declared as a set type, the entire set is passed as a single argument: 
 
@@ -517,7 +511,7 @@ void testSetParameter(Set<String> values, int expectedSize) {
 ```
 
 ### Comments and Blank Lines
-Lines starting with `//` (ignoring leading whitespace) are treated as comments and ignored during parsing. Comments allow adding explanations or temporarily disabling data rows.
+Lines starting with `//` (ignoring leading whitespace) are treated as comments and ignored. Comments allow adding explanations or temporarily disabling data rows.
 
 Blank lines are also ignored and can be used to visually group related rows.
 
@@ -558,10 +552,10 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 
 
 ### Escape Sequences
-Escape sequence handling varies depending on how you define your table data. 
+Escape sequence handling varies depending on the programming language used for the test. 
 
 #### Java Text Blocks
-When using text blocks in Java to provide the table, all Java escape sequences like `\t`, `\"`, `\\`, `\uXXXX`, `\XXX`, etc. are processed by the Java compiler:
+When providing the table using text blocks in Java, all Java escape sequences like `\t`, `\"`, `\\`, `\uXXXX`, `\XXX`, etc. are processed by the Java compiler before handed to TableTest:
 
 ```java
     @TableTest("""
@@ -578,17 +572,17 @@ void testEscapeSequences(String input, int expectedLength) {
 ```
 
 #### Kotlin Raw Strings
-With Kotlin raw strings, escape sequences are **not** processed. They remain as literal backslash characters:
+Using Kotlin raw strings, escape sequences are **not** processed. They remain as literal backslash characters:
 
 ```kotlin
 @TableTest(
     """
-    Scenario                                | Input      | Length?
-    Tab character processed by compiler     | a\tb       | 4
-    Quote marks processed by compiler       | Say \"hi\" | 10
-    Backslash processed by compiler         | path\\file | 10
-    Unicode character processed by compiler | \u0041B    | 7
-    Octal character processed by compiler   | \101B      | 5
+    Scenario                                    | Input      | Length?
+    Tab character NOT processed by compiler     | a\tb       | 4
+    Quote marks NOT processed by compiler       | Say \"hi\" | 10
+    Backslash NOT processed by compiler         | path\\file | 10
+    Unicode character NOT processed by compiler | \u0041B    | 7
+    Octal character NOT processed by compiler   | \101B      | 5
     """)
 fun testEscapeSequences(input: String, expectedLength: Int) {
     assertEquals(expectedLength, input.length)
@@ -596,7 +590,7 @@ fun testEscapeSequences(input: String, expectedLength: Int) {
 ```
 
 #### External File 
-Table files are read as raw text, meaning escape sequences are **not** processed and remain literal (like Kotlin raw strings).
+Table files are read as raw text independent of programming language, meaning escape sequences are **not** processed and remain literal.
 
 #### Workarounds
 If you need special characters in Kotlin or external Table files, you have three options:
@@ -611,10 +605,10 @@ If you need special characters in Kotlin or external Table files, you have three
 ### Requirements
 TableTest requires **Java version 21 or higher**.
 
-TableTest version 0.3.1 is compatible with **JUnit Jupiter versions from 5.11.0 up to and including 5.12.2**.
+TableTest version 0.4.0 is compatible with **JUnit Jupiter versions from 5.11.0 up to and including 5.12.2**.
 
 ### Using TableTest with JUnit 5.13.0
-Please note that **TableTest version 0.3.1 is not compatible with recently released JUnit Jupiter 5.13.0**. This is due to an interface change in AnnotationBasedArgumentsProvider. This will be addressed in a future version of TableTest.
+Please note that **TableTest version 0.4.0 is not compatible with recently released JUnit Jupiter 5.13.0**. This is due to an interface change in AnnotationBasedArgumentsProvider. This will be addressed in a future version of TableTest.
 
 ### Using TableTest with JUnit 5.12.2
 To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as a test scope dependency alongside `junit-jupiter`.
@@ -625,7 +619,7 @@ To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as 
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.3.1</version>
+        <version>0.4.0</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -640,7 +634,7 @@ To use TableTest with JUnit Jupiter **5.12.2**, simply add `tabletest-junit` as 
 #### Gradle with Groovy DSL (build.gradle)
 ```groovy
 dependencies {
-    testImplementation 'io.github.nchaugen:tabletest-junit:0.3.1'    
+    testImplementation 'io.github.nchaugen:tabletest-junit:0.4.0'    
     testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -652,7 +646,7 @@ tasks.named('test', Test) {
 #### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.3.1")
+    testImplementation("io.github.nchaugen:tabletest-junit:0.4.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.2") 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher") 
 }
@@ -663,7 +657,7 @@ tasks.named<Test>("test") {
 ```
 
 ### Using TableTest with JUnit 5.11.0 to 5.12.1
-TableTest version 0.3.1 supports JUnit Jupiter versions 5.11.0 up to and including 5.12.2. For projects using JUnit Jupiter versions in this range, but prior to 5.12.2, you need to exclude the transitive dependencies to avoid conflicts.
+TableTest version 0.4.0 supports JUnit Jupiter versions 5.11.0 up to and including 5.12.2. For projects using JUnit Jupiter versions in this range, but prior to 5.12.2, you need to exclude the transitive dependencies to avoid conflicts.
 
 #### Maven (pom.xml)
 ```xml
@@ -671,7 +665,7 @@ TableTest version 0.3.1 supports JUnit Jupiter versions 5.11.0 up to and includi
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.3.1</version>
+        <version>0.4.0</version>
         <scope>test</scope>
         <exclusions>
             <exclusion>
@@ -696,7 +690,7 @@ TableTest version 0.3.1 supports JUnit Jupiter versions 5.11.0 up to and includi
 #### Gradle with Groovy DSL (build.gradle)
 ```groovy
 dependencies { 
-    testImplementation('io.github.nchaugen:tabletest-junit:0.3.1') { 
+    testImplementation('io.github.nchaugen:tabletest-junit:0.4.0') { 
         exclude group: 'org.junit.jupiter', module: 'junit-jupiter-params' 
         exclude group: 'org.junit.platform', module: 'junit-platform-commons' 
     }
@@ -711,7 +705,7 @@ tasks.named('test', Test) {
 #### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.3.1") {
+    testImplementation("io.github.nchaugen:tabletest-junit:0.4.0") {
         exclude(group = "org.junit.jupiter", module = "junit-jupiter-params") 
         exclude(group = "org.junit.platform", module = "junit-platform-commons") 
     } 
