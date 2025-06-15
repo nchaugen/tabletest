@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenNullSpecifiedForPrimitiveType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -17,7 +18,7 @@ class JavaNullValueTest {
         Empty single quoted | ''     | ''      | ''   | ''  | ''
         Empty double quoted | ""     | ""      | ""   | ""  | ""
         """)
-    void testBlankIsNullForNonString(
+    void blank_is_null_and_empty_is_null_for_non_string(
         String scenario,
         String string,
         Integer integer,
@@ -31,6 +32,15 @@ class JavaNullValueTest {
         assertNull(list);
         assertNull(map);
         assertNull(set);
+    }
+
+    @TableTest("""
+        table value | parameter type
+                    | boolean
+        ''          | int
+        """)
+    void fails_when_null_value_specified_for_primitive_parameter_type(String value, Class<?> type) {
+        assertThrowsWhenNullSpecifiedForPrimitiveType(value, type);
     }
 
 }

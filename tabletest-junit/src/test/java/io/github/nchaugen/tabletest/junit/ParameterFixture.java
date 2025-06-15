@@ -1,5 +1,8 @@
 package io.github.nchaugen.tabletest.junit;
 
+import io.github.nchaugen.tabletest.junit.javadomain.Age;
+import io.github.nchaugen.tabletest.junit.javadomain.Ages;
+
 import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -58,12 +61,12 @@ public class ParameterFixture {
 
     private static final Map<Class<?>, Parameter> paramsByType =
         Arrays.stream(ParameterFixture.class.getDeclaredMethods())
-            .filter(it -> "supportedValueParams".equals(it.getName()))
+            .filter(it -> it.getName().endsWith("NonParameterizedValueParams"))
             .flatMap((Method method) -> Arrays.stream(method.getParameters()))
             .collect(Collectors.toMap(Parameter::getType, it -> it));
 
     @SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
-    private void supportedValueParams(
+    private void javaNonParameterizedValueParams(
         boolean primitiveBoolean,
         byte primitiveByte,
         char primitiveChar,
@@ -110,6 +113,14 @@ public class ParameterFixture {
         List<?> list,
         Set<?> set,
         Optional<?> optional
+    ) {
+        // This method is only used to get the parameter types
+    }
+
+    @SuppressWarnings("unused")
+    private void domainNonParameterizedValueParams(
+        Age age,
+        Ages ages
     ) {
         // This method is only used to get the parameter types
     }
@@ -225,6 +236,17 @@ public class ParameterFixture {
         List<Map<?, ?>> listOfMapWildcard
     ) {
         // This method is only used to get the parameter types
+    }
+
+    // Factory methods for ParameterFixture parameters
+    @SuppressWarnings("unused")
+    public static Age parseAge(int age) {
+        throw new RuntimeException("Factory method is one of multiple applicable, should not be called");
+    }
+
+    @SuppressWarnings("unused")
+    public static Age parseAge(String age) {
+        throw new RuntimeException("Factory method is one of multiple applicable, should not be called");
     }
 
 }

@@ -1,11 +1,8 @@
 package io.github.nchaugen.tabletest.junit.converting
 
-import io.github.nchaugen.tabletest.junit.ParameterFixture.parameter
-import io.github.nchaugen.tabletest.junit.ParameterTypeConverter
 import io.github.nchaugen.tabletest.junit.TableTest
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Test
-import org.junit.platform.commons.support.conversion.ConversionException
+import io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenFallbackFails
+import io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenMultipleFactoryMethodsFound
 
 class KotlinConversionFailureTest {
 
@@ -18,59 +15,42 @@ class KotlinConversionFailureTest {
             """
     )
     fun fails_conversion_for_single_values_outside_type_range(
-        value: String?,
-        type: Class<*>?
+        value: String,
+        type: Class<*>
     ) {
-        assertThrows(ConversionException::class.java) {
-            ParameterTypeConverter.convertValue(value, parameter(type))
-        }
+        assertThrowsWhenFallbackFails(value, type.getTypeName())
     }
 
-    @Test
-    fun fails_when_list_conversion_not_possible() {
-        mapOf(
-            "java.util.List<java.lang.Byte>" to listOf("x")
-        ).forEach { (typeName: String, parsedValue: List<*>) ->
-            assertThrows(
-                ConversionException::class.java, {
-                    ParameterTypeConverter.convertValue(
-                        parsedValue,
-                        parameter(typeName)
-                    )
-                },
-                { "Expected failure for $typeName" }
-            )
-        }
+    @TableTest(
+        """    
+        Value     | Parameterized type
+        [""]      | java.util.List<java.lang.Byte>
+        {""}      | java.util.Set<java.lang.Byte>
+        [key: ""] | java.util.Map<?, java.lang.Short>
+        """
+    )
+    fun fails_conversion_for_element_values_outside_type_range(value: Any, parameterizedTypeName: String) {
+        assertThrowsWhenFallbackFails(value, parameterizedTypeName)
     }
 
-    @Test
-    fun fails_when_set_conversion_not_possible() {
-        mapOf(
-            "java.util.Set<java.lang.Byte>" to setOf("x")
-        ).forEach { (typeName: String, parsedValue: Set<*>) ->
-            assertThrows(
-                ConversionException::class.java, {
-                    ParameterTypeConverter.convertValue(
-                        parsedValue,
-                        parameter(typeName)
-                    )
-                },
-                { "Expected failure for $typeName" }
-            )
-        }
+    @TableTest(
+        """    
+        table value | parameter type
+        [52]        | io.github.nchaugen.tabletest.junit.javadomain.Ages
+        """
+    )
+    fun fails_when_no_factory_method_found(value: Any, type: Class<*>) {
+        assertThrowsWhenFallbackFails(value, type.getTypeName())
     }
 
-    @Test
-    fun fails_when_map_conversion_not_possible() {
-        mapOf(
-            "java.util.Map<?, java.lang.Short>" to mapOf("key" to "x")
-        ).forEach { (typeName: String, parsedValue: Map<*, *>) ->
-            assertThrows(
-                ConversionException::class.java,
-                { ParameterTypeConverter.convertValue(parsedValue, parameter(typeName)) },
-                { "Expected failure for $typeName" }
-            )
-        }
+    @TableTest(
+        """    
+        table value | parameter type
+        52          | io.github.nchaugen.tabletest.junit.javadomain.Age
+        """
+    )
+    fun fails_when_multiple_factory_methods_found(value: String, type: Class<*>) {
+        assertThrowsWhenMultipleFactoryMethodsFound(value, type)
     }
 
 }

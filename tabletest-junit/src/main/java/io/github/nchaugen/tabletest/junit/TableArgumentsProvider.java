@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.github.nchaugen.tabletest.junit.ParameterTypeConverter.convertValue;
+import static io.github.nchaugen.tabletest.junit.TableTestException.failedToReadExternalTable;
+import static io.github.nchaugen.tabletest.junit.TableTestException.notEnoughTestParameters;
 
 /**
  * Provides arguments for parameterized tests from tabular data defined in {@link TableTest} annotations.
@@ -94,24 +96,18 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
     /**
      * Resolves and validates method parameters against the table structure.
      * <p>
-     * Verifies that the number of table columns matches the number of method parameters.
+     * Verifies that there are enough method parameters to represent the table columns.
      * One extra column is allowed, which will be interpreted as the name of the argument set.
      *
      * @param context     The test extension context
      * @param columnCount The number of columns in the table
      * @return Array of method parameters
-     * @throws IllegalArgumentException if column and parameter counts don't match
+     * @throws TableTestException if there are fewer parameters than columns
      */
     private static Parameter[] resolveParameters(ExtensionContext context, int columnCount) {
         Parameter[] parameters = context.getRequiredTestMethod().getParameters();
         if (columnCount < parameters.length || columnCount > parameters.length + 1) {
-            throw new IllegalArgumentException(
-                String.format(
-                    "Number of columns in table (%d) does not match number of parameters in test method (%d)",
-                    columnCount,
-                    parameters.length
-                )
-            );
+            throw new TableTestException(notEnoughTestParameters(parameters.length, columnCount));
         }
         return parameters;
     }
@@ -132,8 +128,8 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
         try (InputStream resourceAsStream = resolveResourceStream(resource, testClass)) {
             return new BufferedReader(new InputStreamReader(resourceAsStream, encoding))
                 .lines().collect(Collectors.joining("\n"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException cause) {
+            throw new TableTestException(failedToReadExternalTable(resource, encoding), cause);
         }
     }
 

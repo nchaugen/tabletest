@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Added
+- More descriptive error messages
 
 ## [0.4.0] - 2025-06-10
 ### Added

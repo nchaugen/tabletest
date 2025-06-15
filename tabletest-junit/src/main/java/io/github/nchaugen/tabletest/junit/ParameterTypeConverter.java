@@ -32,6 +32,10 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static io.github.nchaugen.tabletest.junit.ParameterUtil.nestedElementTypesOf;
+import static io.github.nchaugen.tabletest.junit.TableTestException.cannotAcceptNull;
+import static io.github.nchaugen.tabletest.junit.TableTestException.factoryMethodFailed;
+import static io.github.nchaugen.tabletest.junit.TableTestException.fallbackJUnitConversionFailed;
+import static io.github.nchaugen.tabletest.junit.TableTestException.multipleFactoryMethodsFound;
 import static java.util.stream.Collectors.toUnmodifiableMap;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
@@ -70,13 +74,10 @@ public class ParameterTypeConverter {
         Class<?> targetType = parameter.getType();
         Class<?> testClass = parameter.getDeclaringExecutable().getDeclaringClass();
 
-        if (value == null
-            || isBlankForNonStringType(value, targetType)
-            || isEmptyApplicableValueSet(value, targetType)
+        if (value == null || valueConvertsToNull(targetType, value)
         ) {
             if (targetType.isPrimitive()) {
-                throw new ConversionException(
-                    "Cannot convert null to primitive value of type " + targetType.getTypeName());
+                throw new TableTestException(cannotAcceptNull(value, targetType));
             }
             return null;
         }
@@ -89,14 +90,19 @@ public class ParameterTypeConverter {
         return convert(value, NestedTypes.of(parameter), testClass);
     }
 
+    private static boolean valueConvertsToNull(Class<?> targetType, Object value) {
+        return isEmptyForNonStringType(value, targetType)
+               || isEmptyApplicableValueSet(value, targetType);
+    }
+
     /**
-     * Determines if the cell was blank for a non-string type
+     * Determines if the parsed value was the empty value ("" or '') for a non-string type
      *
-     * @param value      converted cell value
-     * @param targetType type of parameter
+     * @param parsedValue parsed value
+     * @param targetType  type of parameter
      */
-    private static boolean isBlankForNonStringType(Object value, Class<?> targetType) {
-        return value.toString().isBlank() && !targetType.isAssignableFrom(String.class);
+    private static boolean isEmptyForNonStringType(Object parsedValue, Class<?> targetType) {
+        return parsedValue.toString().isEmpty() && !targetType.isAssignableFrom(String.class);
     }
 
     /**
@@ -134,20 +140,29 @@ public class ParameterTypeConverter {
         }
 
         // Types don't match - look for a factory method
-        return findFactoryMethod(testClass, targetType)
+        return findFactoryMethod(targetType, factoryMethodSearchPath(testClass))
             .map(factoryMethod -> invokeFactoryMethod(
                 factoryMethod,
                 // Convert value to match factory method input
                 convert(value, NestedTypes.of(factoryMethod.getParameters()[0]), testClass),
                 targetType
             ))
+            .orElseGet(() -> fallbackToJUnitConversion(value, testClass, targetType));
+    }
 
-            // Fallback to JUnit conversion
-            .orElseGet(() -> ConversionSupport.convert(
+    private static Object fallbackToJUnitConversion(Object value, Class<?> testClass, Class<?> targetType) {
+        try {
+            return ConversionSupport.convert(
                 value.toString(),
                 targetType,
                 testClass.getClassLoader()
-            ));
+            );
+        } catch (ConversionException cause) {
+            throw new TableTestException(
+                fallbackJUnitConversionFailed(value, targetType, factoryMethodSearchPath(testClass)),
+                cause
+            );
+        }
     }
 
     /**
@@ -228,22 +243,36 @@ public class ParameterTypeConverter {
     }
 
     /**
-     * Searches for a factory method for mapping a parsed value to the parameter type.
+     * Searches the provided search path for a factory method for mapping a parsed value to the parameter type.
      * <p>
      * The factory method must be static and public and must take a single parameter.
      * The return type of the factory method must be the target type.
-     * <p>
-     * Searches in priority order and stops at the first suitable method found:
-     * 1. Methods in test class
-     * 2. Methods in enclosing classes
-     * 2. Methods in classes listed in @FactorySources annotation for test class (in listed order)
-     * 3. Methods in classes listed in @FactorySources for enclosing classes (in inside-out order)
      *
-     * @param testClass The test class to search for factory methods
-     * @param toType    The target type of the conversion
+     * @param toType                  The target type of the conversion
+     * @param factoryMethodSearchPath The ordered stream of classes to search for an applicable factory method
      * @return An Optional with the factory method if found, otherwise an empty Optional
      */
-    static Optional<Method> findFactoryMethod(Class<?> testClass, Class<?> toType) {
+    private static Optional<Method> findFactoryMethod(Class<?> toType, Stream<Class<?>> factoryMethodSearchPath) {
+        return factoryMethodSearchPath
+            .map(it -> findMatchingFactoryMethodInClass(it, toType))
+            .filter(Optional::isPresent)
+            .flatMap(Optional::stream)
+            .findFirst();
+    }
+
+    /**
+     * Creates an ordered stream of classes to search for factory methods.
+     * <p>
+     * The stream will contain the following classes in this order:
+     * 1. Test class
+     * 2. Any enclosing classes (in inside-out order)
+     * 2. Any classes listed in @FactorySources annotation for test class (in listed order)
+     * 3. Any classes listed in @FactorySources for enclosing classes (in inside-out order)
+     *
+     * @param testClass The current test class
+     * @return A stream of classes to search for an applicable factory method
+     */
+    private static Stream<Class<?>> factoryMethodSearchPath(Class<?> testClass) {
         return Stream.concat(
                 Stream.concat(
                     testClasses(testClass),
@@ -251,11 +280,7 @@ public class ParameterTypeConverter {
                 ),
                 factorySources(testClass)
             )
-            .filter(Objects::nonNull)
-            .map(it -> findMatchingFactoryMethodInClass(it, toType))
-            .filter(Optional::isPresent)
-            .flatMap(Optional::stream)
-            .findFirst();
+            .filter(Objects::nonNull);
     }
 
     /**
@@ -292,6 +317,7 @@ public class ParameterTypeConverter {
 
     /**
      * Recursive method to find the outermost class of a nested class
+     *
      * @param testClass possibly nested testClass
      * @return outermost class, or the given class if not nested
      */
@@ -326,20 +352,16 @@ public class ParameterTypeConverter {
     /**
      * Helper method to find a factory method for a target type in a class
      */
-    private static Optional<Method> findMatchingFactoryMethodInClass(Class<?> clazz, Class<?> toType) {
-        List<Method> matchingMethods = Arrays.stream(clazz.getDeclaredMethods())
+    private static Optional<Method> findMatchingFactoryMethodInClass(Class<?> factoryMethodClass, Class<?> targetType) {
+        List<Method> matchingMethods = Arrays.stream(factoryMethodClass.getDeclaredMethods())
             .filter(it -> Modifier.isStatic(it.getModifiers()))
             .filter(it -> it.canAccess(null))
             .filter(it -> it.getParameterCount() == 1)
-            .filter(it -> toType.isAssignableFrom(it.getReturnType()))
+            .filter(it -> targetType.isAssignableFrom(it.getReturnType()))
             .toList();
 
         if (matchingMethods.size() > 1) {
-            throw new ConversionException(
-                "Multiple factory methods found for type %s in class %s".formatted(
-                    toType.getTypeName(),
-                    clazz.getTypeName()
-                ));
+            throw new TableTestException(multipleFactoryMethodsFound(factoryMethodClass, targetType));
         }
 
         return matchingMethods.stream().findFirst();
@@ -348,25 +370,16 @@ public class ParameterTypeConverter {
     /**
      * Invokes a factory method to convert a parsed value to the parameter type.
      *
-     * @param factoryMethod  The factory method to invoke
-     * @param value      The parsed value to convert
-     * @param targetType The target type of the conversion
+     * @param factoryMethod The factory method to invoke
+     * @param value         The parsed value to convert
+     * @param targetType    The target type of the conversion
      * @return The converted value
      */
     private static Object invokeFactoryMethod(Method factoryMethod, Object value, Class<?> targetType) {
         try {
             return factoryMethod.invoke(null, value);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new ConversionException(
-                String.format(
-                    "Failed to convert %s \"%s\" to type %s with factory method %s.%s()",
-                    value.getClass().getTypeName(),
-                    value,
-                    targetType.getTypeName(),
-                    factoryMethod.getDeclaringClass().getTypeName(),
-                    factoryMethod.getName()
-                ), e
-            );
+        } catch (IllegalAccessException | InvocationTargetException cause) {
+            throw new TableTestException(factoryMethodFailed(factoryMethod, value, targetType), cause);
         }
     }
 

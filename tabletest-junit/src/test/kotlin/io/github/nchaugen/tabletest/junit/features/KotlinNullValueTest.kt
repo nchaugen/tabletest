@@ -1,6 +1,7 @@
 package io.github.nchaugen.tabletest.junit.features
 
 import io.github.nchaugen.tabletest.junit.TableTest
+import io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenNullSpecifiedForPrimitiveType
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
@@ -14,7 +15,7 @@ class KotlinNullValueTest {
         Empty double quoted | ""     | ""      | ""   | ""  | ""
         """
     )
-    fun testBlankIsNullForNonString(
+    fun blank_is_null_and_empty_is_null_for_non_string(
         scenario: String,
         string: String?,
         integer: Int?,
@@ -27,6 +28,28 @@ class KotlinNullValueTest {
         assertNull(list)
         assertNull(map)
         assertNull(set)
+    }
+
+    @TableTest(
+        """    
+        table value | parameter type
+                    | boolean
+        ''          | int
+        """
+    )
+    fun fails_when_null_value_specified_for_primitive_parameter_type(value: String?, type: Class<*>) {
+        assertThrowsWhenNullSpecifiedForPrimitiveType(value, type)
+    }
+
+    @TableTest(
+        """    
+        blank | empty
+              | ''
+        """
+    )
+    fun kotlin_nullable_types_can_be_null(blank: Boolean?, empty: Integer?) {
+        assertNull(blank)
+        assertNull(empty)
     }
 
 }
