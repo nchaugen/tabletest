@@ -3,6 +3,8 @@
 ## [Unreleased]
 ### Added
 - More descriptive error messages
+- Upped JUnit dependency to 5.13.1
+- Argument values included in test display name for tables with scenario name column 
 
 ## [0.4.0] - 2025-06-10
 ### Added
