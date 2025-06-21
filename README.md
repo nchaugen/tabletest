@@ -256,7 +256,7 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.4.0</version>
+        <version>0.5.0</version>
         <scope>test</scope>
     </dependency>
 </dependencies>
@@ -265,7 +265,7 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 ### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.4.0")
+    testImplementation("io.github.nchaugen:tabletest-junit:0.5.0")
 }
 ```
 
@@ -278,7 +278,7 @@ For projects using JUnit versions prior to 5.13.0, you need to exclude the trans
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.4.0</version>
+        <version>0.5.0</version>
         <scope>test</scope>
         <exclusions>
             <exclusion>
@@ -297,7 +297,7 @@ For projects using JUnit versions prior to 5.13.0, you need to exclude the trans
 ### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.4.0") {
+    testImplementation("io.github.nchaugen:tabletest-junit:0.5.0") {
         exclude(group = "org.junit.jupiter", module = "junit-jupiter-params") 
         exclude(group = "org.junit.platform", module = "junit-platform-commons") 
     } 

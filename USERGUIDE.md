@@ -613,7 +613,7 @@ To use TableTest with JUnit Jupiter **5.13.1**, simply add `tabletest-junit` as 
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.4.0</version>
+        <version>0.5.0</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -628,7 +628,7 @@ To use TableTest with JUnit Jupiter **5.13.1**, simply add `tabletest-junit` as 
 #### Gradle with Groovy DSL (build.gradle)
 ```groovy
 dependencies {
-    testImplementation 'io.github.nchaugen:tabletest-junit:0.4.0'    
+    testImplementation 'io.github.nchaugen:tabletest-junit:0.5.0'    
     testImplementation 'org.junit.jupiter:junit-jupiter:5.13.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -640,7 +640,7 @@ tasks.named('test', Test) {
 #### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.4.0")
+    testImplementation("io.github.nchaugen:tabletest-junit:0.5.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.13.1") 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher") 
 }
@@ -651,7 +651,7 @@ tasks.named<Test>("test") {
 ```
 
 ### Using TableTest with JUnit 5.11.0 to 5.12.2
-TableTest version 0.4.0 is compatible with JUnit Jupiter versions 5.11.0 to 5.12.2. For projects using JUnit Jupiter versions in this range, you need to exclude the transitive JUnit dependencies TableTest brings in to avoid conflicts.
+TableTest is compatible with JUnit Jupiter versions 5.11.0 to 5.12.2. For projects using JUnit Jupiter versions in this range, you need to exclude the transitive JUnit dependencies TableTest brings in to avoid conflicts.
 
 #### Maven (pom.xml)
 ```xml
@@ -659,7 +659,7 @@ TableTest version 0.4.0 is compatible with JUnit Jupiter versions 5.11.0 to 5.12
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.4.0</version>
+        <version>0.5.0</version>
         <scope>test</scope>
         <exclusions>
             <exclusion>
@@ -684,7 +684,7 @@ TableTest version 0.4.0 is compatible with JUnit Jupiter versions 5.11.0 to 5.12
 #### Gradle with Groovy DSL (build.gradle)
 ```groovy
 dependencies { 
-    testImplementation('io.github.nchaugen:tabletest-junit:0.4.0') { 
+    testImplementation('io.github.nchaugen:tabletest-junit:0.5.0') { 
         exclude group: 'org.junit.jupiter', module: 'junit-jupiter-params' 
         exclude group: 'org.junit.platform', module: 'junit-platform-commons' 
     }
@@ -699,7 +699,7 @@ tasks.named('test', Test) {
 #### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.4.0") {
+    testImplementation("io.github.nchaugen:tabletest-junit:0.5.0") {
         exclude(group = "org.junit.jupiter", module = "junit-jupiter-params") 
         exclude(group = "org.junit.platform", module = "junit-platform-commons") 
     } 
@@ -712,7 +712,7 @@ tasks.named<Test>("test") {
 ```
 
 ### Projects using JUnit 5.13.0
-Please note that **TableTest version 0.4.0 is not compatible with JUnit Jupiter 5.13.0**. This is due to a breaking interface change in `AnnotationBasedArgumentsProvider`. This was corrected in JUnit 5.13.1.
+Please note that **TableTest is not compatible with JUnit Jupiter 5.13.0**. This is due to a breaking interface change in `AnnotationBasedArgumentsProvider`. This was corrected in JUnit 5.13.1.
 
 If you are currently using JUnit 5.13.0, please upgrade to JUnit 5.13.1 to use TableTest.
 
