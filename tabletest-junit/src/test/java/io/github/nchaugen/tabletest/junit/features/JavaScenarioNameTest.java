@@ -1,29 +1,57 @@
 package io.github.nchaugen.tabletest.junit.features;
 
+import io.github.nchaugen.tabletest.junit.Scenario;
 import io.github.nchaugen.tabletest.junit.TableTest;
+import org.junit.jupiter.api.TestInfo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JavaScenarioNameTest {
 
     @TableTest("""
-        Scenario     | a | b
-        Zero is zero | 0 | 0
-        One is two   | 1 | 2
-        Two is four  | 2 | 4
+        Scenario | a | b
+        Zero     | 0 | 0
+        ""       | 1 | 2
+                 | 2 | 4
         """)
-    void scenario_column_without_parameter(int a, int b) {
+    void scenario_column_can_be_undeclared(int a, int b) {
         assertEquals(b, 2 * a);
     }
 
     @TableTest("""
-        Scenario     | a | b
-        Zero is zero | 0 | 0
-        One is two   | 1 | 2
-        Two is four  | 2 | 4
+        Scenario | Expected Scenario
+                 |
+        ""       | ""
+        Example  | Example
         """)
-    void scenario_column_with_parameter(String scenario, int a, int b) {
-        assertEquals(b, 2 * a, scenario);
+    void scenario_column_can_be_declared(@Scenario String scenario, String expectedScenario) {
+        assertEquals(expectedScenario, scenario);
+    }
+
+    @TableTest("""
+        Scenario | Display Name?
+                 | "[1] null, [1]"
+        ""       | "[2] , [2]"
+        Example  | "[3] Example"
+        """)
+    void declared_scenario_name_becomes_display_name(@Scenario String ignoredScenario, String expectedDisplayName, TestInfo info) {
+        assertTrue(
+            info.getDisplayName().startsWith(expectedDisplayName),
+            String.format("Display name `%s` did not start with `%s`", info.getDisplayName(), expectedDisplayName)
+        );
+    }
+
+    @TableTest("""
+        Display Name?   | Scenario
+        "[1] Example"   | Example
+        """)
+    void declared_scenario_name_do_not_have_to_be_first_parameter(
+        String expectedDisplayName,
+        @Scenario String ignoredScenario,
+        TestInfo info
+    ) {
+        assertEquals(info.getDisplayName(), expectedDisplayName);
     }
 
 }

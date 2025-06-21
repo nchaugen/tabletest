@@ -32,17 +32,17 @@ import static io.github.nchaugen.tabletest.parser.StringParser.characterExcept;
 import static io.github.nchaugen.tabletest.parser.StringParser.string;
 
 /**
- * Parser for TableTest format rows. Handles cells containing single values, lists, and maps.
+ * Parser for TableTest format rows. Handles values containing single values, lists, and maps.
  */
 public class RowParser {
 
     private RowParser() {}
 
     /**
-     * Parses a string representing a TableTest row with pipe-separated cells.
+     * Parses a string representing a TableTest row with pipe-separated values.
      *
      * @param input string to parse
-     * @return parse result containing captured cells
+     * @return parse result containing captured values
      */
     public static ParseResult parse(String input) {
         return PARSER.parse(input);
@@ -66,7 +66,7 @@ public class RowParser {
     }
 
     /**
-     * Creates a parser for rows with pipe-separated cells.
+     * Creates a parser for rows with pipe-separated values.
      *
      * @return parser for table rows
      */
@@ -78,7 +78,7 @@ public class RowParser {
      * Creates a parser for a single cell with surrounding whitespace.
      * Cell values can be in one of three forms: a map value, a list value, a set value, or a single value.
      *
-     * @return parser for table cells
+     * @return parser for table values
      */
     static Parser cell() {
         return sequence(anyWhitespace(), value(), anyWhitespace());

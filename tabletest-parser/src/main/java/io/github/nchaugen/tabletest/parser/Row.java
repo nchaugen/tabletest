@@ -23,50 +23,74 @@ import java.util.stream.Stream;
 /**
  * Immutable representation of a table row with cell values.
  *
- * @param cells list of cell values
+ * @param values list of cell values
  */
-public record Row(List<Object> cells) {
+public record Row(List<Object> values, List<String> headers) {
 
-    /**
-     * Returns the number of cells in this row.
-     *
-     * @return cell count (0 if row is empty)
-     */
-    public int cellCount() {
-        return !cells.isEmpty() ? cells.size() : 0;
+    public Row(List<Object> values) {
+        this(values, List.of());
     }
 
     /**
-     * Conditionally removes the first cell in the row returned.
+     * Returns the number of values in this row.
+     *
+     * @return value count (0 if row is empty)
+     */
+    public int valueCount() {
+        return !values.isEmpty() ? values.size() : 0;
+    }
+
+    /**
+     * Conditionally removes the first value in the row returned.
      *
      * @param test boolean condition to test
-     * @return new row with first cell removed if test is true, otherwise this row is returned.
+     * @return new row with first value removed if test is false, otherwise this row is returned.
      */
-    public Row skipFirstIf(boolean test) {
-       return test ? new Row(cells.stream().skip(1).toList()) : this;
+    public Row skipFirstUnless(boolean test) {
+       return test ? this : new Row(values.stream().skip(1).toList(), headers.stream().skip(1).toList());
     }
 
     /**
-     * Maps each cell with its index to a new value.
+     * Conditionally removes the first value in the row returned.
+     *
+     * @param test boolean condition to test
+     * @return new row with first value removed if test is true, otherwise this row is returned.
+     */
+    public Row skipFirstIf(boolean test) {
+       return test ? new Row(values.stream().skip(1).toList(), headers.stream().skip(1).toList()) : this;
+    }
+
+    /**
+     * Maps each value with its index to a new value.
      *
      * @param <T> result type
      * @param mapper function taking (index, value) and returning transformed value
      * @return stream of transformed values
      */
     public <T>Stream<T> mapIndexed(BiFunction<Integer, Object, T> mapper) {
-        return IntStream.range(0, cells.size())
-            .mapToObj(i -> mapper.apply(i, cells.get(i)));
+        return IntStream.range(0, values.size())
+            .mapToObj(i -> mapper.apply(i, values.get(i)));
     }
 
     /**
-     * Gets cell value at specified index.
+     * Gets value at specified index.
      *
-     * @param index zero-based cell index
-     * @return cell value
+     * @param index zero-based index
+     * @return value
      * @throws IndexOutOfBoundsException if index is invalid
      */
-    public Object cell(int index) {
-        return cells.get(index);
+    public Object value(int index) {
+        return values.get(index);
     }
 
+    public Row withHeaders(List<String> headers) {
+        return new Row(values, headers);
+    }
+
+    public String header(int index) {
+        if (headers.isEmpty() || index < 0 || index >= headers.size()) {
+            throw new IndexOutOfBoundsException("Invalid header index: " + index);
+        }
+        return headers.get(index);
+    }
 }

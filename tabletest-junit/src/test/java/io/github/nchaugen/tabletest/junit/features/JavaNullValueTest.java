@@ -1,5 +1,6 @@
 package io.github.nchaugen.tabletest.junit.features;
 
+import io.github.nchaugen.tabletest.junit.Scenario;
 import io.github.nchaugen.tabletest.junit.TableTest;
 
 import java.util.List;
@@ -19,7 +20,7 @@ class JavaNullValueTest {
         Empty double quoted | ""     | ""      | ""   | ""  | ""
         """)
     void blank_is_null_and_empty_is_null_for_non_string(
-        String scenario,
+        @Scenario String scenario,
         String string,
         Integer integer,
         List<?> list,

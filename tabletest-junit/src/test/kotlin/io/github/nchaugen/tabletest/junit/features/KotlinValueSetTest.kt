@@ -4,7 +4,7 @@ import io.github.nchaugen.tabletest.junit.TableTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 
-class KotlinApplicableValueSetTest {
+class KotlinValueSetTest {
 
     @TableTest(
         """    
@@ -15,7 +15,7 @@ class KotlinApplicableValueSetTest {
         Adding nothing to nothing |               |           |             | true         | false
         """
     )
-    fun applicable_value_sets(
+    fun value_sets(
         a: Int?,
         b: Set<Int?>?,
         expectedSize: Int?,
@@ -33,12 +33,12 @@ class KotlinApplicableValueSetTest {
     }
 
     @TableTest(
-        """
+        """    
         Scenario                      | a                | b | c | d         | e
         Anything multiplied by 0 is 0 | {-1, 0, 1, 1000} | 0 | 0 | {1, 2, 3} | 3
         """
     )
-    fun testApplicableValueSet(a: Int, b: Int, c: Int, d: Set<Int>, e: Int) {
+    fun testValueSet(a: Int, b: Int, c: Int, d: Set<Int>, e: Int) {
         kotlin.test.assertEquals(c, a * b)
         kotlin.test.assertEquals(e, d.size)
     }

@@ -24,7 +24,7 @@ class KotlinFactorySourcesTest {
         fromInt: Age,
         inList: List<Age>,
         inSet: Set<Age>,
-        fromApplicableSet: Age,
+        fromValueSet: Age,
         inMap: Map<String, Age>,
         inNested: Map<String, List<Age>>,
         inOtherFactoryMethod: Ages
@@ -33,7 +33,7 @@ class KotlinFactorySourcesTest {
         assertEquals(expected, fromInt)
         assertEquals(listOf(expected), inList)
         assertEquals(setOf(expected), inSet)
-        assertEquals(expected, fromApplicableSet)
+        assertEquals(expected, fromValueSet)
         assertEquals(mapOf("age" to expected), inMap)
         assertEquals(mapOf("ages" to listOf(expected, expected)), inNested)
         assertEquals(Ages(listOf<Age?>(expected, expected)), inOtherFactoryMethod)

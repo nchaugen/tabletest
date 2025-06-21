@@ -101,7 +101,7 @@ TableParser converts strings in TableTest format into structured Table objects. 
 Here is an example of basic usage in Java:
 
 ```java
-import io.github.nchaugen.tabletest.parser.Table; 
+import io.github.nchaugen.tabletest.parser.Table;
 import io.github.nchaugen.tabletest.parser.TableParser;
 
 // Parse a multi-line string in TableTest format
@@ -122,13 +122,13 @@ String nameHeader = table.header(0); // "Name"
 List headers = table.headers(); // ["Name", "Age", "Skills", "Attributes"] 
 
 // Access row and cell data - properly typed as String, List, or Map 
-String name = (String) table.row(0).cell(0); // "John Smith"
-int age = Integer.parseInt((String) table.row(0).cell(1)); // 30
-List<String> skills = (List<String>) table.row(0).cell(2); // ["Java", "SQL"]
-Map<String, String> attrs = (Map<String, String>) table.row(0).cell(3); // {"strength": "8", "dexterity": "6"}  
+String name = (String) table.row(0).value(0); // "John Smith"
+int age = Integer.parseInt((String) table.row(0).value(1)); // 30
+List<String> skills = (List<String>) table.row(0).value(2); // ["Java", "SQL"]
+Map<String, String> attrs = (Map<String, String>) table.row(0).value(3); // {"strength": "8", "dexterity": "6"}  
 
-// Get all cells in a row 
-List rowCells = table.row(1).cells(); // ["Jane Doe", "28", ["Python", "JS"], {"wisdom": "9", "charisma": "10"}]
+// Get all values in a row 
+List rowCells = table.row(1).values(); // ["Jane Doe", "28", ["Python", "JS"], {"wisdom": "9", "charisma": "10"}]
 
 // Process all rows in a functional style
 table.map(row -> {
@@ -162,18 +162,18 @@ val nameHeader = table.header(0)  // "Name"
 val headers = table.headers()  // ["Name", "Age", "Skills", "Attributes"]
 
 // Access row and cell data - properly typed as String, List, or Map
-val name = table.row(0).cell(0) as String  // "John Smith"
-val age = (table.row(0).cell(1) as String).toInt()  // 30
-val skills = table.row(0).cell(2) as List<String>  // ["Java", "SQL"]
-val attrs = table.row(0).cell(3) as Map<String, String>  // {"strength": "8", "dexterity": "6"}
+val name = table.row(0).value(0) as String  // "John Smith"
+val age = (table.row(0).value(1) as String).toInt()  // 30
+val skills = table.row(0).value(2) as List<String>  // ["Java", "SQL"]
+val attrs = table.row(0).value(3) as Map<String, String>  // {"strength": "8", "dexterity": "6"}
 
-// Get all cells in a row
-val rowCells = table.row(1).cells()  // ["Jane Doe", "28", ["Python", "JS"], {"wisdom": "9", "charisma": "10"}]
+// Get all values in a row
+val rowCells = table.row(1).values()  // ["Jane Doe", "28", ["Python", "JS"], {"wisdom": "9", "charisma": "10"}]
 
 // Process all rows in a functional style
 table.map { row ->
-    val rowName = row.cell(0) as String
-    val rowSkills = row.cell(2) as List<String>
+    val rowName = row.value(0) as String
+    val rowSkills = row.value(2) as List<String>
     "$rowName has ${rowSkills.size} skills: ${rowSkills.joinToString()}"
 }.forEach(::println)
 ```

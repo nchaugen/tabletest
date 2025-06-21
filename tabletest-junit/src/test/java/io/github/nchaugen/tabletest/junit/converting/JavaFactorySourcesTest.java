@@ -27,7 +27,7 @@ public class JavaFactorySourcesTest {
         Age fromInt,
         List<Age> inList,
         Set<Age> inSet,
-        Age fromApplicableSet,
+        Age fromValueSet,
         Map<String, Age> inMap,
         Map<String, List<Age>> inNested,
         Ages inOtherFactoryMethod
@@ -36,7 +36,7 @@ public class JavaFactorySourcesTest {
         assertEquals(expected, fromInt);
         assertEquals(List.of(expected), inList);
         assertEquals(Set.of(expected), inSet);
-        assertEquals(expected, fromApplicableSet);
+        assertEquals(expected, fromValueSet);
         assertEquals(Map.of("age", expected), inMap);
         assertEquals(Map.of("ages", List.of(expected, expected)), inNested);
         assertEquals(new Ages(List.of(expected, expected)), inOtherFactoryMethod);

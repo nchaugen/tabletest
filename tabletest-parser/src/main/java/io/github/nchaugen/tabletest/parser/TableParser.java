@@ -16,8 +16,11 @@
 package io.github.nchaugen.tabletest.parser;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Parser for converting TableTest format text into Table object.
@@ -41,13 +44,12 @@ public class TableParser {
                 .map(TableParser::parseRow)
                 .filter(Objects::nonNull)
                 .toList()
-        );
+        ).withHeadersInRows();
     }
 
     private static Row parseRow(String line) {
-        List<Object> cells = RowParser.parse(line).captures().stream()
-            .toList();
-        return cells.isEmpty() ? null : new Row(cells);
+        List<Object> values = RowParser.parse(line).captures().stream().toList();
+        return values.isEmpty() ? null : new Row(values);
     }
 
 }

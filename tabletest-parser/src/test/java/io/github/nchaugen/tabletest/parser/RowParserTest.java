@@ -242,7 +242,7 @@ class RowParserTest {
     }
 
     @Test
-    void shouldCaptureCell() {
+    void shouldCaptureValue() {
         Map<String, Object> testCases = Map.of(
             "0", "0",                         // Integer
             "1.23", "1.23",                   // Decimal
@@ -367,20 +367,20 @@ class RowParserTest {
         // Test empty input
         assertEquals(failure(), tableRow.parse(""));
 
-        // Test single cell
+        // Test single value
         assertEquals(List.of("a"), tableRow.parse("a").captures());
 
-        // Test two cells
+        // Test two values
         assertEquals(List.of("a ", ""), tableRow.parse("a |").captures());
         assertEquals(List.of("a ", " b"), tableRow.parse("a | b").captures());
 
-        // Test three cells
+        // Test three values
         assertEquals(List.of("a ", " ", " c"), tableRow.parse("a | | c").captures());
     }
 
     @Test
     void shouldHandleEdgeCases() {
-        // Empty cells
+        // Empty values
         assertEquals(
             Arrays.asList(null, null, null),
             trimStringCaptures(row().parse("| |"))

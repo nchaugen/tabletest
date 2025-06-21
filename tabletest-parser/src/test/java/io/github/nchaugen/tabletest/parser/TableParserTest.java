@@ -27,8 +27,8 @@ public class TableParserTest {
         assertEquals("c", result.header(2));
 
         assertEquals(List.of("a", "b", "c"), result.headers());
-        assertEquals(List.of("1", "2", "3"), result.row(0).cells());
-        assertEquals(List.of("4", "5", "6"), result.row(1).cells());
+        assertEquals(List.of("1", "2", "3"), result.row(0).values());
+        assertEquals(List.of("4", "5", "6"), result.row(1).values());
     }
 
     @Test
@@ -47,10 +47,10 @@ public class TableParserTest {
         Table result = TableParser.parse(input);
 
         assertEquals(List.of("a", "b"), result.headers());
-        assertEquals(List.of("//2", "3"), result.row(0).cells());
-        assertEquals(List.of("4 //", "5"), result.row(1).cells());
-        assertEquals(List.of("6", "// 7"), result.row(2).cells());
-        assertEquals(List.of("8", "9 //"), result.row(3).cells());
+        assertEquals(List.of("//2", "3"), result.row(0).values());
+        assertEquals(List.of("4 //", "5"), result.row(1).values());
+        assertEquals(List.of("6", "// 7"), result.row(2).values());
+        assertEquals(List.of("8", "9 //"), result.row(3).values());
     }
 
     @Test
@@ -71,8 +71,8 @@ public class TableParserTest {
 
         assertEquals(2, result.rowCount());
         assertEquals(List.of("a", "b", "c"), result.headers());
-        assertEquals(List.of("1", "2", "3"), result.row(0).cells());
-        assertEquals(List.of("4", "5", "6"), result.row(1).cells());
+        assertEquals(List.of("1", "2", "3"), result.row(0).values());
+        assertEquals(List.of("4", "5", "6"), result.row(1).values());
 
     }
 
@@ -93,10 +93,10 @@ public class TableParserTest {
         assertEquals(5, result.rowCount());
         assertEquals(3, result.columnCount());
 
-        assertEquals("|", result.row(0).cell(1));
-        assertEquals("|", result.row(1).cell(1));
-        assertEquals("\\n", result.row(2).cell(1));
-        assertEquals("\\n", result.row(3).cell(1));
-        assertEquals("\\n", result.row(4).cell(1));
+        assertEquals("|", result.row(0).value(1));
+        assertEquals("|", result.row(1).value(1));
+        assertEquals("\\n", result.row(2).value(1));
+        assertEquals("\\n", result.row(3).value(1));
+        assertEquals("\\n", result.row(4).value(1));
     }
 }

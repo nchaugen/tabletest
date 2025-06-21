@@ -92,7 +92,7 @@ public class ParameterTypeConverter {
 
     private static boolean valueConvertsToNull(Class<?> targetType, Object value) {
         return isEmptyForNonStringType(value, targetType)
-               || isEmptyApplicableValueSet(value, targetType);
+               || isEmptyValueSet(value, targetType);
     }
 
     /**
@@ -106,12 +106,12 @@ public class ParameterTypeConverter {
     }
 
     /**
-     * Determines if the cell is an applicable value set with no values
+     * Determines if the cell is a value set with no values
      *
      * @param value      converted cell value
      * @param targetType type of parameter
      */
-    private static boolean isEmptyApplicableValueSet(Object value, Class<?> targetType) {
+    private static boolean isEmptyValueSet(Object value, Class<?> targetType) {
         return value instanceof Set<?> set && set.isEmpty() && !targetType.isAssignableFrom(Set.class);
     }
 
@@ -175,7 +175,7 @@ public class ParameterTypeConverter {
     private static boolean isTargetMatchingTypeOfParsedValue(Object value, Class<?> targetType) {
         return targetType == null
                || targetType.isAssignableFrom(value.getClass())
-               // for applicable value sets the target will be the element type
+               // for value sets the target will be the element type
                || Set.class.isAssignableFrom(value.getClass());
     }
 
@@ -212,7 +212,7 @@ public class ParameterTypeConverter {
         NestedTypes nestedTypes,
         Class<?> testClass
     ) {
-        // if this is an applicable value set, the target type will be the element type
+        // if this is a value set, the target type will be the element type
         NestedTypes types = nestedTypes.nextIsSet() ? nestedTypes.skipNext() : nestedTypes;
 
         return set.stream()

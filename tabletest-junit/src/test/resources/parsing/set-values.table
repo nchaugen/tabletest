@@ -3,7 +3,7 @@ Empty set                            | {}                                     | 
 Single element                       | {hello}                                | 1     | java.lang.String
 Multiple elements                    | {hello, world, test}                   | 3     | java.lang.String
 Multiple same elements               | {hello, hello, hello}                  | 1     | java.lang.String
-Multiple elements whitespace differs | {hello , " hello", 'hello '}           | 3     | java.lang.String
+Multiple elements whitespace differs | {hello, " hello", 'hello '}            | 3     | java.lang.String
 Opening bracket unquoted             | {=[>, test}                            | 2     | java.lang.String
 Opening brace unquoted               | {={o, test}                            | 2     | java.lang.String
 Comma in quoted element              | {"hello, world", test}                 | 2     | java.lang.String

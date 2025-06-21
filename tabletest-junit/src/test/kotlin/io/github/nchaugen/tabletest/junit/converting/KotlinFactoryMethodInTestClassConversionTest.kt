@@ -21,7 +21,7 @@ class KotlinFactoryMethodInTestClassConversionTest {
         fromInt: Age,
         inList: java.util.List<Age>,
         inSet: Set<Age>,
-        fromApplicableSet: Age,
+        fromValueSet: Age,
         inMap: java.util.Map<String, Age>,
         inNested: java.util.Map<String, List<Age>>,
         inOtherFactoryMethod: Ages
@@ -30,7 +30,7 @@ class KotlinFactoryMethodInTestClassConversionTest {
         assertEquals(expected, fromInt)
         assertEquals(listOf(expected), inList)
         assertEquals(setOf(expected), inSet)
-        assertEquals(expected, fromApplicableSet)
+        assertEquals(expected, fromValueSet)
         assertEquals(mapOf("value" to expected), inMap)
         assertEquals(mapOf("value" to listOf(expected, expected)), inNested)
         assertEquals(Ages(listOf(expected, expected)), inOtherFactoryMethod)

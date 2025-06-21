@@ -20,6 +20,8 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Immutable representation of a table with header row and data rows.
  */
@@ -36,11 +38,16 @@ public final class Table {
      * @throws IllegalArgumentException if rows list is empty
      */
     public Table(List<Row> rows) {
-        if (rows.isEmpty()) {
+        if (rows == null || rows.isEmpty()) {
             throw new IllegalArgumentException("Table must have at least one row");
         }
         this.header = rows.getFirst();
         this.data = rows.subList(1, rows.size());
+    }
+
+    private Table(Row header, List<Row> data) {
+        this.header = requireNonNull(header, "Header row cannot be null");
+        this.data = requireNonNull(data, "Data rows cannot be null");
     }
 
     /**
@@ -58,7 +65,7 @@ public final class Table {
      * @return column count
      */
     public int columnCount() {
-        return header.cellCount();
+        return header.valueCount();
     }
 
     /**
@@ -89,7 +96,7 @@ public final class Table {
      * @return list of header values
      */
     public List<String> headers() {
-        return header.cells().stream().map(Object::toString).map(String::trim).toList();
+        return header.values().stream().map(Object::toString).map(String::trim).toList();
     }
 
     /**
@@ -122,5 +129,14 @@ public final class Table {
         return "Table[" +
                "header=" + header + ", " +
                "data=" + data + ']';
+    }
+
+    public Table withHeadersInRows() {
+        return new Table(
+            header,
+            data.stream()
+                .map(row -> row.withHeaders(this.headers()))
+                .toList()
+        );
     }
 }

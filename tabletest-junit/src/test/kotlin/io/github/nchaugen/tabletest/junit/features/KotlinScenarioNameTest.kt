@@ -1,32 +1,54 @@
 package io.github.nchaugen.tabletest.junit.features
 
+import io.github.nchaugen.tabletest.junit.Scenario
 import io.github.nchaugen.tabletest.junit.TableTest
+import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class KotlinScenarioNameTest {
 
     @TableTest(
-        """
-        Scenario     | a | b
-        Zero is zero | 0 | 0
-        One is two   | 1 | 2
-        Two is four  | 2 | 4
+        """    
+        Scenario | a | b
+        Zero     | 0 | 0
+        ""       | 1 | 2
+                 | 2 | 4
         """
     )
-    fun scenario_name_without_parameter(a: Int, b: Int) {
+    fun scenario_column_can_be_undeclared(a: Int, b: Int) {
         assertEquals(b, 2 * a)
     }
 
     @TableTest(
-        """
-        Scenario     | a | b
-        Zero is zero | 0 | 0
-        One is two   | 1 | 2
-        Two is four  | 2 | 4
+        """    
+        Scenario | Expected Scenario
+                 |
+        ""       | ""
+        Example  | Example
         """
     )
-    fun scenario_name_with_parameter(scenario: String, a: Int, b: Int) {
-        assertEquals(b, 2 * a, scenario)
+    fun scenario_column_can_be_declared(@Scenario scenario: String?, expectedScenario: String?) {
+        assertEquals(expectedScenario, scenario)
+    }
+
+    @TableTest(
+        """    
+        Scenario | Display Name?
+                 | "[1] null, [1]"
+        ""       | "[2] , [2]"
+        Example  | "[3] Example"
+        """
+    )
+    fun declared_scenario_name_becomes_display_name(
+        @Suppress("unused") @Scenario scenario: String?,
+        expectedDisplayName: String,
+        info: TestInfo
+    ) {
+        assertTrue(
+            info.displayName.startsWith(expectedDisplayName),
+            "Display name `${info.displayName}` did not start with `$expectedDisplayName`"
+        )
     }
 
 }
