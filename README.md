@@ -146,7 +146,7 @@ Blank cells and empty quoted values will translate to `null` for all parameter t
 
 ```java
 @TableTest("""
-    Scenario          | String | Integer | List | Map | Set
+    Scenario            | String | Integer | List | Map | Set
     Blank               |        |         |      |     |
     Empty single quoted | ''     | ''      | ''   | ''  | ''
     Empty double quoted | ""     | ""      | ""   | ""  | ""
@@ -230,7 +230,7 @@ void testComment(String string, int expectedLength) {
 ```
 
 ### Table in External File
-Tables can be loaded from external files instead of being in-lined in the annotation. For this use the `resource` attribute. The file must be located as a resource relative to the test class. Typically it is stored in the test `resources` directory or one of its subdirectories.
+Tables can be loaded from external files using the `resource` attribute. The file must be located as a resource relative to the test class. Typically, it is stored in the test `resources` directory or one of its subdirectories.
 
 By default, the file is assumed to use UTF-8 encoding. If your file uses a different encoding, specify it with the `encoding` attribute.
 
