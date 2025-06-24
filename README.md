@@ -126,7 +126,7 @@ void singleValues(short number, String text, LocalDate date, Class<?> type) {
 ```
 
 ### Parameterized Types
-Compound values like List, Set, and Map will also benefit from conversion to match parameterized types. For example, `[1, 2, 3]` becomes `List<Integer>` when the parameter is declared as such. Even nested values are traversed and converted to match parameterized types. Map keys remain String type and are not converted.
+TableTest will convert elements in compound values like List, Set, and Map to match parameterized types. Nested values are also traversed and converted. Map keys remain String type and are not converted.
 
 In the example below, the list of grades inside the map is converted to `List<Integer>`:
 

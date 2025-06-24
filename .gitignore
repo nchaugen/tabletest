@@ -3,6 +3,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Gradle
+.gradle/
+
 ### IntelliJ IDEA ###
 .idea/
 *.iws
