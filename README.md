@@ -93,7 +93,7 @@ void testValues(String single, List<?> list, Set<?> set, Map<String, ?> map) {
 TableTest converts table values to method parameter types using this priority:
 
 1. **Factory method** (in test class or `@FactorySources`)
-2. **JUnit built-in conversion** (primitives, dates, enums, etc.)
+2. **Built-in conversion** (primitives, dates, enums, etc.)
 
 ### Factory Methods
 Factory methods are `public static` methods that accept one parameter and return the target type:
@@ -112,7 +112,7 @@ TableTest will look for a factory method present in either the test class or in 
 
 There is no specific naming pattern for factory methods, any method fulfilling the requirements above will be considered. Only one factory method per target type is possible per class.
 
-### JUnit Built-In Conversion
+### Built-In Conversion
 TableTest falls back to [JUnit's built-in type converters](https://junit.org/junit5/docs/5.12.2/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit) if no factory method is found. 
 
 ```java
@@ -248,7 +248,9 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 
 ## Installation
 
-**Requirements**: Java 21+, JUnit 5.11.0-5.13.1 (except 5.13.0)
+TableTest is available from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit versions 5.11.0 to 5.13.1 (except 5.13.0).
+
+Please note that TableTest requires Java version 21 or above.
 
 ### Maven (pom.xml)
 ```xml
@@ -269,10 +271,13 @@ dependencies {
 }
 ```
 
-### Using TableTest with JUnit 5.11.0 to 5.12.2
-For projects using JUnit versions prior to 5.13.0, you need to exclude the transitive JUnit dependencies TableTest brings in to avoid conflicts.
+Please see the [compatibility tests](compatibility-tests) for more examples of how to include TableTest in combination with frameworks such as SpringBoot and Quarkus. 
 
-### Maven (pom.xml)
+
+### Using TableTest with JUnit 5.11.0 to 5.12.2
+For projects using JUnit versions prior to 5.13.0, you might have to exclude the transitive JUnit dependencies TableTest brings in to avoid conflicts.
+
+#### Maven (pom.xml)
 ```xml
 <dependencies>
     <dependency>
@@ -294,7 +299,7 @@ For projects using JUnit versions prior to 5.13.0, you need to exclude the trans
 </dependencies>
 ```
 
-### Gradle with Kotlin DSL (build.gradle.kts)
+#### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
     testImplementation("io.github.nchaugen:tabletest-junit:0.5.0") {
