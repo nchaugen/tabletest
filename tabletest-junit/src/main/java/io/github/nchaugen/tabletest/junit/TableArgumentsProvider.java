@@ -67,7 +67,7 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
      * @param context   The current extension context
      * @param tableTest The TableTest annotation containing the table data
      * @return A stream of Arguments objects, one for each data row in the table
-     * @throws IllegalArgumentException if column and parameter counts don't match
+     * @throws TableTestException if unable to provide an argument
      */
     @Override
     protected Stream<? extends Arguments> provideArguments(ExtensionContext context, TableTest tableTest) {

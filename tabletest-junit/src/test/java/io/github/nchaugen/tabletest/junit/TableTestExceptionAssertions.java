@@ -14,7 +14,7 @@ public class TableTestExceptionAssertions {
     public static void assertThrowsWhenFallbackFails(Object parsedValue, String typeName) {
         assertThrowsTableTestException(
             () -> convertValue(parsedValue, parameter(typeName)),
-            "Fallback JUnit conversion of value \"[^\"]*\" to type .+ " +
+            "Built-in conversion of value \"[^\"]*\" to type .+ " +
             "Are you missing a factory method for this conversion\\? " +
             "Locations searched for public static factory methods: .+"
         );

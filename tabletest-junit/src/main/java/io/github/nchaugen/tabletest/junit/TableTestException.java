@@ -15,12 +15,14 @@
  */
 package io.github.nchaugen.tabletest.junit;
 
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TableTestException extends RuntimeException {
+public class TableTestException extends ParameterResolutionException {
 
     public TableTestException(String message, Throwable cause) {
         super(message, cause);
@@ -70,7 +72,7 @@ public class TableTestException extends RuntimeException {
         Stream<Class<?>> factoryMethodSearchPath
     ) {
         return String.format(
-            "Fallback JUnit conversion of value \"%s\" to type %s failed. " +
+            "Built-in conversion of value \"%s\" to type %s failed. " +
             "Are you missing a factory method for this conversion? " +
             "Locations searched for public static factory methods: %s",
             parsedValue,

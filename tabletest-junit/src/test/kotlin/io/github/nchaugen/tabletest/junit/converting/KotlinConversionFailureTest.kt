@@ -1,8 +1,9 @@
 package io.github.nchaugen.tabletest.junit.converting
 
 import io.github.nchaugen.tabletest.junit.TableTest
-import io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenFallbackFails
-import io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenMultipleFactoryMethodsFound
+import io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.*
+import io.github.nchaugen.tabletest.junit.javadomain.Age
+import org.junit.jupiter.api.Test
 
 class KotlinConversionFailureTest {
 
@@ -12,6 +13,8 @@ class KotlinConversionFailureTest {
         0.1         | java.lang.Byte
         256         | java.lang.Byte
         abc         | java.lang.Character
+        invalid     | java.time.LocalDate
+        52          | io.github.nchaugen.tabletest.junit.javadomain.Ages
             """
     )
     fun fails_conversion_for_single_values_outside_type_range(
@@ -23,34 +26,30 @@ class KotlinConversionFailureTest {
 
     @TableTest(
         """    
-        Value     | Parameterized type
-        [""]      | java.util.List<java.lang.Byte>
-        {""}      | java.util.Set<java.lang.Byte>
-        [key: ""] | java.util.Map<?, java.lang.Short>
-        """
-    )
-    fun fails_conversion_for_element_values_outside_type_range(value: Any, parameterizedTypeName: String) {
-        assertThrowsWhenFallbackFails(value, parameterizedTypeName)
-    }
-
-    @TableTest(
-        """    
-        table value | parameter type
-        [52]        | io.github.nchaugen.tabletest.junit.javadomain.Ages
-        """
-    )
-    fun fails_when_no_factory_method_found(value: Any, type: Class<*>) {
-        assertThrowsWhenFallbackFails(value, type.getTypeName())
-    }
-
-    @TableTest(
-        """    
         table value | parameter type
         52          | io.github.nchaugen.tabletest.junit.javadomain.Age
         """
     )
     fun fails_when_multiple_factory_methods_found(value: String, type: Class<*>) {
         assertThrowsWhenMultipleFactoryMethodsFound(value, type)
+    }
+
+    @Suppress("unused")
+    fun parseAge(age: String?): Age {
+        throw IllegalStateException("should not be called")
+    }
+
+    @Suppress("unused")
+    fun anotherParseAge(age: Int?): Age {
+        throw IllegalStateException("should not be called")
+    }
+
+    @Test
+    fun failing_primitive_conversion() {
+        assertThrowsWhenNullSpecifiedForPrimitiveType(
+            null,
+            Boolean::class.javaPrimitiveType
+        )
     }
 
 }

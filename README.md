@@ -96,7 +96,7 @@ TableTest converts table values to method parameter types using this priority:
 2. **Built-in conversion** (primitives, dates, enums, etc.)
 
 ### Factory Methods
-Factory methods are `public static` methods that accept one parameter and return the target type:
+Factory methods are `public static` methods in a public class that accept one parameter and return the target type:
 
 ```java
 public static LocalDate parseDate(String input) {
