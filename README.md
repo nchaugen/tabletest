@@ -21,7 +21,7 @@ void testNumberToWord(int number, String word) {
 - **Self-documenting**: Tables serve as living documentation
 - **Collaborative**: Non-technical stakeholders can understand and contribute
 
-**Requirements**: Java 21+, JUnit 5.11.0-5.13.1 (except 5.13.0).
+**Requirements**: Java 21+, JUnit 5.11.0-5.13.4 (except 5.13.0).
 
 **IDE Support**: [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for working with tables.
 
@@ -63,7 +63,7 @@ public void leapYearCalculation(Year year, boolean expectedResult) {
 - Values automatically convert to parameter types
 - Test methods must be non-private, non-static, void return
 
-Technically `@TableTest` is a [JUnit `@ParameterizedTest`](https://junit.org/junit5/docs/5.13.1/user-guide/index.html#writing-tests-parameterized-tests) with a custom-format argument source. 
+Technically `@TableTest` is a [JUnit `@ParameterizedTest`](https://junit.org/junit5/docs/5.13.4/user-guide/index.html#writing-tests-parameterized-tests) with a custom-format argument source. 
 
 
 ## Value Formats
@@ -248,7 +248,7 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 
 ## Installation
 
-TableTest is available from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit versions 5.11.0 to 5.13.1 (except 5.13.0).
+TableTest is available from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit versions 5.11.0 to 5.13.4 (except 5.13.0).
 
 Please note that TableTest requires Java version 21 or above.
 

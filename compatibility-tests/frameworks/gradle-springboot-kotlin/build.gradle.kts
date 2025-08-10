@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation("io.github.nchaugen:tabletest-junit:0.5.0")
+    testImplementation("io.github.nchaugen:tabletest-junit:0.5.1-SNAPSHOT")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(kotlin("test"))
 }

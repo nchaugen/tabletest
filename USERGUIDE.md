@@ -148,7 +148,7 @@ void testNestedParameterizedTypes(
 TableTest will attempt to convert values to the type required by the test method parameter. This eliminates the need for manual conversion in your test method, keeping tests focused on invoking the system under test and asserting the results.
 
 ### Built-In Conversion
-Out of the box, TableTest is able to convert single values to many of the standard types. For this it uses JUnit's built-in type converters. Please see the [JUnit documentation](https://junit.org/junit5/docs/5.13.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit) for a list of supported types and the required format for each.
+Out of the box, TableTest is able to convert single values to many of the standard types. For this it uses JUnit's built-in type converters. Please see the [JUnit documentation](https://junit.org/junit5/docs/5.13.4/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit) for a list of supported types and the required format for each.
 
 ```java
 @TableTest("""

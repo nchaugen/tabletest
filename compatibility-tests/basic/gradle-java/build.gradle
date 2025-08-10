@@ -14,8 +14,8 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'io.github.nchaugen:tabletest-junit:0.5.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.1'
+    testImplementation 'io.github.nchaugen:tabletest-junit:0.5.1-SNAPSHOT'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

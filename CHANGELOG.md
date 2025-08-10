@@ -1,15 +1,21 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Added
+- Compatibility tests for build systems (Maven, Gradle) and application frameworks (Quarkus, SpringBoot)
+### Changed
+- Improved user guide on value conversion topic
+- TableTestException now of type ParameterResolutionException
+- Bumped JUnit dependency to 5.13.4
 
 ## [0.5.0] - 2025-06-21
 ### Added
-- Upped JUnit dependency to 5.13.1
 - Descriptive error messages
 - Allow test method parameters provided by ParameterResolvers (TestInfo, TestReporter, etc.)
 - Unique test invocation display names when using value sets
 - Explicit scenario name column with `@Scenario` annotated parameter can be in any position
 ### Changed
+- Bumped JUnit dependency to 5.13.1
 - More concise README.md, moved details to USERGUIDE.md
 
 
