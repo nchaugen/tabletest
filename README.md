@@ -252,7 +252,9 @@ TableTest is available from [Maven Central Repository](https://central.sonatype.
 
 TableTest is compatible with JUnit versions 5.11.0 to 5.13.4 (except 5.13.0).
 
-Frameworks such as Quarkus and SpringBoot packages their own version of JUnit. Please see the [compatibility tests](compatibility-tests) for examples of how to use TableTest with these frameworks. 
+Frameworks such as Quarkus and SpringBoot packages their own version of JUnit. TableTest is compatible with Quarkus version 3.21.2 and above, and SpringBoot version 3.4.0 and above.
+
+Please see the [compatibility tests](compatibility-tests) for examples of how to use TableTest with these frameworks. 
 
 Please note that TableTest requires Java version 21 or above. 
 
