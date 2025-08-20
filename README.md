@@ -248,9 +248,13 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 
 ## Installation
 
-TableTest is available from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit versions 5.11.0 to 5.13.4 (except 5.13.0).
+TableTest is available from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit.
 
-Please note that TableTest requires Java version 21 or above.
+TableTest is compatible with JUnit versions 5.11.0 to 5.13.4 (except 5.13.0).
+
+Frameworks such as Quarkus and SpringBoot packages their own version of JUnit. Please see the [compatibility tests](compatibility-tests) for examples of how to use TableTest with these frameworks. 
+
+Please note that TableTest requires Java version 21 or above. 
 
 ### Maven (pom.xml)
 ```xml
@@ -261,6 +265,12 @@ Please note that TableTest requires Java version 21 or above.
         <version>0.5.0</version>
         <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.13.4</version>
+        <scope>test</scope>
+    </dependency>
 </dependencies>
 ```
 
@@ -268,46 +278,11 @@ Please note that TableTest requires Java version 21 or above.
 ```kotlin
 dependencies { 
     testImplementation("io.github.nchaugen:tabletest-junit:0.5.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 ```
 
-Please see the [compatibility tests](compatibility-tests) for more examples of how to include TableTest in combination with frameworks such as SpringBoot and Quarkus. 
-
-
-### Using TableTest with JUnit 5.11.0 to 5.12.2
-For projects using JUnit versions prior to 5.13.0, you might have to exclude the transitive JUnit dependencies TableTest brings in to avoid conflicts.
-
-#### Maven (pom.xml)
-```xml
-<dependencies>
-    <dependency>
-        <groupId>io.github.nchaugen</groupId>
-        <artifactId>tabletest-junit</artifactId>
-        <version>0.5.0</version>
-        <scope>test</scope>
-        <exclusions>
-            <exclusion>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-params</artifactId>
-            </exclusion>
-            <exclusion>
-                <groupId>org.junit.platform</groupId>
-                <artifactId>junit-platform-commons</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
-</dependencies>
-```
-
-#### Gradle with Kotlin DSL (build.gradle.kts)
-```kotlin
-dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.5.0") {
-        exclude(group = "org.junit.jupiter", module = "junit-jupiter-params") 
-        exclude(group = "org.junit.platform", module = "junit-platform-commons") 
-    } 
-}
-```
 
 ## IDE Support
 The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) enhances your development experience when working with TableTest format tables. The plugin provides:
@@ -322,8 +297,10 @@ Installing the plugin streamlines the creation and maintenance of data-driven te
 ## License
 TableTest is licensed under the liberal and business-friendly [Apache Licence, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) and is freely available on [GitHub](https://github.com/nchaugen/tabletest). 
 
-Additionally, the `tabletest-junit` distribution uses the following modules from JUnit 5 which is released under [Eclipse Public License 2.0](https://raw.githubusercontent.com/junit-team/junit5/refs/heads/main/LICENSE.md):
+Additionally, `tabletest-junit` distributions prior to version 0.5.1 included the following modules from JUnit 5 which is released under [Eclipse Public License 2.0](https://raw.githubusercontent.com/junit-team/junit5/refs/heads/main/LICENSE.md):
 - `org.junit.jupiter:junit-jupiter-params`
 - `org.junit.platform:junit-platform-commons`
+
+Starting from version 0.5.1, these modules are no longer included in the `tabletest-junit` distribution.
 
 TableTest binaries are published to the repositories of Maven Central. The artefacts signatures can be validated against [this PGP public key](https://keyserver.ubuntu.com/pks/lookup?search=nchaugen%40gmail.com).

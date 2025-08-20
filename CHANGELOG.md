@@ -5,9 +5,9 @@
 - Inherited factory methods are now found and used (for Java-based tests, inheritance of static methods not supported in Kotlin) 
 - Compatibility tests for build systems (Maven, Gradle) and application frameworks (Quarkus, SpringBoot)
 ### Changed
-- Improved user guide on value conversion topic
+- Easier install as dependent JUnit modules are no longer packaged with TableTest distribution
 - TableTestException now of type ParameterResolutionException
-- Bumped JUnit dependency to 5.13.4
+- Improved user guide on value conversion topic
 
 ## [0.5.0] - 2025-06-21
 ### Added
