@@ -353,7 +353,7 @@ public class ParameterTypeConverter {
      * Helper method to find a factory method for a target type in a class
      */
     private static Optional<Method> findMatchingFactoryMethodInClass(Class<?> factoryMethodClass, Class<?> targetType) {
-        List<Method> matchingMethods = Arrays.stream(factoryMethodClass.getDeclaredMethods())
+        List<Method> matchingMethods = Arrays.stream(factoryMethodClass.getMethods())
             .filter(it -> Modifier.isStatic(it.getModifiers()))
             .filter(it -> it.canAccess(null))
             .filter(it -> it.getParameterCount() == 1)

@@ -252,7 +252,7 @@ Alternatively, regular Kotlin classes with factory methods defined as `@JvmStati
 ### Factory Method Search Strategy in Java
 TableTest uses the following strategy to search for factory methods in Java test classes:
 
-1. Search current test class
+1. Search current test class, including inherited methods
 2. In case of a `@Nested` test class, search enclosing classes, starting with the direct outer class
 3. Search classes listed in a `@FactorySources` annotation on current test class in the order they are listed
 4. In case of a `@Nested` test class, search classes listed by `@FactorySources` of enclosing classes, starting with the direct outer class
@@ -261,7 +261,7 @@ TableTest will stop searching as soon as it finds a matching factory method and 
 
 
 ### Factory Method Search Strategy in Kotlin
-In Kotlin, a `@Nested` test class must be declared `inner class` and these are not allowed to have companion objects. Hence, test class factory methods must be either declared in the companion object of the outer class (with `@JvmStatic`) or at package level in the same file as the test class.
+Kotlin does not support inheritance of static, companion object methods. Also, a `@Nested` test class must be declared `inner class` and these are not allowed to have companion objects. Hence, test class factory methods must be either declared in the companion object of the outer class (with `@JvmStatic`) or at package level in the same file as the test class.
 
 So for Kotlin, the search strategy becomes as follows:
 
@@ -469,14 +469,14 @@ Escape sequence handling varies depending on the programming language used for t
 When providing the table using text blocks in Java, all Java escape sequences like `\t`, `\"`, `\\`, `\uXXXX`, `\XXX`, etc. are processed by the Java compiler before handed to TableTest:
 
 ```java
-    @TableTest("""
-        Scenario                                | Input      | Length?
-        Tab character processed by compiler     | a\tb       | 3
-        Quote marks processed by compiler       | Say \"hi\" | 8
-        Backslash processed by compiler         | path\\file | 9
-        Unicode character processed by compiler | \u0041B    | 2
-        Octal character processed by compiler   | \101B      | 2
-        """)
+@TableTest("""
+    Scenario                                | Input      | Length?
+    Tab character processed by compiler     | a\tb       | 3
+    Quote marks processed by compiler       | Say \"hi\" | 8
+    Backslash processed by compiler         | path\\file | 9
+    Unicode character processed by compiler | \u0041B    | 2
+    Octal character processed by compiler   | \101B      | 2
+    """)
 void testEscapeSequences(String input, int expectedLength) {
   assertEquals(expectedLength, input.length());
 }

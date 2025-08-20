@@ -84,7 +84,7 @@ public class ReadmeExamplesTest {
     }
 
     @SuppressWarnings("unused")
-    static Students parse(Map<String, List<Integer>> input) {
+    public static Students parse(Map<String, List<Integer>> input) {
         return new Students(
             input.entrySet().stream()
                 .map(entry -> new Student(
@@ -95,7 +95,7 @@ public class ReadmeExamplesTest {
         );
     }
 
-    private record Students(List<Student> students) {
+    public record Students(List<Student> students) {
         int highestGrade() {
             return students.stream()
                 .map(Student::findHighestGrade)

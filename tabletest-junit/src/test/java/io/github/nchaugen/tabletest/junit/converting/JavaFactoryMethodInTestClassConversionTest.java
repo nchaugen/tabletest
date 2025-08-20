@@ -13,11 +13,11 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JavaFactoryMethodInTestClassConversionTest {
+public class JavaFactoryMethodInTestClassConversionTest extends JavaTestSuperClass {
 
     @TableTest("""
-        Int | List | Set  | AVS  | Map       | Nested           | Ages
-        16  | [16] | {16} | {16} | [age: 16] | [ages: [16, 16]] | [ages: [16, 16]]
+        Int | List | Set  | AVS  | Map       | Nested
+        16  | [16] | {16} | {16} | [age: 16] | [ages: [16, 16]]
         """)
     void using_factory_method_in_test_class(
         Age fromInt,
@@ -25,8 +25,7 @@ public class JavaFactoryMethodInTestClassConversionTest {
         Set<Age> inSet,
         Age fromValueSet,
         Map<String, Age> inMap,
-        Map<String, List<Age>> inNested,
-        Ages inOtherFactoryMethod
+        Map<String, List<Age>> inNested
     ) {
         Age expected = new Age(16);
         assertEquals(expected, fromInt);
@@ -35,7 +34,6 @@ public class JavaFactoryMethodInTestClassConversionTest {
         assertEquals(expected, fromValueSet);
         assertEquals(Map.of("age", expected), inMap);
         assertEquals(Map.of("ages", List.of(expected, expected)), inNested);
-        assertEquals(new Ages(List.of(expected, expected)), inOtherFactoryMethod);
     }
 
     @SuppressWarnings("unused")
@@ -53,9 +51,13 @@ public class JavaFactoryMethodInTestClassConversionTest {
         throw new ConversionException("Factory method not accessible, should not be called");
     }
 
-    @SuppressWarnings("unused")
-    public static Ages parseAges(Map<String, List<Age>> age) {
-        return new Ages(age.get("ages"));
+    @TableTest("""
+        Ages
+        [ages: [16, 16]]
+        """)
+    void using_factory_method_in_super_class(Ages inSuperClass) {
+        Age expected = new Age(16);
+        assertEquals(new Ages(List.of(expected, expected)), inSuperClass);
     }
 
     @TableTest("""
@@ -96,24 +98,34 @@ public class JavaFactoryMethodInTestClassConversionTest {
         }
 
         @TableTest("""
-        Age | Ages | Expected
-        16  | [ages: [16, 16]] | 17
+        Age | Expected
+        16  | 17
         """)
         void factory_method_in_nested_class_takes_precedence(
             Age fromFactoryMethodInThisClass,
-            Ages fromFactoryMethodInEnclosingClass,
             int expectedAgeAfterConversion
         ) {
             Age expected = new Age(expectedAgeAfterConversion);
             assertEquals(expected, fromFactoryMethodInThisClass);
-            assertEquals(
-                new Ages(List.of(expected, expected)),
-                fromFactoryMethodInEnclosingClass);
         }
 
         @SuppressWarnings("unused")
         public static Age parseAgePlusOne(int age) {
             return new Age(age + 1);
+        }
+
+        @TableTest("""
+        Ages             | Expected
+        [ages: [16, 16]] | 17
+        """)
+        void factory_method_inherited_in_nested_class(
+                Ages fromFactoryMethodInheritedByEnclosingClass,
+                int expectedAgeAfterConversion
+        ) {
+            Age expected = new Age(expectedAgeAfterConversion);
+            assertEquals(
+                    new Ages(List.of(expected, expected)),
+                    fromFactoryMethodInheritedByEnclosingClass);
         }
 
 
@@ -135,19 +147,15 @@ public class JavaFactoryMethodInTestClassConversionTest {
             }
 
             @TableTest("""
-                Age | Ages             | Expected
-                16  | [ages: [16, 16]] | 18
+                Age | Expected
+                16  | 18
                 """)
             void factory_method_in_nested_class_takes_precedence(
                 Age fromFactoryMethodInThisClass,
-                Ages fromFactoryMethodInEnclosingClass,
                 int expectedAgeAfterConversion
             ) {
                 Age expected = new Age(expectedAgeAfterConversion);
                 assertEquals(expected, fromFactoryMethodInThisClass);
-                assertEquals(
-                    new Ages(List.of(expected, expected)),
-                    fromFactoryMethodInEnclosingClass);
             }
 
             @SuppressWarnings("unused")

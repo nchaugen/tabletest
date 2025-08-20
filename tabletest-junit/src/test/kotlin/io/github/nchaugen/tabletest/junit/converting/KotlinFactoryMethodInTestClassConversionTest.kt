@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Nested
 import org.junit.platform.commons.support.conversion.ConversionException
 import java.time.LocalDate
 
-class KotlinFactoryMethodInTestClassConversionTest {
+open class KotlinFactoryMethodInTestClassConversionTest : KotlinTestSuperClass() {
 
     @TableTest(
         """    
-        Int | List | Set  | AVS  | Map         | Nested            | Ages
-        16  | [16] | {16} | {16} | [value: 16] | [value: [16, 16]] | [value: [16, 16]]
+        Int | List | Set  | AVS  | Map         | Nested
+        16  | [16] | {16} | {16} | [value: 16] | [value: [16, 16]]
             """
     )
     fun uses_factory_method_in_test_class(
@@ -23,8 +23,7 @@ class KotlinFactoryMethodInTestClassConversionTest {
         inSet: Set<Age>,
         fromValueSet: Age,
         inMap: java.util.Map<String, Age>,
-        inNested: java.util.Map<String, List<Age>>,
-        inOtherFactoryMethod: Ages
+        inNested: java.util.Map<String, List<Age>>
     ) {
         val expected = Age(16)
         assertEquals(expected, fromInt)
@@ -33,7 +32,6 @@ class KotlinFactoryMethodInTestClassConversionTest {
         assertEquals(expected, fromValueSet)
         assertEquals(mapOf("value" to expected), inMap)
         assertEquals(mapOf("value" to listOf(expected, expected)), inNested)
-        assertEquals(Ages(listOf(expected, expected)), inOtherFactoryMethod)
     }
 
     @Suppress("unused")
@@ -44,9 +42,7 @@ class KotlinFactoryMethodInTestClassConversionTest {
     companion object {
         @JvmStatic
         @Suppress("unused")
-        fun parseAge(age: Int): Age {
-            return Age(age)
-        }
+        fun parseAge(age: Int): Age = Age(age)
 
         @JvmStatic
         @Suppress("unused")
@@ -56,10 +52,18 @@ class KotlinFactoryMethodInTestClassConversionTest {
 
         @JvmStatic
         @Suppress("unused")
-        fun parseAges(age: Map<String, List<Age>>): Ages {
-            return Ages(age["value"])
-        }
+        fun parseAges(ages: Map<String, List<Age>>): Ages = KotlinTestSuperClass.parseAges(ages)
+    }
 
+    @TableTest(
+        """    
+        Ages
+        [ages: [16, 16]]
+        """
+    )
+    fun using_factory_method_delegating_to_super_class(ages: Ages) {
+        val expected = Age(16)
+        assertEquals(Ages(listOf(expected, expected)), ages)
     }
 
     @TableTest(

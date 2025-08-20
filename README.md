@@ -108,7 +108,7 @@ public static LocalDate parseDate(String input) {
 }
 ```
 
-TableTest will look for a factory method present in either the test class or in one of the classes listed by a `@FactorySources` annotation. The first factory method found will be used. If required, TableTest will first convert the cell value to match the factory method parameter type, before invoking the factory method to convert it to the test method parameter type.
+TableTest will look for a factory method present in either the test class, including inherited methods, or in one of the classes listed by a `@FactorySources` annotation. The first factory method found will be used. If required, TableTest will first convert the cell value to match the factory method parameter type, before invoking the factory method to convert it to the test method parameter type.
 
 There is no specific naming pattern for factory methods, any method fulfilling the requirements above will be considered. Only one factory method per target type is possible per class.
 
