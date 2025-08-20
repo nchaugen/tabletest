@@ -19,7 +19,7 @@ val quarkusVersion = (project.findProperty("quarkus.version") as String?) ?: "3.
 dependencies {
     implementation(enforcedPlatform("io.quarkus:quarkus-bom:$quarkusVersion"))
 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.5.1-SNAPSHOT")
+    testImplementation("io.github.nchaugen:tabletest-junit:0.5.2-SNAPSHOT")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation(kotlin("test"))
 }

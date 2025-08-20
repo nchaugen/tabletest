@@ -21,7 +21,7 @@ val springBootVersion = (project.findProperty("springboot.version") as String?) 
 dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.5.1-SNAPSHOT")
+    testImplementation("io.github.nchaugen:tabletest-junit:0.5.2-SNAPSHOT")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(kotlin("test"))
 }

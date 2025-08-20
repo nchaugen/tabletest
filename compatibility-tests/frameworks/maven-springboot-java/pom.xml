@@ -13,7 +13,7 @@
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <tabletest.version>0.5.1-SNAPSHOT</tabletest.version>
+        <tabletest.version>0.5.2-SNAPSHOT</tabletest.version>
         <springboot.version>3.5.4</springboot.version>
     </properties>
 
