@@ -5,10 +5,12 @@
 #   JUNIT_VERSIONS="5.13.4 5.13.2 5.12.2 5.11.0"
 #   QUARKUS_VERSIONS="3.25.3 3.24.0 3.23.4 3.21.2"
 #   SPRINGBOOT_VERSIONS="3.5.4 3.4.8 3.4.0"
+#   TABLETEST_VERSION="0.5.2-SNAPSHOT"  # default TableTest version (can be overridden via env)
 # Usage examples:
 #   ./test-compatibility.sh                    # run all with defaults
 #   JUNIT_VERSIONS="5.13.4 5.11.0" ./test-compatibility.sh
 #   QUARKUS_VERSIONS="3.25.3" SPRINGBOOT_VERSIONS="3.5.4" ./test-compatibility.sh
+#   TABLETEST_VERSION="0.5.2" ./test-compatibility.sh
 
 # Colors for output
 YELLOW='\033[1;33m'
@@ -18,6 +20,7 @@ NC='\033[0m' # No Color
 if [ -z "$JUNIT_VERSIONS" ]; then JUNIT_VERSIONS="5.13.4 5.13.2 5.12.2 5.11.0"; fi
 if [ -z "$QUARKUS_VERSIONS" ]; then QUARKUS_VERSIONS="3.25.3 3.24.0 3.23.4 3.21.2"; fi
 if [ -z "$SPRINGBOOT_VERSIONS" ]; then SPRINGBOOT_VERSIONS="3.5.4 3.4.8 3.4.0"; fi
+if [ -z "$TABLETEST_VERSION" ]; then TABLETEST_VERSION="0.5.2-SNAPSHOT"; fi
 
 # Test results tracking
 PASSED=0
@@ -65,13 +68,15 @@ run_tests() {
 
     case $build_tool in
         "maven")
-            mvn clean test -q $extra_args
+            tt_arg="-Dtabletest.version=$TABLETEST_VERSION"
+            mvn clean test -q $extra_args $tt_arg
             ;;
         "gradle")
+            tt_arg="-Ptabletest.version=$TABLETEST_VERSION"
             if [ -f "./gradlew" ]; then
-                ./gradlew clean test -q $extra_args
+                ./gradlew clean test -q $extra_args $tt_arg
             else
-                gradle clean test -q $extra_args
+                gradle clean test -q $extra_args $tt_arg
             fi
             ;;
         *)

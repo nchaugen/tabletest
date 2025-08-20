@@ -15,13 +15,15 @@ repositories {
     mavenLocal()
 }
 
-// Allow overriding SpringBoot version via -springboot.version, with default if not set
+// Allow overriding SpringBoot version via -Pspringboot.version
 val springBootVersion = (project.findProperty("springboot.version") as String?) ?: "3.5.4"
+// Allow overriding TableTest version via -Ptabletest.version
+val tabletestVersion = (project.findProperty("tabletest.version") as String?) ?: "0.5.2-SNAPSHOT"
 
 dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.5.2-SNAPSHOT")
+    testImplementation("io.github.nchaugen:tabletest-junit:$tabletestVersion")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(kotlin("test"))
 }

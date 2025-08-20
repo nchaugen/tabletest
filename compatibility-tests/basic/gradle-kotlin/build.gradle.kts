@@ -13,11 +13,13 @@ repositories {
     mavenLocal()
 }
 
-// Allow overriding JUnit version via -Pjunit.version, with default if not set
+// Allow overriding JUnit version via -Pjunit.version
 val junitVersion = (project.findProperty("junit.version") as String?) ?: "5.13.4"
+// Allow overriding TableTest version via -Ptabletest.version
+val tabletestVersion = (project.findProperty("tabletest.version") as String?) ?: "0.5.2-SNAPSHOT"
 
 dependencies {
-    testImplementation("io.github.nchaugen:tabletest-junit:0.5.2-SNAPSHOT")
+    testImplementation("io.github.nchaugen:tabletest-junit:$tabletestVersion")
     testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
     testImplementation(kotlin("test"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
