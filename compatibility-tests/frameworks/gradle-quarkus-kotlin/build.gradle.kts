@@ -2,6 +2,12 @@ plugins {
     kotlin("jvm") version "2.2.0"
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 repositories {
     mavenCentral()
     mavenLocal()
@@ -15,7 +21,6 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+tasks.test {
+    useJUnitPlatform()
 }
