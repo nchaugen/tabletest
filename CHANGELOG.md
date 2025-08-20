@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [0.5.1] - 2025-08-20
 ### Added
 - Inherited factory methods are now found and used (for Java-based tests, inheritance of static methods not supported in Kotlin) 
 - Compatibility tests for build systems (Maven, Gradle) and frameworks (JUnit, Quarkus, SpringBoot)

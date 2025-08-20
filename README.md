@@ -264,7 +264,7 @@ Please note that TableTest requires Java version 21 or above.
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.5.0</version>
+        <version>0.5.1</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -279,7 +279,7 @@ Please note that TableTest requires Java version 21 or above.
 ### Gradle with Kotlin DSL (build.gradle.kts)
 ```kotlin
 dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.5.0")
+    testImplementation("io.github.nchaugen:tabletest-junit:0.5.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
