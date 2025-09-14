@@ -4,9 +4,7 @@ import io.github.nchaugen.tabletest.junit.TableTest;
 import io.github.nchaugen.tabletest.junit.javadomain.Age;
 import org.junit.jupiter.api.Test;
 
-import static io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenFallbackFails;
-import static io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenMultipleFactoryMethodsFound;
-import static io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenNullSpecifiedForPrimitiveType;
+import static io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.*;
 
 public class JavaConversionFailureTest {
 
@@ -19,7 +17,7 @@ public class JavaConversionFailureTest {
         52          | io.github.nchaugen.tabletest.junit.javadomain.Ages
         """)
     void fails_builtin_conversion(String value, Class<?> type) {
-        assertThrowsWhenFallbackFails(value, type.getTypeName());
+        assertThrowsWhenFallbackFails(value, type);
     }
 
     @TableTest("""

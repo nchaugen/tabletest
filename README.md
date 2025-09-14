@@ -149,21 +149,19 @@ void testParameterizedTypes(Map<String, List<Integer>> grades, int expectedHighe
 ```
 
 ### Null Values
-Blank cells and empty quoted values will translate to `null` for all parameter types except primitives. For primitives, it will cause an exception as they cannot represent a `null` value.
+Blank cells will translate to `null` for all parameter types except primitives. For primitives, it will cause an exception as they cannot represent a `null` value.
 
 ```java
-@TableTest("""
-    Scenario            | String | Integer | List | Map
-    Blank               |        |         |      |
-    Empty single quoted | ''     | ''      | ''   | ''
-    Empty double quoted | ""     | ""      | ""   | ""
+    @TableTest("""
+    String | Integer | List | Map | Set
+           |         |      |     |
     """)
-void testBlankMeansNull(@Scenario String scenario, String string, Integer integer, List<?> list, Map<String, ?> map) {
-    if ("Blank".equals(scenario)) assertNull(string);
-    else assertEquals("", string);
+void blankConvertsToNull(String string, Integer integer, List<?> list, Map<String, ?> map, Set<?> set) {
+    assertNull(string);
     assertNull(integer);
     assertNull(list);
     assertNull(map);
+    assertNull(set);
 }
 ```
 

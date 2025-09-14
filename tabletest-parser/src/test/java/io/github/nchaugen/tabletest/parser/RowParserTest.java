@@ -76,6 +76,9 @@ class RowParserTest {
 
     @Test
     void shouldCaptureListValueElement() {
+        // Test null list
+        assertEquals(List.of(), listValue().parse("").captures());
+
         // Test empty list
         assertEquals(List.of(List.of()), listValue().parse("[]").captures());
 
@@ -120,6 +123,9 @@ class RowParserTest {
 
     @Test
     void shouldCaptureSetValueElement() {
+        // Test null set
+        assertEquals(List.of(), setValue().parse("").captures());
+
         // Test empty set
         assertEquals(List.of(Set.of()), setValue().parse("{}").captures());
 
@@ -170,6 +176,9 @@ class RowParserTest {
 
     @Test
     void shouldCaptureMapValueElement() {
+        // Test null map
+        assertEquals(List.of(), mapValue().parse("").captures());
+
         // Test empty map
         assertEquals(List.of(Map.of()), mapValue().parse("[:]").captures());
 

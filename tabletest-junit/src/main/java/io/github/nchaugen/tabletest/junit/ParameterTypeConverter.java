@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.github.nchaugen.tabletest.junit.TableTestException.typeDoNotAllowNull;
+import static io.github.nchaugen.tabletest.junit.TableTestException.primitiveTypeDoesNotAllowNull;
 import static java.util.stream.Collectors.toUnmodifiableMap;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
@@ -66,38 +66,14 @@ public class ParameterTypeConverter {
         ParameterType parameterType = ParameterType.of(parameter);
         Class<?> testClass = parameter.getDeclaringExecutable().getDeclaringClass();
 
-        if (valueConvertsToNull(parameterType, value)) {
+        if (value == null) {
             if (parameterType.isPrimitive()) {
-                throw new TableTestException(typeDoNotAllowNull(value, parameterType));
+                throw new TableTestException(primitiveTypeDoesNotAllowNull(parameterType));
             }
             return null;
         }
 
         return convert(value, parameterType, testClass);
-    }
-
-    private static boolean valueConvertsToNull(ParameterType parameterType, Object value) {
-        return value == null || isEmptyForNonStringType(value, parameterType) || isEmptyValueSet(value, parameterType);
-    }
-
-    /**
-     * Determines if the parsed value was the empty value ("" or '') for a non-string type
-     *
-     * @param parsedValue parsed value
-     * @param targetType  type of parameter
-     */
-    private static boolean isEmptyForNonStringType(Object parsedValue, ParameterType targetType) {
-        return parsedValue.toString().isEmpty() && !targetType.isAssignableFrom(String.class);
-    }
-
-    /**
-     * Determines if the cell is a value set with no values
-     *
-     * @param value      converted cell value
-     * @param targetType type of parameter
-     */
-    private static boolean isEmptyValueSet(Object value, ParameterType targetType) {
-        return value instanceof Set<?> set && set.isEmpty() && !targetType.isAssignableFrom(Set.class);
     }
 
     /**

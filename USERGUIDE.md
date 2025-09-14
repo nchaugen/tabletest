@@ -332,20 +332,15 @@ public void testLeapYear(@Scenario String scenario, Year year, boolean expectedR
 ```
 
 ### Null Values
-Blank cells and empty quoted values will translate to `null` for all parameter types except primitives. For primitives, it will cause an exception as they cannot represent a `null` value.
-
-The built-in conversion will **not** translate empty quoted values to `null` when they appear as elements inside lists, sets, and maps. This will instead cause a `TableTestException`. Consider using a [factory method](#factory-method-conversion) if you need this.
+Blank cells translate to `null` for all parameter types except primitives. For primitives, it will cause an exception as they cannot represent a `null` value.
 
 ```java
-@TableTest("""
-    Scenario            | String | Integer | List | Map | Set
-    Blank               |        |         |      |     |
-    Empty single quoted | ''     | ''      | ''   | ''  | ''
-    Empty double quoted | ""     | ""      | ""   | ""  | ""
+    @TableTest("""
+    String | Integer | List | Map | Set
+           |         |      |     |
     """)
-void testBlankMeansNull(@Scenario String scenario, String string, Integer integer, List<?> list, Map<String, ?> map, Set<?> set) {
-    if ("Blank".equals(scenario)) assertNull(string);
-    else assertEquals("", string);
+void blankConvertsToNull(String string, Integer integer, List<?> list, Map<String, ?> map, Set<?> set) {
+    assertNull(string);
     assertNull(integer);
     assertNull(list);
     assertNull(map);

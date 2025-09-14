@@ -1,30 +1,26 @@
 package io.github.nchaugen.tabletest.junit.features
 
-import io.github.nchaugen.tabletest.junit.Scenario
 import io.github.nchaugen.tabletest.junit.TableTest
+import io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenFallbackFails
 import io.github.nchaugen.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenNullSpecifiedForPrimitiveType
-import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class KotlinNullValueTest {
 
     @TableTest(
         """    
-        Scenario            | String | Integer | List | Map | Set
-        Blank               |        |         |      |     |
-        Empty single quoted | ''     | ''      | ''   | ''  | ''
-        Empty double quoted | ""     | ""      | ""   | ""  | ""
+        String | Integer | List | Map | Set
+               |         |      |     |
         """
     )
-    fun blank_is_null_and_empty_is_null_for_non_string(
-        @Scenario scenario: String,
+    fun blank_converts_to_null(
         string: String?,
         integer: Int?,
         list: List<*>?,
         map: Map<String, *>?,
         set: Set<*>?
     ) {
-        if (scenario == "Blank") assertNull(string) else assertEquals("", string)
+        assertNull(string)
         assertNull(integer)
         assertNull(list)
         assertNull(map)
@@ -35,22 +31,29 @@ class KotlinNullValueTest {
         """    
         table value | parameter type
                     | boolean
-        ''          | int
+                    | short
+                    | char
+        
         """
     )
-    fun fails_when_null_value_specified_for_primitive_parameter_type(value: String?, type: Class<*>) {
+    fun blank_fails_for_primitive_parameter_type(value: String?, type: Class<*>?) {
         assertThrowsWhenNullSpecifiedForPrimitiveType(value, type)
     }
 
     @TableTest(
         """    
-        blank | empty
-              | ''
+        Scenario            | table value | Type
+        Empty single quoted | ''          | java.util.List
+        Empty double quoted | ""          | java.lang.Integer
+        Empty primitive     | ""          | boolean
+        
         """
     )
-    fun kotlin_nullable_types_can_be_null(blank: Boolean?, empty: Integer?) {
-        assertNull(blank)
-        assertNull(empty)
+    fun empty_string_for_non_string_types_requires_factory_method(
+        value: String?,
+        type: Class<*>?
+    ) {
+        assertThrowsWhenFallbackFails(value, type)
     }
 
 }

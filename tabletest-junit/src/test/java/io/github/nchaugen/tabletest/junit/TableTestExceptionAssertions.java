@@ -11,9 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TableTestExceptionAssertions {
 
-    public static void assertThrowsWhenFallbackFails(Object parsedValue, String typeName) {
+    public static void assertThrowsWhenFallbackFails(Object parsedValue, Class<?> type) {
         assertThrowsTableTestException(
-            () -> convertValue(parsedValue, parameter(typeName)),
+            () -> convertValue(parsedValue, parameter(type)),
             "Built-in conversion of value \"[^\"]*\" to type .+ " +
             "Are you missing a factory method for this conversion\\? " +
             "Locations searched for public static factory methods: .+"

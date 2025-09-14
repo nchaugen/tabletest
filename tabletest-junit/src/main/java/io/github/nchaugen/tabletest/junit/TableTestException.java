@@ -55,13 +55,9 @@ public class TableTestException extends ParameterResolutionException {
         );
     }
 
-    static String typeDoNotAllowNull(Object value, ParameterType parameterType) {
-        String valueDescription = value == null ? "Blank cell" : "Value \"" + value + "\"";
-        String typeQualifier = parameterType.isPrimitive() ? "primitive" : "parameter";
+    static String primitiveTypeDoesNotAllowNull(ParameterType parameterType) {
         return String.format(
-            "%s translates to null, but null cannot be assigned to %s type %s",
-            valueDescription,
-            typeQualifier,
+            "Blank cell translates to null, but null cannot be assigned to primitive type %s",
             parameterType.name()
         );
     }
