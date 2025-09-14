@@ -17,7 +17,7 @@ TableTest allows you to express how the system is expected to behave through mul
   - [Factory Method Search Strategy in Java](#factory-method-search-strategy-in-java)
   - [Factory Method Search Strategy in Kotlin](#factory-method-search-strategy-in-kotlin)
   - [Overriding Built-In Conversion](#overriding-built-in-conversion)
-- [Key Features](#key-features)
+- [Additional Features](#additional-features)
   - [Scenario Names](#scenario-names)
   - [Null Values](#null-values)
   - [Value Sets](#value-sets)
@@ -297,7 +297,7 @@ public static LocalDate parseLocalDate(String input) {
 ```
 
 
-## Key Features
+## Additional Features
 TableTest contains a number of other useful features for expressing examples in a table format.
 
 ### Scenario Names
@@ -335,7 +335,7 @@ public void testLeapYear(@Scenario String scenario, Year year, boolean expectedR
 Blank cells translate to `null` for all parameter types except primitives. For primitives, it will cause an exception as they cannot represent a `null` value.
 
 ```java
-    @TableTest("""
+@TableTest("""
     String | Integer | List | Map | Set
            |         |      |     |
     """)

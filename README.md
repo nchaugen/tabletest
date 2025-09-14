@@ -42,7 +42,7 @@ public static boolean parseBoolean(String input) {
 - [Usage](#usage)
 - [Value Formats](#value-formats)
 - [Value Conversion](#value-conversion)
-- [Key Features](#key-features)
+- [Additional Features](#additional-features)
 - [Installation](#installation)
 - [IDE Support](#ide-support)
 - [License](#license)
@@ -154,7 +154,7 @@ void testParameterizedTypes(Map<String, List<Integer>> grades, int expectedHighe
 Blank cells will translate to `null` for all parameter types except primitives. For primitives, it will cause an exception as they cannot represent a `null` value.
 
 ```java
-    @TableTest("""
+@TableTest("""
     String | Integer | List | Map | Set
            |         |      |     |
     """)
@@ -168,7 +168,7 @@ void blankConvertsToNull(String string, Integer integer, List<?> list, Map<Strin
 ```
 
 
-## Key Features
+## Additional Features
 TableTest contains a number of other useful features for expressing examples in a table format.
 
 ### Scenario Names
