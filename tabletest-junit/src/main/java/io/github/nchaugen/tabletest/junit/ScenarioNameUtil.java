@@ -31,15 +31,13 @@ import static io.github.nchaugen.tabletest.junit.ValueSetUtil.isFromValueSet;
 public class ScenarioNameUtil {
 
     /**
-     * Returns true if the first value in the row is the name of the scenario.
-     * <p>
-     * This is the case if the corresponding column header starts with the string `#`.
+     * Returns true if row contains one extra column compared to the number of parameters.
      *
      * @param row        row of data from the table
      * @param parameters test method parameters
      * @return true if the first value in the row is the name of the scenario
      */
-    public static boolean isFirstColumnUndeclared(Row row, Parameter[] parameters) {
+    public static boolean hasUndeclaredColumn(Row row, Parameter[] parameters) {
         return row.valueCount() == parameters.length + 1;
     }
 
@@ -56,14 +54,15 @@ public class ScenarioNameUtil {
         String scenarioName = getScenarioName(values, row, parameters);
         String currentValueSetValues = currentValueSetValues(values, row);
         return currentValueSetValues.isEmpty()
-               ? scenarioName
-               : String.format("%s (%s)", scenarioName, currentValueSetValues);
+            ? scenarioName
+            : String.format("%s (%s)", scenarioName, currentValueSetValues);
     }
 
     /**
      * Gets the name of any implicitly or explicitly defined scenario column, or `"null"` if not defined.
-     * @param values converted values
-     * @param row table row
+     *
+     * @param values     converted values
+     * @param row        table row
      * @param parameters test method parameters
      * @return the string representation of any scenario column
      */
@@ -76,15 +75,16 @@ public class ScenarioNameUtil {
 
     /**
      * Finds the value of any implicitly or explicitly defined scenario column.
-     * @param values converted values
-     * @param row table row
+     *
+     * @param values     converted values
+     * @param row        table row
      * @param parameters test method parameters
      * @return the value of the scenario column, if any
      */
     private static Optional<?> findScenarioValue(List<?> values, Row row, Parameter[] parameters) {
-        return isFirstColumnUndeclared(row, parameters)
-               ? Optional.ofNullable(row.value(0))
-               : findDeclaredScenarioIndex(parameters).map(values::get);
+        return hasUndeclaredColumn(row, parameters)
+            ? Optional.ofNullable(row.value(0))
+            : findDeclaredScenarioIndex(parameters).map(values::get);
     }
 
     /**
@@ -106,8 +106,8 @@ public class ScenarioNameUtil {
 
     private static String toValueFromValueSetDescription(List<?> values, int index, Row parameterRow) {
         return isFromValueSet(values.get(index), parameterRow.value(index))
-               ? String.format("%s = %s", parameterRow.header(index), values.get(index))
-               : null;
+            ? String.format("%s = %s", parameterRow.header(index), values.get(index))
+            : null;
     }
 
     /**
@@ -119,15 +119,18 @@ public class ScenarioNameUtil {
      * @return true if the row contains a scenario name
      */
     public static boolean hasScenarioName(Row row, Parameter[] parameters) {
-        return isFirstColumnUndeclared(row, parameters)
-               || findDeclaredScenarioIndex(parameters)
-                   .map(index -> isNotBlank(row.value(index)))
-                   .orElse(false);
+        return hasUndeclaredColumn(row, parameters) || hasDeclaredScenarioColumn(row, parameters);
+    }
 
+    private static Boolean hasDeclaredScenarioColumn(Row row, Parameter[] parameters) {
+        return findDeclaredScenarioIndex(parameters)
+            .map(index -> isNotBlank(row.value(index)))
+            .orElse(false);
     }
 
     /**
      * Finds the index of the parameter with `@Scenario` annotation, if any.
+     *
      * @param parameters test method parameters
      * @return index if present
      */
@@ -145,6 +148,7 @@ public class ScenarioNameUtil {
 
     /**
      * Tests if the given value is not null and not blank.
+     *
      * @param value to test
      * @return true if not null and not blank, false otherwise
      */

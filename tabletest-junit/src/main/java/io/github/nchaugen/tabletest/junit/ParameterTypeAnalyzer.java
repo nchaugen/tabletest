@@ -26,33 +26,27 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * Utility class providing helper methods for parameter conversion.
- * <ul>
- *   <li>Extract type information from complex generic parameter types</li>
- *   <li>Handle primitive-to-wrapper type conversions</li>
- * </ul>
- * <p>
- * These utilities are used by the {@link ParameterTypeConverter} to process
- * parameters from test methods annotated with {@link TableTest}.
+ * Extracts the type stack of a method parameter.
  */
-public class ParameterUtil {
+public class ParameterTypeAnalyzer {
 
-    private ParameterUtil() {
+    private ParameterTypeAnalyzer() {
     }
 
     /**
-     * Extracts the nested class types from a parameterized type.
+     * Extracts the type stack of a method parameter.
      * <p>
-     * This method analyses a parameter's generic type information and returns a list
-     * of all the Class objects in the type hierarchy. For example, for a parameter of type
-     * {@code List<Map<String, Integer>>}, it would return [List.class, Map.class, Integer.class].
+     * For non-generic parameters it returns a list of one element: the parameter's class.
+     * For generic parameters it returns the list of nested class objects with the outermost first.
+     * For generic Map types, only the value type is included in the list (key types are ignored).
      * <p>
-     * For Map types, only the value type is included (key types are skipped).
+     * Example:
+     * A parameter of type {@code List<Map<String, Integer>>}, would return [List.class, Map.class, Integer.class].
      *
-     * @param parameter The parameter whose nested types should be extracted
-     * @return A list of Class objects representing the nested types in the parameter
+     * @param parameter The parameter whose types should be extracted
+     * @return A list of Class objects representing the types in the parameter
      */
-    public static List<? extends Class<?>> nestedElementTypesOf(Parameter parameter) {
+    public static List<? extends Class<?>> typeStackOf(Parameter parameter) {
         return collectTypes(parameter.getParameterizedType()).toList();
     }
 
@@ -65,8 +59,9 @@ public class ParameterUtil {
 
             case ParameterizedType paramType when paramType.getRawType() instanceof Class<?> rawClass -> Stream.concat(
                 Stream.<Class<?>>of(rawClass),
-                Map.class.isAssignableFrom(rawClass) ? collectMapValueTypes(paramType)
-                                                     : collectAllTypeArguments(paramType)
+                Map.class.isAssignableFrom(rawClass)
+                    ? collectMapValueTypes(paramType)
+                    : collectAllTypeArguments(paramType)
             );
 
             case WildcardType wildcardType -> Stream.concat(
@@ -86,8 +81,8 @@ public class ParameterUtil {
     private static Stream<Class<?>> collectMapValueTypes(ParameterizedType mapType) {
         Type[] typeArgs = mapType.getActualTypeArguments();
         return typeArgs.length >= 2
-               ? collectTypes(typeArgs[1])  // Skip key (index 0), process value (index 1)
-               : Stream.empty();
+            ? collectTypes(typeArgs[1])  // Skip key (index 0), process value (index 1)
+            : Stream.empty();
     }
 
     /**
@@ -95,7 +90,7 @@ public class ParameterUtil {
      */
     private static Stream<Class<?>> collectAllTypeArguments(ParameterizedType paramType) {
         return Arrays.stream(paramType.getActualTypeArguments())
-            .flatMap(ParameterUtil::collectTypes);
+            .flatMap(ParameterTypeAnalyzer::collectTypes);
     }
 
     /**
@@ -104,7 +99,7 @@ public class ParameterUtil {
     private static Stream<Class<?>> collectBounds(Type[] bounds) {
         return Arrays.stream(bounds)
             .filter(bound -> !bound.equals(Object.class))
-            .flatMap(ParameterUtil::collectTypes);
+            .flatMap(ParameterTypeAnalyzer::collectTypes);
     }
 
 }

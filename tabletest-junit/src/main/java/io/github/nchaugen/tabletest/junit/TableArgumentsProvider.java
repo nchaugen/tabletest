@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 
 import static io.github.nchaugen.tabletest.junit.ParameterTypeConverter.convertValue;
 import static io.github.nchaugen.tabletest.junit.ScenarioNameUtil.hasScenarioName;
-import static io.github.nchaugen.tabletest.junit.ScenarioNameUtil.isFirstColumnUndeclared;
+import static io.github.nchaugen.tabletest.junit.ScenarioNameUtil.hasUndeclaredColumn;
 import static io.github.nchaugen.tabletest.junit.ScenarioNameUtil.toDisplayName;
 import static io.github.nchaugen.tabletest.junit.TableTestException.failedToReadExternalTable;
 import static io.github.nchaugen.tabletest.junit.TableTestException.notEnoughTestParameters;
@@ -90,8 +90,8 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
      */
     private String resolveInput(ExtensionContext context, TableTest tableTest) {
         return tableTest.resource().isBlank()
-               ? tableTest.value()
-               : loadResource(tableTest.resource(), tableTest.encoding(), context.getRequiredTestClass());
+            ? tableTest.value()
+            : loadResource(tableTest.resource(), tableTest.encoding(), context.getRequiredTestClass());
     }
 
     /**
@@ -155,12 +155,10 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
     }
 
     /**
-     * Converts a table row into a stream of Arguments instances by mapping each cell to
-     * the corresponding parameter type and possibly expanding sets of values to one Arguments
-     * instance per value.
+     * Converts a table row into a stream of Arguments instances by mapping each cell value to the
+     * corresponding parameter type and expanding value sets to one Arguments instance per value.
      * <p>
-     * Uses {@link ParameterTypeConverter} to convert each cell value to the appropriate type
-     * based on the method parameter's declared type.
+     * Uses {@link ParameterTypeConverter} to convert cell values to the expected parameter type.
      * <p>
      * If the row has one additional cell compared to the number of parameters, the first cell is
      * assumed to be the name of the argument set. Alternatively, a single parameter with annotation
@@ -173,14 +171,15 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
     private static Stream<? extends Arguments> toArguments(Row row, Parameter[] parameters) {
 
         List<Object> convertedValues = row
-            .skipFirstIf(isFirstColumnUndeclared(row, parameters))
+            .skipFirstIf(hasUndeclaredColumn(row, parameters)) // first column is scenario name by convention
             .mapIndexed((index, cell) -> convertValue(cell, parameters[index]))
             .toList();
 
         return generateValueCombinations(convertedValues, parameters, 0)
-            .map(values -> hasScenarioName(row, parameters)
-                           ? Arguments.argumentSet(toDisplayName(values, row, parameters), values.toArray())
-                           : Arguments.of(values.toArray())
+            .map(values ->
+                hasScenarioName(row, parameters)
+                    ? Arguments.argumentSet(toDisplayName(values, row, parameters), values.toArray())
+                    : Arguments.of(values.toArray())
             );
     }
 
