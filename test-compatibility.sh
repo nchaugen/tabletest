@@ -5,7 +5,7 @@
 #   JUNIT_VERSIONS="5.13.4 5.13.2 5.12.2 5.11.0"
 #   QUARKUS_VERSIONS="3.25.3 3.24.0 3.23.4 3.21.2"
 #   SPRINGBOOT_VERSIONS="3.5.4 3.4.8 3.4.0"
-#   TABLETEST_VERSION="0.5.2-SNAPSHOT"  # default TableTest version (can be overridden via env)
+#   TABLETEST_VERSION="0.5.3-SNAPSHOT"  # default TableTest version (can be overridden via env)
 # Usage examples:
 #   ./test-compatibility.sh                    # run all with defaults
 #   JUNIT_VERSIONS="5.13.4 5.11.0" ./test-compatibility.sh
@@ -20,7 +20,7 @@ NC='\033[0m' # No Color
 if [ -z "$JUNIT_VERSIONS" ]; then JUNIT_VERSIONS="5.13.4 5.13.2 5.12.2 5.11.0"; fi
 if [ -z "$QUARKUS_VERSIONS" ]; then QUARKUS_VERSIONS="3.26.3 3.24.0 3.23.4 3.21.2"; fi
 if [ -z "$SPRINGBOOT_VERSIONS" ]; then SPRINGBOOT_VERSIONS="3.5.5 3.4.8 3.4.0"; fi
-if [ -z "$TABLETEST_VERSION" ]; then TABLETEST_VERSION="0.5.2-SNAPSHOT"; fi
+if [ -z "$TABLETEST_VERSION" ]; then TABLETEST_VERSION="0.5.3-SNAPSHOT"; fi
 
 # Test results tracking
 PASSED=0
