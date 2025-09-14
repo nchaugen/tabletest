@@ -4,13 +4,20 @@ TableTest extends JUnit 5 for data-driven testing using a concise table format. 
 
 ```java
 @TableTest("""
-    Input | Expected
-    1     | one
-    2     | two
-    3     | three
+    Scenario                        | Year               | Is leap year?
+    Not divisible by 4              | {1, 2001, 30001}   | No
+    Divisible by 4                  | {4, 2004, 30008}   | Yes
+    Divisible by 100 but not by 400 | {100, 2100, 30300} | No
+    Divisible by 400                | {400, 2000, 30000} | Yes
+    Year 0                          | 0                  | Yes
+    Negative input                  | -1                 | No
     """)
-void testNumberToWord(int number, String word) {
-    assertEquals(word, NumberConverter.toWord(number));
+void testLeapYears(Year year, boolean isLeapYear) {
+    assertEquals(isLeapYear, year.isLeap());
+}
+
+public static boolean parseBoolean(String input) {
+    return input.equalsIgnoreCase("yes");
 }
 ```
 
@@ -146,18 +153,17 @@ Blank cells and empty quoted values will translate to `null` for all parameter t
 
 ```java
 @TableTest("""
-    Scenario            | String | Integer | List | Map | Set
-    Blank               |        |         |      |     |
-    Empty single quoted | ''     | ''      | ''   | ''  | ''
-    Empty double quoted | ""     | ""      | ""   | ""  | ""
+    Scenario            | String | Integer | List | Map
+    Blank               |        |         |      |
+    Empty single quoted | ''     | ''      | ''   | ''
+    Empty double quoted | ""     | ""      | ""   | ""
     """)
-void testBlankMeansNull(@Scenario String scenario, String string, Integer integer, List<?> list, Map<String, ?> map, Set<?> set) {
+void testBlankMeansNull(@Scenario String scenario, String string, Integer integer, List<?> list, Map<String, ?> map) {
     if ("Blank".equals(scenario)) assertNull(string);
     else assertEquals("", string);
     assertNull(integer);
     assertNull(list);
     assertNull(map);
-    assertNull(set);
 }
 ```
 

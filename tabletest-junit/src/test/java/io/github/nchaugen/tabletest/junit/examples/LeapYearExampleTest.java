@@ -54,8 +54,8 @@ public class LeapYearExampleTest {
         Year 0                          | 0                  | Yes
         Negative input                  | -1                 | No
         """)
-    void testLeapYears(int year, boolean isLeapYear) {
-        assertEquals(isLeapYear, Year.isLeap(year));
+    void testLeapYears(Year year, boolean isLeapYear) {
+        assertEquals(isLeapYear, year.isLeap());
     }
 
 }
