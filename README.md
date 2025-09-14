@@ -36,6 +36,8 @@ public static boolean parseBoolean(String input) {
 
 **User Guide**: See the [user guide](USERGUIDE.md) for more details on how to use TableTest.
 
+**Blog Posts**: See [this blog post](https://nchaugen.com/2025/08/31/table-driven-testing.html) for a short introduction to table-driven testing and TableTest.
+
 ## Table of Contents
 - [Usage](#usage)
 - [Value Formats](#value-formats)
