@@ -4,11 +4,11 @@
     <parent>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest</artifactId>
-        <version>0.5.2</version>
+        <version>0.5.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>tabletest-parser</artifactId>
-    <version>0.5.2</version>
+    <version>0.5.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>TableTest Parser</name>
