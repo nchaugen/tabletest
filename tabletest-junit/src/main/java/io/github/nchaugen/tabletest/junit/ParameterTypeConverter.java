@@ -350,14 +350,12 @@ public class ParameterTypeConverter {
     }
 
     /**
-     * Helper method to find a factory method for a target type in a class
+     * Find applicable factory method in class if any
      */
     private static Optional<Method> findMatchingFactoryMethodInClass(Class<?> factoryMethodClass, Class<?> targetType) {
         List<Method> matchingMethods = Arrays.stream(factoryMethodClass.getMethods())
-            .filter(it -> Modifier.isStatic(it.getModifiers()))
-            .filter(it -> it.canAccess(null))
-            .filter(it -> it.getParameterCount() == 1)
-            .filter(it -> targetType.isAssignableFrom(it.getReturnType()))
+            .filter(ParameterTypeConverter::isFactoryMethod)
+            .filter(it -> isConvertingToTargetType(targetType, it.getReturnType()))
             .toList();
 
         if (matchingMethods.size() > 1) {
@@ -366,6 +364,47 @@ public class ParameterTypeConverter {
 
         return matchingMethods.stream().findFirst();
     }
+
+    /**
+     * Decides if a method can be used for type conversion
+     * @return true if public, static, and takes a single parameter; false otherwise
+     */
+    private static boolean isFactoryMethod(Method method) {
+        return Modifier.isStatic(method.getModifiers()) && method.canAccess(null) && method.getParameterCount() == 1;
+    }
+
+    /**
+     * Decides if return type of factory method can be assigned to parameter of target type.
+     *
+     * @param targetType of parameter to convert to
+     * @param returnType of factory method
+     * @return true if returnType can be assigned to targetType, false otherwise
+     */
+    private static boolean isConvertingToTargetType(Class<?> targetType, Class<?> returnType) {
+        return targetType.isAssignableFrom(returnType)
+                || isAssignableFromBoxed(targetType, returnType)
+                || isAssignableFromUnboxed(targetType, returnType);
+    }
+
+    private static boolean isAssignableFromUnboxed(Class<?> targetType, Class<?> returnType) {
+        return returnType.equals(PRIMITIVE_TO_WRAPPER.get(targetType));
+    }
+
+    private static boolean isAssignableFromBoxed(Class<?> targetType, Class<?> returnType) {
+        return targetType.equals(PRIMITIVE_TO_WRAPPER.get(returnType));
+    }
+
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER = Map.of(
+            boolean.class, Boolean.class,
+            byte.class, Byte.class,
+            char.class, Character.class,
+            short.class, Short.class,
+            int.class, Integer.class,
+            long.class, Long.class,
+            float.class, Float.class,
+            double.class, Double.class,
+            void.class, Void.class
+    );
 
     /**
      * Invokes a factory method to convert a parsed value to the parameter type.
@@ -394,18 +433,12 @@ public class ParameterTypeConverter {
     ) {
         /**
          * Creates a NestedTypes instance from a parameter.
-         * <p>
-         * If the parameter has a @ConvertWith annotation, returns an empty list
-         * since conversion will be handled by the argument converter.
-         * Otherwise, extracts the nested element types from the parameter.
          *
          * @param parameter The method parameter to analyse
          * @return A NestedTypes instance containing type information
          */
         static NestedTypes of(Parameter parameter) {
-            return parameter.isAnnotationPresent(org.junit.jupiter.params.converter.ConvertWith.class)
-                   ? new NestedTypes(List.of())
-                   : new NestedTypes(nestedElementTypesOf(parameter));
+            return new NestedTypes(nestedElementTypesOf(parameter));
         }
 
         /**

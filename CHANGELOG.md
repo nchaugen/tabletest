@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Fixed
+- Support factory methods returning primitive type
 
 ## [0.5.1] - 2025-08-20
 ### Added

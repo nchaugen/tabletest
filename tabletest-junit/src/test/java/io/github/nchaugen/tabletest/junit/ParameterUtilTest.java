@@ -10,14 +10,14 @@ class ParameterUtilTest {
 
     @TableTest("""
         type name | types?
-        boolean   | [java.lang.Boolean]
-        byte      | [java.lang.Byte]
-        char      | [java.lang.Character]
-        short     | [java.lang.Short]
-        int       | [java.lang.Integer]
-        long      | [java.lang.Long]
-        float     | [java.lang.Float]
-        double    | [java.lang.Double]
+        boolean   | [boolean]
+        byte      | [byte]
+        char      | [char]
+        short     | [short]
+        int       | [int]
+        long      | [long]
+        float     | [float]
+        double    | [double]
         """)
     void findsPrimitiveElementTypes(String typeName, List<Class<?>> expectedTypes) {
         assertEquals(expectedTypes, nestedElementTypesOf(parameter(typeName)));

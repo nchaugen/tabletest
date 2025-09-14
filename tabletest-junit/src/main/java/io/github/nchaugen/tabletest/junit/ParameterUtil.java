@@ -47,16 +47,13 @@ public class ParameterUtil {
      * of all the Class objects in the type hierarchy. For example, for a parameter of type
      * {@code List<Map<String, Integer>>}, it would return [List.class, Map.class, Integer.class].
      * <p>
-     * The method handles primitive types by returning their corresponding wrapper classes.
      * For Map types, only the value type is included (key types are skipped).
      *
      * @param parameter The parameter whose nested types should be extracted
      * @return A list of Class objects representing the nested types in the parameter
      */
     public static List<? extends Class<?>> nestedElementTypesOf(Parameter parameter) {
-        return collectTypes(parameter.getParameterizedType())
-            .map(ParameterUtil::toWrapperClass)
-            .toList();
+        return collectTypes(parameter.getParameterizedType()).toList();
     }
 
     /**
@@ -108,24 +105,6 @@ public class ParameterUtil {
         return Arrays.stream(bounds)
             .filter(bound -> !bound.equals(Object.class))
             .flatMap(ParameterUtil::collectTypes);
-    }
-
-    /**
-     * Converts primitive types to their wrapper classes.
-     */
-    private static Class<?> toWrapperClass(Class<?> clazz) {
-        return clazz.isPrimitive() ? switch (clazz.getName()) {
-            case "boolean" -> Boolean.class;
-            case "byte" -> Byte.class;
-            case "char" -> Character.class;
-            case "short" -> Short.class;
-            case "int" -> Integer.class;
-            case "long" -> Long.class;
-            case "float" -> Float.class;
-            case "double" -> Double.class;
-            default -> clazz; // Fallback, shouldn't happen for primitives
-        } : clazz;
-
     }
 
 }
