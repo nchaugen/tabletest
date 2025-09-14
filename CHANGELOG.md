@@ -1,10 +1,12 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [0.5.2] - 2025-09-14
 ### Changed
 - Empty quoted values no longer convert to `null` for non-string types
 ### Fixed
-- Support factory methods returning primitive type
+- Support for factory methods returning primitive type
 
 ## [0.5.1] - 2025-08-20
 ### Added
