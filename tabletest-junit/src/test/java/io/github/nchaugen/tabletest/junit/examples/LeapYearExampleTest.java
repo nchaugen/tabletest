@@ -30,7 +30,7 @@ public class LeapYearExampleTest {
     }
 
     @TableTest("""
-        Scenario                        | Year | Is leap year?
+        Scenario                        | Year | Is Leap Year?
         Not divisible by 4              | 2001 | No
         Divisible by 4                  | 2004 | Yes
         Divisible by 100 but not by 400 | 2100 | No
@@ -41,12 +41,12 @@ public class LeapYearExampleTest {
     }
 
     @SuppressWarnings("unused")
-    public static boolean parseBoolean(String input) {
+    public static boolean parseYesNo(String input) {
         return input.equalsIgnoreCase("yes");
     }
 
     @TableTest("""
-        Scenario                        | Year               | Is leap year?
+        Scenario                        | Year               | Is Leap Year?
         Not divisible by 4              | {1, 2001, 30001}   | No
         Divisible by 4                  | {4, 2004, 30008}   | Yes
         Divisible by 100 but not by 400 | {100, 2100, 30300} | No
