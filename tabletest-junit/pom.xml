@@ -16,9 +16,7 @@
 
     <properties>
         <version.tabletest-parser>0.5.3-SNAPSHOT</version.tabletest-parser>
-        <version.junit-platform-commons>1.14.0</version.junit-platform-commons>
-        <version.junit-params>5.14.0</version.junit-params>
-        <version.junit>5.14.0</version.junit>
+        <version.junit>6.0.0</version.junit>
         <version.kotlin>2.2.0</version.kotlin>
     </properties>
 
@@ -31,13 +29,13 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>${version.junit-params}</version>
+            <version>${version.junit}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-commons</artifactId>
-            <version>${version.junit-platform-commons}</version>
+            <version>${version.junit}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

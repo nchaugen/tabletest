@@ -256,7 +256,7 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 
 TableTest is available from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit.
 
-TableTest is compatible with JUnit versions 5.11.0 to 5.14.0 (except 5.13.0).
+TableTest is compatible with JUnit versions 5.11.0 to 6.0.0 (except 5.13.0).
 
 Frameworks such as Quarkus and SpringBoot packages their own version of JUnit. TableTest is compatible with Quarkus version 3.21.2 and above, and SpringBoot version 3.4.0 and above.
 
@@ -276,7 +276,7 @@ Please note that TableTest requires Java version 21 or above.
     <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>5.14.0</version>
+        <version>6.0.0</version>
         <scope>test</scope>
     </dependency>
 </dependencies>
@@ -286,7 +286,7 @@ Please note that TableTest requires Java version 21 or above.
 ```kotlin
 dependencies { 
     testImplementation("io.github.nchaugen:tabletest-junit:0.5.2")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.14.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.0.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 ```

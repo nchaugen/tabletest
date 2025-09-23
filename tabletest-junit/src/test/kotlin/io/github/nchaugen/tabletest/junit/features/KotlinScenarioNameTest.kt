@@ -35,9 +35,9 @@ class KotlinScenarioNameTest {
     @TableTest(
         """    
         Scenario | Display Name?
-                 | "[1] null, [1]"
-        ""       | "[2] , [2]"
-        Example  | "[3] Example"
+                 | '[1] null, "[1]'
+        ""       | '[2] "", "[2]'
+        Example  | '[3] Example'
         """
     )
     fun declared_scenario_name_becomes_display_name(
