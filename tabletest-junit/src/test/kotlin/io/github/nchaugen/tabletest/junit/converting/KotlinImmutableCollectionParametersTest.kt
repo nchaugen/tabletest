@@ -22,25 +22,25 @@ class KotlinImmutableCollectionParametersTest {
     ) {
         try {
             list.add("x")
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }
         try {
             nestedList.first().add("x")
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }
         try {
             nestedSet.first().add("x")
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }
         try {
             nestedMap.first().put("x", "y")
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }
@@ -60,25 +60,25 @@ class KotlinImmutableCollectionParametersTest {
     ) {
         try {
             map.put("x", "y")
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }
         try {
             nestedList.get("empty")!!.add("x")
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }
         try {
             nestedSet.get("empty")!!.add("x")
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }
         try {
             nestedMap.get("empty")!!.put("x", "y")
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }
@@ -98,25 +98,25 @@ class KotlinImmutableCollectionParametersTest {
     ) {
         try {
             set.add("x")
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }
         try {
             nestedList.forEach(Consumer { it: List<String?>? -> it!!.add("x") })
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }
         try {
             nestedSet.forEach(Consumer { it: MutableSet<String?>? -> it!!.add("x") })
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }
         try {
             nestedMap.forEach(Consumer { it: Map<String?, String?>? -> it!!.put("x", "y") })
-            fail<Any?>("modifying collections from the table should fail")
+            fail<Any>("modifying collections from the table should fail")
         } catch (_: Exception) {
             // expected
         }

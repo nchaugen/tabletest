@@ -42,7 +42,7 @@ class KotlinConvertWithTest {
 
         override fun convert(
             source: Any?,
-            context: ParameterContext?
+            context: ParameterContext
         ): Any? {
             if (source is Map<*, *>) {
                 return Person(
