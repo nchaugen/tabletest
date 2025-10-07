@@ -148,7 +148,7 @@ void testNestedParameterizedTypes(
 TableTest will attempt to convert values to the type required by the test method parameter. This eliminates the need for manual conversion in your test method, keeping tests focused on invoking the system under test and asserting the results.
 
 ### Built-In Conversion
-Out of the box, TableTest is able to convert single values to many of the standard types. For this it uses JUnit's built-in type converters. Please see the [JUnit documentation](https://junit.org/junit5/docs/5.13.4/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit) for a list of supported types and the required format for each.
+Out of the box, TableTest is able to convert single values to many of the standard types. For this it uses JUnit's built-in type converters. Please see the [JUnit documentation](https://junit.org/junit5/docs/current/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit) for a list of supported types and the required format for each.
 
 ```java
 @TableTest("""
@@ -507,7 +507,7 @@ If you need special characters in Kotlin or external Table files, you have three
 
 
 ### Explicit Argument Conversion
-In addition to implicitly called factory methods and built-in conversion, TableTest supports JUnit [explicit argument conversion](https://junit.org/junit5/docs/5.12.1/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit). This can be used for explicit conversion to custom types.
+In addition to implicitly called factory methods and built-in conversion, TableTest supports JUnit [explicit argument conversion](https://junit.org/junit5/docs/current/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit). This can be used for explicit conversion to custom types.
 
 As there is no parameter type information available in the ArgumentConverter interface, custom ArgumentConverters will receive the [parsed value](#value-conversion). In the example below, the value of the `source` parameter received by `PersonConverter.convert` will be of type `Map<String, String>`. However, since the `ArgumentConverter` interface specifies `source` parameter as type `Object`, the value needs to be inspected and processed using `instanceof`.
 

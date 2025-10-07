@@ -28,7 +28,7 @@ public static boolean parseBoolean(String input) {
 - **Self-documenting**: Tables serve as living documentation
 - **Collaborative**: Non-technical stakeholders can understand and contribute
 
-**Requirements**: Java 21+, JUnit 5.11.0-5.13.4 (except 5.13.0).
+**Requirements**: Java 21+, JUnit 5.11.0-5.14.0 (except 5.13.0).
 
 **IDE Support**: [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for working with tables.
 
@@ -72,7 +72,7 @@ public void leapYearCalculation(Year year, boolean expectedResult) {
 - Values automatically convert to parameter types
 - Test methods must be non-private, non-static, void return
 
-Technically `@TableTest` is a [JUnit `@ParameterizedTest`](https://junit.org/junit5/docs/5.13.4/user-guide/index.html#writing-tests-parameterized-tests) with a custom-format argument source. 
+Technically `@TableTest` is a [JUnit `@ParameterizedTest`](https://junit.org/junit5/docs/current/user-guide/index.html#writing-tests-parameterized-tests) with a custom-format argument source. 
 
 
 ## Value Formats
@@ -122,7 +122,7 @@ TableTest will look for a factory method present in either the test class, inclu
 There is no specific naming pattern for factory methods, any method fulfilling the requirements above will be considered. Only one factory method per target type is possible per class.
 
 ### Built-In Conversion
-TableTest falls back to [JUnit's built-in type converters](https://junit.org/junit5/docs/5.12.2/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit) if no factory method is found. 
+TableTest falls back to [JUnit's built-in type converters](https://junit.org/junit5/docs/current/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit) if no factory method is found. 
 
 ```java
 @TableTest("""
@@ -256,7 +256,7 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 
 TableTest is available from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit.
 
-TableTest is compatible with JUnit versions 5.11.0 to 5.13.4 (except 5.13.0).
+TableTest is compatible with JUnit versions 5.11.0 to 5.14.0 (except 5.13.0).
 
 Frameworks such as Quarkus and SpringBoot packages their own version of JUnit. TableTest is compatible with Quarkus version 3.21.2 and above, and SpringBoot version 3.4.0 and above.
 
@@ -276,7 +276,7 @@ Please note that TableTest requires Java version 21 or above.
     <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>5.13.4</version>
+        <version>5.14.0</version>
         <scope>test</scope>
     </dependency>
 </dependencies>
@@ -286,7 +286,7 @@ Please note that TableTest requires Java version 21 or above.
 ```kotlin
 dependencies { 
     testImplementation("io.github.nchaugen:tabletest-junit:0.5.2")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.14.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 ```

@@ -17,9 +17,9 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Set defaults if env not provided
-if [ -z "$JUNIT_VERSIONS" ]; then JUNIT_VERSIONS="5.13.4 5.13.2 5.12.2 5.11.0"; fi
-if [ -z "$QUARKUS_VERSIONS" ]; then QUARKUS_VERSIONS="3.26.3 3.24.0 3.23.4 3.21.2"; fi
-if [ -z "$SPRINGBOOT_VERSIONS" ]; then SPRINGBOOT_VERSIONS="3.5.5 3.4.8 3.4.0"; fi
+if [ -z "$JUNIT_VERSIONS" ]; then JUNIT_VERSIONS="5.14.0 5.13.4 5.12.2 5.11.0"; fi
+if [ -z "$QUARKUS_VERSIONS" ]; then QUARKUS_VERSIONS="3.28.2 3.24.0 3.23.4 3.21.2"; fi
+if [ -z "$SPRINGBOOT_VERSIONS" ]; then SPRINGBOOT_VERSIONS="3.5.6 3.4.8 3.4.0"; fi
 if [ -z "$TABLETEST_VERSION" ]; then TABLETEST_VERSION="0.5.3-SNAPSHOT"; fi
 
 # Test results tracking

@@ -14,7 +14,7 @@ repositories {
 }
 
 // Allow overriding JUnit version via -Pjunit.version
-val junitVersion = (project.findProperty("junit.version") as String?) ?: "5.13.4"
+val junitVersion = (project.findProperty("junit.version") as String?) ?: "5.14.0"
 // Allow overriding TableTest version via -Ptabletest.version
 val tabletestVersion = (project.findProperty("tabletest.version") as String?) ?: "0.5.3-SNAPSHOT"
 
