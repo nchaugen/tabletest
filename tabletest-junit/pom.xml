@@ -12,7 +12,7 @@
     <packaging>jar</packaging>
 
     <name>TableTest JUnit</name>
-    <description>Extension to JUnit 5 for data-driven testing with the TableTest format</description>
+    <description>Extension to JUnit for data-driven testing with the TableTest format</description>
 
     <properties>
         <version.tabletest-parser>0.5.3-SNAPSHOT</version.tabletest-parser>

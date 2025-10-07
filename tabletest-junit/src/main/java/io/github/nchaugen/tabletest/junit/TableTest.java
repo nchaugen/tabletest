@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The {@code @TableTest} annotation enables data-driven testing with tabular data in JUnit 5.
+ * The {@code @TableTest} annotation enables data-driven testing with tabular data in JUnit.
  * <p>
  * Test methods using this annotation must follow standard JUnit rules: they cannot be {@code private}
  * or {@code static} and must return {@code void}.

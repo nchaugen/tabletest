@@ -1,6 +1,6 @@
 # TableTest
 
-TableTest extends JUnit 5 for data-driven testing using a concise table format. Express system behaviour through multiple examples, reducing test code while improving readability and maintainability.
+TableTest extends JUnit for data-driven testing using a concise table format. Express system behaviour through multiple examples, reducing test code while improving readability and maintainability.
 
 ```java
 @TableTest("""
@@ -28,7 +28,7 @@ public static boolean parseBoolean(String input) {
 - **Self-documenting**: Tables serve as living documentation
 - **Collaborative**: Non-technical stakeholders can understand and contribute
 
-**Requirements**: Java 21+, JUnit 5.11.0-5.14.0 (except 5.13.0).
+**Requirements**: Java 21+, JUnit 5.11.0-6.0.0 (except 5.13.0).
 
 **IDE Support**: [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for working with tables.
 
@@ -305,7 +305,7 @@ Installing the plugin streamlines the creation and maintenance of data-driven te
 ## License
 TableTest is licensed under the liberal and business-friendly [Apache Licence, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) and is freely available on [GitHub](https://github.com/nchaugen/tabletest). 
 
-Additionally, `tabletest-junit` distributions prior to version 0.5.1 included the following modules from JUnit 5 which is released under [Eclipse Public License 2.0](https://raw.githubusercontent.com/junit-team/junit5/refs/heads/main/LICENSE.md):
+Additionally, `tabletest-junit` distributions prior to version 0.5.1 included the following modules from JUnit 5 which are released under [Eclipse Public License 2.0](https://raw.githubusercontent.com/junit-team/junit5/refs/heads/main/LICENSE.md):
 - `org.junit.jupiter:junit-jupiter-params`
 - `org.junit.platform:junit-platform-commons`
 
