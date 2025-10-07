@@ -1,8 +1,10 @@
 package io.github.nchaugen.tabletest.junit.examples;
 
 import io.github.nchaugen.tabletest.junit.TableTest;
+import io.github.nchaugen.tabletest.junit.javadomain.Grades;
+import io.github.nchaugen.tabletest.junit.javadomain.Student;
+import io.github.nchaugen.tabletest.junit.javadomain.Students;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,63 +44,6 @@ public class StudentGradesExampleTest {
     @SuppressWarnings("unused")
     public static Grades parseGrades(List<Integer> input) {
         return new Grades(input);
-    }
-
-    public record Students(List<Student> students) {
-        int highestGrade() {
-            return students.stream()
-                .map(Student::findHighestGrade)
-                .mapToInt(Integer::intValue)
-                .max()
-                .orElse(0);
-        }
-
-        double averageGrade() {
-            return students.stream()
-                .map(Student::averageGrade)
-                .mapToDouble(Double::doubleValue)
-                .average()
-                .orElse(0.0);
-        }
-
-        double passCount() {
-            return students.stream()
-                .filter(Student::hasPassed)
-                .count();
-        }
-    }
-
-    private record Student(String name, Grades grades) {
-        int findHighestGrade() {
-            return grades.findHighestGrade();
-        }
-
-        double averageGrade() {
-            return grades.averageGrade();
-        }
-
-        boolean hasPassed() {
-            return grades.hasPassed();
-        }
-    }
-
-    public record Grades(List<Integer> grades) {
-        int findHighestGrade() {
-            return grades.stream()
-                .max(Comparator.naturalOrder())
-                .orElse(0);
-        }
-
-        double averageGrade() {
-            return grades.stream()
-                .mapToInt(Integer::intValue)
-                .average()
-                .orElse(0.0);
-        }
-
-        boolean hasPassed() {
-            return averageGrade() >= 70.0;
-        }
     }
 
 }
