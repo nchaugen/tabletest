@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [0.5.3] - 2025-10-26
 ### Added
 - Unsuccessful parsing of table fails the test with TableTestParseException pointing to the problematic section
 

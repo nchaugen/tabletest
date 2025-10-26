@@ -10,7 +10,7 @@
 #   ./test-compatibility.sh                    # run all with defaults
 #   JUNIT_VERSIONS="5.13.4 5.11.0" ./test-compatibility.sh
 #   QUARKUS_VERSIONS="3.25.3" SPRINGBOOT_VERSIONS="3.5.4" ./test-compatibility.sh
-#   TABLETEST_VERSION="0.5.2" ./test-compatibility.sh
+#   TABLETEST_VERSION="0.5.3-SNAPSHOT" ./test-compatibility.sh
 
 # Colors for output
 YELLOW='\033[1;33m'
