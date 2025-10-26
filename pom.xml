@@ -4,7 +4,7 @@
 
     <groupId>io.github.nchaugen</groupId>
     <artifactId>tabletest</artifactId>
-    <version>0.5.3-SNAPSHOT</version>
+    <version>0.5.3</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2025</inceptionYear>
@@ -72,7 +72,7 @@
         <connection>scm:git:${repository.url</connection>
         <developerConnection>scm:git:${repository.url}</developerConnection>
         <url>${repository.url}</url>
-        <tag>HEAD</tag>
+        <tag>tabletest-0.5.3</tag>
     </scm>
 
     <distributionManagement>

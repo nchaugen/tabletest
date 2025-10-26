@@ -4,18 +4,18 @@
     <parent>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest</artifactId>
-        <version>0.5.3-SNAPSHOT</version>
+        <version>0.5.3</version>
     </parent>
 
     <artifactId>tabletest-junit</artifactId>
-    <version>0.5.3-SNAPSHOT</version>
+    <version>0.5.3</version>
     <packaging>jar</packaging>
 
     <name>TableTest JUnit</name>
     <description>Extension to JUnit for data-driven testing with the TableTest format</description>
 
     <properties>
-        <version.tabletest-parser>0.5.3-SNAPSHOT</version.tabletest-parser>
+        <version.tabletest-parser>0.5.3</version.tabletest-parser>
         <version.junit>6.0.0</version.junit>
         <version.kotlin>2.2.0</version.kotlin>
     </properties>
