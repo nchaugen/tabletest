@@ -48,7 +48,11 @@ public class TableParser {
     }
 
     private static Row parseRow(String line) {
-        List<Object> values = RowParser.parse(line).captures().stream().toList();
+        ParseResult parsedRow = RowParser.parse(line);
+        if (parsedRow.isFailure() || parsedRow.hasRest()) {
+            throw new TableTestParseException(line, parsedRow);
+        }
+        List<Object> values = parsedRow.captures().stream().toList();
         return values.isEmpty() ? null : new Row(values);
     }
 

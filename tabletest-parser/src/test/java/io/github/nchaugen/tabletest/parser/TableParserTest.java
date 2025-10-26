@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TableParserTest {
 
@@ -98,5 +100,17 @@ public class TableParserTest {
         assertEquals("\\n", result.row(2).value(1));
         assertEquals("\\n", result.row(3).value(1));
         assertEquals("\\n", result.row(4).value(1));
+    }
+
+    @Test
+    void shouldThrowExceptionOnParsingErrors() {
+        // language=TableTest
+        String input = """
+            Scenario         | Purchase time       | Past purchases        | Count previous 30 days?
+            Purchase too old | 2025-09-30T23:59:59 | [2025-08-01T00:00:00] | 0
+            """;
+
+        TableTestParseException exception = assertThrows(TableTestParseException.class, () -> TableParser.parse(input));
+        assertTrue(exception.getMessage().startsWith("Failed to parse `[2025-08-01T00:00:00] | 0` in line `Purchase too old"));
     }
 }

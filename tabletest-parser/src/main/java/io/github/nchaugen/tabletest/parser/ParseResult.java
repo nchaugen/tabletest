@@ -57,6 +57,14 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
      */
     public abstract boolean isSuccess();
 
+    public boolean isFailure() {
+        return !isSuccess();
+    }
+
+    public boolean hasRest() {
+        return !rest().isBlank();
+    }
+
     abstract String rest();
 
     /**
