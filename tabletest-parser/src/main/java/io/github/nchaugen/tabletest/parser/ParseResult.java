@@ -17,9 +17,10 @@ package io.github.nchaugen.tabletest.parser;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -27,45 +28,43 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Collections.*;
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.*;
 
 /**
- * Represents the result of a parsing operation. Abstract sealed class
- * extended by Success and Failure subclasses.
+ * Represents the result of a parsing operation.
  */
-public abstract sealed class ParseResult permits ParseResult.Success, ParseResult.Failure {
+public sealed interface ParseResult permits ParseResult.Success, ParseResult.Failure {
 
-    private ParseResult() {}
-
-    static Success success(String value, String rest, List<Object> captures) {
-        return new Success(value, rest, captures);
+    static Success success(String consumed, String rest, List<Object> captures) {
+        return new Success(consumed, rest, captures);
     }
 
-    static Success success(String value, String rest) {
-        return success(value, rest, List.of());
+    static Success success(String consumed, String rest) {
+        return success(consumed, rest, List.of());
     }
 
-    static Failure failure() {
-        return new Failure();
+    static Failure failure(String rest) {
+        return new Failure(rest);
     }
 
     /**
      * Determines if the parse operation succeeded.
-     *
      * @return true if successful, false otherwise
      */
-    public abstract boolean isSuccess();
+    boolean isSuccess();
 
-    public boolean isFailure() {
+    /**
+     * Determines if the parse operation failed.
+     * @return true if failure, false otherwise
+     */
+    default boolean isFailure() {
         return !isSuccess();
     }
 
-    public boolean hasRest() {
+    default boolean hasRest() {
         return !rest().isBlank();
     }
 
-    abstract String rest();
+    String rest();
 
     /**
      * Retrieves captured objects from the parse result.
@@ -73,9 +72,9 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
      *
      * @return list of captured objects
      */
-    public abstract List<Object> captures();
+    List<Object> captures();
 
-    ParseResult append(Supplier<ParseResult> nextResult) {
+    default ParseResult append(Supplier<ParseResult> nextResult) {
         return switch (this) {
             case Failure ignored -> this;
             case Success success -> switch (nextResult.get()) {
@@ -85,15 +84,9 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
         };
     }
 
-    static final class Success extends ParseResult {
-        private final String value;
-        private final String rest;
-        private final List<Object> captures;
-
-        private Success(String value, String rest, List<Object> captures) {
-            this.value = value;
-            this.rest = rest;
-            this.captures = Collections.unmodifiableList(new ArrayList<>(captures));
+    record Success(String consumed, String rest, List<Object> captures) implements ParseResult {
+        public Success {
+            captures = Collections.unmodifiableList(new ArrayList<>(captures));
         }
 
         @Override
@@ -101,108 +94,64 @@ public abstract sealed class ParseResult permits ParseResult.Success, ParseResul
             return true;
         }
 
-        @Override
-        String rest() {
-            return rest;
-        }
-
-        @Override
-        public List<Object> captures() {
-            return captures;
-        }
-
-        ParseResult.Success capture() {
+        Success capture() {
             ArrayList<Object> nextCaptures = new ArrayList<>(captures);
-            nextCaptures.add(value);
-            return new Success(value, rest, nextCaptures);
+            nextCaptures.add(consumed);
+            return new Success(consumed, rest, nextCaptures);
         }
 
-        ParseResult.Success captureTrimmed() {
+        Success captureTrimmed() {
             ArrayList<Object> nextCaptures = new ArrayList<>(captures);
-            nextCaptures.add(value.isBlank() ? null : value.trim());
-            return new Success(value, rest, nextCaptures);
+            nextCaptures.add(consumed.isBlank() ? null : consumed.trim());
+            return new Success(consumed, rest, nextCaptures);
         }
 
-        ParseResult.Success captureGroup() {
-            return new Success(value, rest, List.of(List.copyOf(captures)));
+        Success collectCapturesToList() {
+            return new Success(consumed, rest, List.of(List.copyOf(captures)));
         }
 
-        ParseResult.Success captureSet() {
-            return new Success(value, rest, List.of(Set.copyOf(captures)));
+        Success collectCapturesToSet() {
+            Set<Object> set = new LinkedHashSet<>(captures.size());
+            set.addAll(captures);
+            return new Success(consumed, rest, List.of(Collections.unmodifiableSet(set)));
         }
 
-        ParseResult.Success captureNamedElements() {
+        Success collectCapturesToMap() {
             if (captures.size() % 2 != 0) {
-                throw new IllegalStateException("Capture group must have an even number of elements to form a map");
+                throw new IllegalStateException("Must have an even number of captures to collect to map");
             }
             Map<String, Object> captureGroup =
                 IntStream.range(0, captures.size())
                     .filter(i -> i % 2 == 0)
                     .mapToObj(i -> Map.entry((String) captures.get(i), captures.get(i + 1)))
-                    .collect(toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> b,
+                        LinkedHashMap::new
+                    ));
 
-            return new Success(value, rest, List.of(unmodifiableMap(captureGroup)));
+            return new Success(consumed, rest, List.of(unmodifiableMap(captureGroup)));
         }
 
-        private ParseResult.Success append(ParseResult.Success nextResult) {
+        private Success append(Success nextResult) {
             return new Success(
-                value + nextResult.value,
+                consumed + nextResult.consumed,
                 nextResult.rest,
                 Stream.concat(captures.stream(), nextResult.captures.stream()).toList()
             );
         }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-
-            Success other = (Success) o;
-            return Objects.equals(value, other.value) && Objects.equals(rest, other.rest);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(value, rest);
-        }
-
-        @Override
-        public String toString() {
-            return "Result.Success[" + value + ", " + rest + ", " + captures + "]";
-        }
-
     }
 
-    static final class Failure extends ParseResult {
-        private Failure() {}
-
+    record Failure(String rest) implements ParseResult {
         @Override
         public boolean isSuccess() {
             return false;
         }
 
         @Override
-        String rest() {
-            return "";
-        }
-
-        @Override
         public List<Object> captures() {
             return List.of();
-        }
-
-        @Override
-        public String toString() {
-            return "Result.Failure";
-        }
-
-        @Override
-        public int hashCode() {
-            return super.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            return (other != null && getClass() == other.getClass());
         }
     }
 }

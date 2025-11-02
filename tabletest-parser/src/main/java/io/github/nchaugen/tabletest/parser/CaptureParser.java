@@ -18,8 +18,6 @@ package io.github.nchaugen.tabletest.parser;
 import io.github.nchaugen.tabletest.parser.ParseResult.Failure;
 import io.github.nchaugen.tabletest.parser.ParseResult.Success;
 
-import static io.github.nchaugen.tabletest.parser.ParseResult.failure;
-
 /**
  * Utility class for creating parsers that capture matched input values.
  */
@@ -35,7 +33,7 @@ public class CaptureParser {
      */
     public static Parser capture(Parser parser) {
         return input -> switch (parser.parse(input)) {
-            case Failure ignored -> failure();
+            case Failure ignored -> ignored;
             case Success success -> success.capture();
         };
     }
@@ -48,47 +46,47 @@ public class CaptureParser {
      */
     public static Parser captureTrimmed(Parser parser) {
         return input -> switch (parser.parse(input)) {
-            case Failure ignored -> failure();
+            case Failure ignored -> ignored;
             case Success success -> success.captureTrimmed();
         };
     }
 
     /**
-     * Creates a parser that captures a matched group of values as a list.
+     * Creates a parser that collects captured values to a list.
      *
-     * @param parser base parser to use
-     * @return parser that captures values as a group
+     * @param parser parser capturing values
+     * @return created parser
      */
-    public static Parser captureElements(Parser parser) {
+    public static Parser captureAsList(Parser parser) {
         return input -> switch (parser.parse(input)) {
-            case Failure ignored -> failure();
-            case Success success -> success.captureGroup();
+            case Failure ignored -> ignored;
+            case Success success -> success.collectCapturesToList();
         };
     }
 
     /**
-     * Creates a parser that captures a matched group of values as a set.
+     * Creates a parser that collects captured values to a set.
      *
-     * @param parser base parser to use
-     * @return parser that captures values as a group
+     * @param parser parser capturing values
+     * @return created parser
      */
-    public static Parser captureElementSet(Parser parser) {
+    public static Parser captureAsSet(Parser parser) {
         return input -> switch (parser.parse(input)) {
-            case Failure ignored -> failure();
-            case Success success -> success.captureSet();
+            case Failure ignored -> ignored;
+            case Success success -> success.collectCapturesToSet();
         };
     }
 
     /**
-     * Creates a parser that captures key-value pairs as a map.
+     * Creates a parser that collects captured key-value pairs to a map.
      *
-     * @param parser base parser to use
-     * @return parser that captures named elements as a map
+     * @param parser parser capturing values
+     * @return created parser
      */
-    public static Parser captureNamedElements(Parser parser) {
+    public static Parser captureAsMap(Parser parser) {
         return input -> switch (parser.parse(input)) {
-            case Failure ignored -> failure();
-            case Success success -> success.captureNamedElements();
+            case Failure ignored -> ignored;
+            case Success success -> success.collectCapturesToMap();
         };
     }
 }

@@ -48,7 +48,7 @@ public class StringParser {
     private static Parser character(String c) {
         return input -> input.startsWith(c)
                         ? success(c, input.substring(1))
-                        : failure();
+                        : failure(input);
     }
 
     /**
@@ -86,9 +86,9 @@ public class StringParser {
      */
     public static Parser characterExcept(char... noneOf) {
         return input -> switch (characters(noneOf).parse(input)) {
-            case Success ignored -> failure();
-            case Failure ignored -> input.isEmpty()
-                                    ? failure()
+            case Success __ -> failure(input);
+            case Failure __ -> input.isEmpty()
+                                    ? failure(input)
                                     : success(String.valueOf(input.charAt(0)), input.substring(1));
         };
     }

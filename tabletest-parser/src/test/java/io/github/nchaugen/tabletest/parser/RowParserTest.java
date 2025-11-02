@@ -374,7 +374,7 @@ class RowParserTest {
         );
 
         // Test empty input
-        assertEquals(failure(), tableRow.parse(""));
+        assertEquals(failure(""), tableRow.parse(""));
 
         // Test single value
         assertEquals(List.of("a"), tableRow.parse("a").captures());

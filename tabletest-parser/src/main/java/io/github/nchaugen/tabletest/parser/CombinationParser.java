@@ -42,7 +42,7 @@ public class CombinationParser {
             .map(it -> it.parse(input))
             .filter(ParseResult::isSuccess)
             .findFirst()
-            .orElse(failure());
+            .orElse(failure(input));
     }
 
     /**

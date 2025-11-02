@@ -5,9 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static io.github.nchaugen.tabletest.parser.CaptureParser.capture;
-import static io.github.nchaugen.tabletest.parser.CaptureParser.captureElements;
-import static io.github.nchaugen.tabletest.parser.CaptureParser.captureNamedElements;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.*;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.atLeast;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.optional;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.sequence;
@@ -18,8 +16,7 @@ import static io.github.nchaugen.tabletest.parser.StringParser.character;
 import static io.github.nchaugen.tabletest.parser.StringParser.characterExcept;
 import static io.github.nchaugen.tabletest.parser.StringParser.characters;
 import static io.github.nchaugen.tabletest.parser.StringParser.string;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CaptureParserTest {
 
@@ -37,10 +34,10 @@ class CaptureParserTest {
         assertEquals(List.of("1", "2"), plusExpression.parse("1+2").captures());
 
         // Verify failure cases
-        assertEquals(failure(), plusExpression.parse("1-2"));
-        assertEquals(failure(), plusExpression.parse("a+b"));
-        assertEquals(failure(), plusExpression.parse("1+"));
-        assertEquals(failure(), plusExpression.parse("+2"));
+        assertEquals(failure("-2"), plusExpression.parse("1-2"));
+        assertEquals(failure("a+b"), plusExpression.parse("a+b"));
+        assertEquals(failure(""), plusExpression.parse("1+"));
+        assertEquals(failure("+2"), plusExpression.parse("+2"));
     }
 
     @Test
@@ -60,7 +57,7 @@ class CaptureParserTest {
         // Create a list parser
         Parser listParser = sequence(
             character('['),
-            captureElements(
+            captureAsList(
                 optional(
                     sequence(
                         capture(atLeast(1, characterExcept(',', ']'))),
@@ -88,12 +85,12 @@ class CaptureParserTest {
         assertEquals(List.of(List.of("a", "b", "c")), listParser.parse("[a, b, c]").captures());
 
         // Test failure cases
-        assertEquals(failure(), listParser.parse("[a,]"));
-        assertEquals(failure(), listParser.parse("[,b]"));
+        assertEquals(failure(",]"), listParser.parse("[a,]"));
+        assertEquals(failure(",b]"), listParser.parse("[,b]"));
     }
 
     @Test
-    void shouldCaptureNamedElements() {
+    void shouldCaptureAsMap() {
         // Create a simple map parser
         Parser keyValueParser = sequence(
             anyWhitespace(),
@@ -107,7 +104,7 @@ class CaptureParserTest {
 
         Parser mapParser = sequence(
             character('{'),
-            captureNamedElements(
+            captureAsMap(
                 optional(
                     sequence(
                         keyValueParser,
@@ -139,7 +136,7 @@ class CaptureParserTest {
         // Test failure cases - odd number of elements should throw exception
         Parser invalidMap = sequence(
             character('{'),
-            captureNamedElements(
+            captureAsMap(
                 sequence(
                     capture(string("key")),
                     character(':'),

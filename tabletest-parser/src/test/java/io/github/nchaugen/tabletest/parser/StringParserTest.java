@@ -21,7 +21,7 @@ class StringParserTest {
         assertTrue(character('a').parse("abc").isSuccess());
         assertFalse(character('b').parse("abc").isSuccess());
         assertEquals(success("a", "bc"), character('a').parse("abc"));
-        assertEquals(failure(), character('a').parse(""));
+        assertEquals(failure(""), character('a').parse(""));
     }
 
     @Test
@@ -32,7 +32,7 @@ class StringParserTest {
         assertTrue(anyVowel.parse("egg").isSuccess());
         assertEquals(success("e", "gg"), anyVowel.parse("egg"));
         assertFalse(anyVowel.parse("xyz").isSuccess());
-        assertEquals(failure(), anyVowel.parse(""));
+        assertEquals(failure(""), anyVowel.parse(""));
 
         // Test with string overload
         Parser digits = characters("0123456789");
@@ -45,9 +45,9 @@ class StringParserTest {
         Parser string = string("abc");
 
         assertEquals(success("abc", "def"), string.parse("abcdef"));
-        assertEquals(failure(), string.parse("abdef"));
-        assertEquals(failure(), string.parse("ab"));
-        assertEquals(failure(), string.parse(""));
+        assertEquals(failure("def"), string.parse("abdef"));
+        assertEquals(failure(""), string.parse("ab"));
+        assertEquals(failure(""), string.parse(""));
 
         // Test empty string
         assertEquals(success("", "xyz"), string("").parse("xyz"));
@@ -63,8 +63,8 @@ class StringParserTest {
         assertEquals(success("\f", ""), whitespace().parse("\f"));
 
         // Test failure cases
-        assertEquals(failure(), whitespace().parse(""));
-        assertEquals(failure(), whitespace().parse("a"));
+        assertEquals(failure(""), whitespace().parse(""));
+        assertEquals(failure("a"), whitespace().parse("a"));
 
         // Test multiple whitespace characters
         assertEquals(success("  ", "a"), whitespace().parse("  a"));
@@ -91,7 +91,7 @@ class StringParserTest {
         assertTrue(notA.parse("b").isSuccess());
         assertEquals(success("b", ""), notA.parse("b"));
         assertFalse(notA.parse("a").isSuccess());
-        assertEquals(failure(), notA.parse(""));
+        assertEquals(failure(""), notA.parse(""));
 
         // Test with multiple excluded characters
         Parser notDigit = characterExcept('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');

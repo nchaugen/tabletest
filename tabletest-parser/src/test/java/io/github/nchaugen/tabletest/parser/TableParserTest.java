@@ -111,6 +111,6 @@ public class TableParserTest {
             """;
 
         TableTestParseException exception = assertThrows(TableTestParseException.class, () -> TableParser.parse(input));
-        assertTrue(exception.getMessage().startsWith("Failed to parse `[2025-08-01T00:00:00] | 0` in line `Purchase too old"));
+        assertTrue(exception.getMessage().startsWith("Failed to parse `[2025-08-01T00:00:00] | 0` in row `Purchase too old"), exception.getMessage());
     }
 }

@@ -49,8 +49,8 @@ public class TableParser {
 
     private static Row parseRow(String line) {
         ParseResult parsedRow = RowParser.parse(line);
-        if (parsedRow.isFailure() || parsedRow.hasRest()) {
-            throw new TableTestParseException(line, parsedRow);
+        if (parsedRow.hasRest() || parsedRow.isFailure()) {
+            throw new TableTestParseException("Failed to parse `" + parsedRow.rest() + "` in row `" + line + "`");
         }
         List<Object> values = parsedRow.captures().stream().toList();
         return values.isEmpty() ? null : new Row(values);

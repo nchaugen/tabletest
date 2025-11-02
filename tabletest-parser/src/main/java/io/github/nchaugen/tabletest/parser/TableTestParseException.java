@@ -16,9 +16,7 @@
 package io.github.nchaugen.tabletest.parser;
 
 public class TableTestParseException extends RuntimeException {
-    public TableTestParseException(String input, ParseResult result) {
-        super(result.isFailure()
-            ? "Failed to parse `" + input + "`"
-            : "Failed to parse `" + result.rest() + "` in line `" + input + "`");
+    public TableTestParseException(String message) {
+        super(message);
     }
 }

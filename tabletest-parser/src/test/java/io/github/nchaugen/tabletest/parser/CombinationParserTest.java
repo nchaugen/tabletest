@@ -32,7 +32,7 @@ class CombinationParserTest {
         assertFalse(aOrB.parse("c").isSuccess());
         assertEquals(success("a", "bc"), aOrB.parse("abc"));
         assertEquals(success("b", "cd"), aOrB.parse("bcd"));
-        assertEquals(failure(), aOrB.parse(""));
+        assertEquals(failure(""), aOrB.parse(""));
 
         // Test order of evaluation - first match wins
         Parser orderTest = either(
@@ -64,10 +64,10 @@ class CombinationParserTest {
         // Basic sequence test
         Parser aAndB = sequence(character('a'), character('b'));
         assertEquals(success("ab", "cdef"), aAndB.parse("abcdef"));
-        assertEquals(failure(), aAndB.parse("bcdef"));
-        assertEquals(failure(), aAndB.parse("acdef"));
-        assertEquals(failure(), aAndB.parse("adef"));
-        assertEquals(failure(), aAndB.parse(""));
+        assertEquals(failure("bcdef"), aAndB.parse("bcdef"));
+        assertEquals(failure("cdef"), aAndB.parse("acdef"));
+        assertEquals(failure("def"), aAndB.parse("adef"));
+        assertEquals(failure(""), aAndB.parse(""));
 
         // Sequence with mixed parser types
         Parser helloWorld = sequence(
@@ -76,7 +76,7 @@ class CombinationParserTest {
             string("world")
         );
         assertEquals(success("hello world", "!"), helloWorld.parse("hello world!"));
-        assertEquals(failure(), helloWorld.parse("helloworld"));
+        assertEquals(failure("world"), helloWorld.parse("helloworld"));
 
         // Empty sequence should succeed
         Parser emptySeq = sequence();
@@ -100,9 +100,9 @@ class CombinationParserTest {
         assertEquals(success("12", ""), atLeastTwoDigits.parse("12"));
         assertEquals(success("12345", ""), atLeastTwoDigits.parse("12345"));
         assertEquals(success("123", "abc"), atLeastTwoDigits.parse("123abc"));
-        assertEquals(failure(), atLeastTwoDigits.parse(""));
-        assertEquals(failure(), atLeastTwoDigits.parse("1"));
-        assertEquals(failure(), atLeastTwoDigits.parse("1abc"));
+        assertEquals(failure(""), atLeastTwoDigits.parse(""));
+        assertEquals(failure(""), atLeastTwoDigits.parse("1"));
+        assertEquals(failure("abc"), atLeastTwoDigits.parse("1abc"));
 
         // atLeast(0, ...) should always succeed
         Parser atLeastZeroDigits = atLeast(0, characters("0123456789"));
@@ -119,7 +119,7 @@ class CombinationParserTest {
         );
         assertEquals(success("hello world", ""), words.parse("hello world"));
         assertEquals(success("a b", ""), words.parse("a b"));
-        assertEquals(failure(), words.parse("word"));
+        assertEquals(failure(""), words.parse("word"));
     }
 
     @Test
@@ -206,8 +206,8 @@ class CombinationParserTest {
     void shouldHandleEmptyPatterns() {
         // Empty either should fail
         Parser emptyEither = either();
-        assertEquals(failure(), emptyEither.parse("abc"));
-        assertEquals(failure(), emptyEither.parse(""));
+        assertEquals(failure("abc"), emptyEither.parse("abc"));
+        assertEquals(failure(""), emptyEither.parse(""));
 
         // Empty sequence should succeed with empty match
         Parser emptySequence = sequence();
