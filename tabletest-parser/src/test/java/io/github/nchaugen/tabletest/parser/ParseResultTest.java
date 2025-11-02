@@ -8,29 +8,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.github.nchaugen.tabletest.parser.ParseResult.failure;
+import static io.github.nchaugen.tabletest.parser.ParseResult.success;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ParseResultTest {
 
     @Test
     void successIsSuccess() {
-        ParseResult result = ParseResult.success("value", "rest", List.of("capture"));
-        assertTrue(result.isSuccess(), "Parse result should be success");
-        assertFalse(result.isFailure(), "Parse result should not be failure");
-//        assertEquals("value", result.consumed());
-        assertTrue(result.hasRest(), "Unconsumed input should be rest");
-        assertEquals("rest", result.rest());
-        assertEquals(List.of("capture"), result.captures());
+        ParseResult result = success("value", "rest", List.of("capture"));
+        assertAll(
+            () -> assertTrue(result.isSuccess(), "Should be success"),
+            () -> assertFalse(result.isFailure(), "Should not be failure"),
+            () -> assertEquals("rest", result.rest()),
+            () -> assertEquals(List.of("capture"), result.captures())
+        );
     }
 
     @Test
     void failureIsFailure() {
-        ParseResult result = ParseResult.failure("failure");
-        assertFalse(result.isSuccess(), "Parse result should not be success");
-        assertTrue(result.isFailure(), "Parse result should be failure");
-        assertTrue(result.hasRest(), "Unconsumed input should be rest");
-        assertEquals("failure", result.rest());
-        assertTrue(result.captures().isEmpty(), "Captures should be empty on failure");
+        ParseResult result = failure("rest");
+        assertAll(
+            () -> assertFalse(result.isSuccess(), "Should not be success"),
+            () -> assertTrue(result.isFailure(), "Should be failure"),
+            () -> assertEquals("rest", result.rest()),
+            () -> assertEquals(List.of(), result.captures())
+        );
+    }
+
+    @Test
+    void incompleteness() {
+        assertAll(
+            () -> assertFalse(success("value", "").isIncomplete(), "Successful result with empty rest is complete"),
+            () -> assertTrue(success("value", "rest").isIncomplete(), "Result with rest is incomplete"),
+            () -> assertTrue(failure("rest").isIncomplete(), "Failure result is always incomplete"),
+            () -> assertTrue(failure("").isIncomplete(), "Failure result is always incomplete")
+        );
     }
 
     @Nested
@@ -38,7 +51,7 @@ class ParseResultTest {
 
         @Test
         void nothingAppendsToFailure() {
-            ParseResult failure = ParseResult.failure("failure");
+            ParseResult failure = failure("failure");
 
             assertSame(
                 failure, failure.append(() -> {
@@ -49,8 +62,8 @@ class ParseResultTest {
 
         @Test
         void appendingSuccessesCombinesResult() {
-            ParseResult firstSuccess = ParseResult.success("first", "secondrest", List.of("first"));
-            ParseResult thenSuccess = ParseResult.success("second", "rest", List.of("second"));
+            ParseResult firstSuccess = success("first", "secondrest", List.of("first"));
+            ParseResult thenSuccess = success("second", "rest", List.of("second"));
 
             ParseResult result = firstSuccess.append(() -> thenSuccess);
 
@@ -63,8 +76,8 @@ class ParseResultTest {
 
         @Test
         void appendingFailureToSuccessIsFailure() {
-            ParseResult firstSuccess = ParseResult.success("first", "rest");
-            ParseResult thenFailure = ParseResult.failure("rest");
+            ParseResult firstSuccess = success("first", "rest");
+            ParseResult thenFailure = failure("rest");
 
             assertSame(thenFailure, firstSuccess.append(() -> thenFailure));
         }
@@ -76,7 +89,7 @@ class ParseResultTest {
 
         @Test
         void captureSavesConsumedString() {
-            Success success = ParseResult.success("consumed", "");
+            Success success = success("consumed", "");
             assertEquals(List.of(), success.captures());
 
             Success capturedSuccess = success.capture();
@@ -85,14 +98,13 @@ class ParseResultTest {
 
         @Test
         void capturesAreImmutable() {
-            ParseResult result = ParseResult.success("capture", "", List.of("capture"));
+            ParseResult result = success("capture", "", List.of("capture"));
             assertThrows(UnsupportedOperationException.class, () -> result.captures().add("newCapture"));
         }
 
         @Test
         void capturesCanBeCollectedToImmutableInsertionOrderSet() {
-            ParseResult result = ParseResult
-                .success("capture1-capture2", "", List.of("capture1", "capture2"))
+            ParseResult result = success("capture1-capture2", "", List.of("capture1", "capture2"))
                 .collectCapturesToSet();
 
             assertEquals(List.of(Set.of("capture1", "capture2")), result.captures());
@@ -102,8 +114,7 @@ class ParseResultTest {
 
         @Test
         void capturesCanBeCollectedToImmutableList() {
-            ParseResult result = ParseResult
-                .success("capture1-capture2", "", List.of("capture1", "capture2"))
+            ParseResult result = success("capture1-capture2", "", List.of("capture1", "capture2"))
                 .collectCapturesToList();
 
             assertEquals(List.of(List.of("capture1", "capture2")), result.captures());
@@ -112,8 +123,7 @@ class ParseResultTest {
 
         @Test
         void capturesCanBeCollectedToImmutableInsertionOrderMap() {
-            ParseResult result = ParseResult
-                .success("capture1-capture2", "", List.of("capture1", "value1", "capture2", "value2"))
+            ParseResult result = success("capture1-capture2", "", List.of("capture1", "value1", "capture2", "value2"))
                 .collectCapturesToMap();
 
             assertEquals(List.of(Map.of("capture1", "value1", "capture2", "value2")), result.captures());
@@ -125,15 +135,15 @@ class ParseResultTest {
         void collectingEmptyCapturesIsPossible() {
             assertEquals(
                 List.of(List.of()),
-                ParseResult.success("", "", List.of()).collectCapturesToList().captures()
+                success("", "", List.of()).collectCapturesToList().captures()
             );
             assertEquals(
                 List.of(Set.of()),
-                ParseResult.success("", "", List.of()).collectCapturesToSet().captures()
+                success("", "", List.of()).collectCapturesToSet().captures()
             );
             assertEquals(
                 List.of(Map.of()),
-                ParseResult.success("", "", List.of()).collectCapturesToMap().captures()
+                success("", "", List.of()).collectCapturesToMap().captures()
             );
         }
 
@@ -141,7 +151,7 @@ class ParseResultTest {
         void collectingUnevenNumberOfCapturesToMapIsNotPossible() {
             assertThrows(
                 IllegalStateException.class,
-                () -> ParseResult.success("", "", List.of("a", "1", "b", "2", "c"))
+                () -> success("", "", List.of("a", "1", "b", "2", "c"))
                     .collectCapturesToMap()
             );
         }

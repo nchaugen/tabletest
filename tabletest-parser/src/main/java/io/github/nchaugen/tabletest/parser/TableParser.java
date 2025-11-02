@@ -49,7 +49,7 @@ public class TableParser {
 
     private static Row parseRow(String line) {
         ParseResult parsedRow = RowParser.parse(line);
-        if (parsedRow.hasRest() || parsedRow.isFailure()) {
+        if (parsedRow.isIncomplete()) {
             throw new TableTestParseException("Failed to parse `" + parsedRow.rest() + "` in row `" + line + "`");
         }
         List<Object> values = parsedRow.captures().stream().toList();

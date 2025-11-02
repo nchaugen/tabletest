@@ -50,7 +50,12 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
      * Determines if the parse operation succeeded.
      * @return true if successful, false otherwise
      */
-    boolean isSuccess();
+    default boolean isSuccess() {
+        return switch(this) {
+            case Success __ -> true;
+            case Failure __ -> false;
+        };
+    }
 
     /**
      * Determines if the parse operation failed.
@@ -60,8 +65,8 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
         return !isSuccess();
     }
 
-    default boolean hasRest() {
-        return !rest().isBlank();
+    default boolean isIncomplete() {
+        return !rest().isBlank() || isFailure();
     }
 
     String rest();
@@ -87,11 +92,6 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
     record Success(String consumed, String rest, List<Object> captures) implements ParseResult {
         public Success {
             captures = Collections.unmodifiableList(new ArrayList<>(captures));
-        }
-
-        @Override
-        public boolean isSuccess() {
-            return true;
         }
 
         Success capture() {
@@ -144,11 +144,6 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
     }
 
     record Failure(String rest) implements ParseResult {
-        @Override
-        public boolean isSuccess() {
-            return false;
-        }
-
         @Override
         public List<Object> captures() {
             return List.of();
