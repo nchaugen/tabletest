@@ -252,6 +252,16 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 }
 ```
 
+### Publishing Tables to File
+TableTest can be configured to publish tables to file as they are being tested. This can be used to generate documentation from the tables.
+
+The following formats are supported:
+- Markdown
+- AsciiDoc
+- TableTest
+
+Publishing to file is disabled by default. To enable it, add `tabletest.publisher.format = <format>` to your [JUnit configuration parameters](https://docs.junit.org/current/user-guide/#running-tests-config-params). `<format>` is one of `markdown`, `asciidoc`, or `tabletest`.
+
 ## Installation
 
 TableTest is available from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit.

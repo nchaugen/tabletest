@@ -1,6 +1,11 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Added
+- Configurable publishing of tables to TableTest, Markdown and AsciiDoc formats
+### Changed
+- Set and maps conserve insertion order
+- Improved error message for table parse failures
 
 ## [0.5.3] - 2025-10-26
 ### Added

@@ -17,6 +17,7 @@ package io.github.nchaugen.tabletest.renderer;
 
 import io.github.nchaugen.tabletest.parser.Table;
 
+@FunctionalInterface
 public interface TableRenderer {
     String render(Table table);
 }
