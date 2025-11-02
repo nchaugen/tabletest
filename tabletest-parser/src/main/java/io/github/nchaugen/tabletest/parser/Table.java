@@ -139,4 +139,8 @@ public final class Table {
                 .toList()
         );
     }
+
+    public List<Row> rows() {
+        return data;
+    }
 }

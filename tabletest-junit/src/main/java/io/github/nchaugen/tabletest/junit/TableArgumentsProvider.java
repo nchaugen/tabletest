@@ -18,6 +18,7 @@ package io.github.nchaugen.tabletest.junit;
 import io.github.nchaugen.tabletest.parser.Row;
 import io.github.nchaugen.tabletest.parser.Table;
 import io.github.nchaugen.tabletest.parser.TableParser;
+import io.github.nchaugen.tabletest.renderer.MarkdownRenderer;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.MediaType;
 import org.junit.jupiter.params.provider.AnnotationBasedArgumentsProvider;
@@ -81,6 +82,12 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
             context.getDisplayName() + ".table",
             MediaType.TEXT_PLAIN_UTF_8,
             path -> Files.writeString(path, tableTest.value())
+        );
+
+        context.publishFile(
+            context.getDisplayName() + ".md",
+            MediaType.TEXT_PLAIN_UTF_8,
+            path -> Files.writeString(path, new MarkdownRenderer().render(table))
         );
 
         return table.map(row -> toArguments(row, parameters));
