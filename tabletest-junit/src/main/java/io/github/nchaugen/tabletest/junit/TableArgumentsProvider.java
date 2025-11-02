@@ -19,6 +19,7 @@ import io.github.nchaugen.tabletest.parser.Row;
 import io.github.nchaugen.tabletest.parser.Table;
 import io.github.nchaugen.tabletest.parser.TableParser;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.MediaType;
 import org.junit.jupiter.params.provider.AnnotationBasedArgumentsProvider;
 import org.junit.jupiter.params.provider.Arguments;
 
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Parameter;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -74,6 +76,12 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
         String input = resolveInput(context, tableTest);
         Table table = TableParser.parse(input);
         Parameter[] parameters = resolveParameters(context, table.columnCount());
+
+        context.publishFile(
+            context.getDisplayName() + ".table",
+            MediaType.TEXT_PLAIN_UTF_8,
+            path -> Files.writeString(path, tableTest.value())
+        );
 
         return table.map(row -> toArguments(row, parameters));
     }
