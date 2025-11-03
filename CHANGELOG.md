@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [0.5.4] - 2025-11-03
 ### Added
 - Configurable publishing of tables to TableTest, Markdown and AsciiDoc formats
 ### Changed
