@@ -4,6 +4,7 @@ import io.github.nchaugen.tabletest.parser.ParseResult.Success;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -97,6 +98,33 @@ class ParseResultTest {
         }
 
         @Test
+        void captureTrimmedSavesConsumedStringWithoutWhitespace() {
+            Success success = success("  consumed\t\t", "");
+            assertEquals(List.of(), success.captures());
+
+            Success capturedSuccess = success.captureTrimmed();
+            assertEquals(List.of("consumed"), capturedSuccess.captures());
+        }
+
+        @Test
+        void captureTrimmedSavesEmptyStringAsNull() {
+            Success success = success("", "");
+            assertEquals(List.of(), success.captures());
+
+            Success capturedSuccess = success.captureTrimmed();
+            assertEquals(Collections.singletonList(null), capturedSuccess.captures());
+        }
+
+        @Test
+        void captureTrimmedSavesBlankStringAsNull() {
+            Success success = success(" \t ", "");
+            assertEquals(List.of(), success.captures());
+
+            Success capturedSuccess = success.captureTrimmed();
+            assertEquals(Collections.singletonList(null), capturedSuccess.captures());
+        }
+
+        @Test
         void capturesAreImmutable() {
             ParseResult result = success("capture", "", List.of("capture"));
             assertThrows(UnsupportedOperationException.class, () -> result.captures().add("newCapture"));
@@ -150,7 +178,7 @@ class ParseResultTest {
         @Test
         void collectingUnevenNumberOfCapturesToMapIsNotPossible() {
             assertThrows(
-                IllegalStateException.class,
+                TableTestParseException.class,
                 () -> success("", "", List.of("a", "1", "b", "2", "c"))
                     .collectCapturesToMap()
             );

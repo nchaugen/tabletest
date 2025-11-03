@@ -79,6 +79,16 @@ public class StringParser {
     }
 
     /**
+     * Creates a parser matching any character except the ones listed in the given string.
+     *
+     * @param noneOf string of characters not to match
+     * @return parser that succeeds if input starts with a character not among the given characters
+     */
+    public static Parser characterExcept(String noneOf) {
+        return characterExcept(noneOf.toCharArray());
+    }
+
+    /**
      * Creates a parser matching any character except the given ones.
      *
      * @param noneOf characters not to match

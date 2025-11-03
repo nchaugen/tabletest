@@ -15,13 +15,7 @@
  */
 package io.github.nchaugen.tabletest.parser;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -48,7 +42,6 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
 
     /**
      * Determines if the parse operation succeeded.
-     * @return true if successful, false otherwise
      */
     default boolean isSuccess() {
         return switch(this) {
@@ -59,12 +52,14 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
 
     /**
      * Determines if the parse operation failed.
-     * @return true if failure, false otherwise
      */
     default boolean isFailure() {
         return !isSuccess();
     }
 
+    /**
+     * Determines if the parse operation is incomplete, that is, if there is more input to parse or if the parse failed.
+     */
     default boolean isIncomplete() {
         return !rest().isBlank() || isFailure();
     }
@@ -72,13 +67,18 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
     String rest();
 
     /**
-     * Retrieves captured objects from the parse result.
-     * Captures represent portions of input that matched specific patterns.
-     *
-     * @return list of captured objects
+     * Retrieves captured values from the parse result.
+     * Captures represent parsed values that was stored using the capture or captureTrimmed methods.
      */
     List<Object> captures();
 
+    /**
+     * Concatenates two parse results if both succeeded, joining the consumed strings and captures,
+     * and keeping the rest of the appended. If this parse result is a failure, nothing is appended.
+     * If the next parse result is a failure, the next parse result is returned.
+     * @param nextResult
+     * @return
+     */
     default ParseResult append(Supplier<ParseResult> nextResult) {
         return switch (this) {
             case Failure ignored -> this;
@@ -94,31 +94,63 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
             captures = Collections.unmodifiableList(new ArrayList<>(captures));
         }
 
+        /**
+         * Stores the parsed value as a capture. If nothing was consumed, an empty string is stored.
+         */
         Success capture() {
             ArrayList<Object> nextCaptures = new ArrayList<>(captures);
             nextCaptures.add(consumed);
             return new Success(consumed, rest, nextCaptures);
         }
 
+        /**
+         * Stores the parsed value as a capture, trimming off leading and trailing whitespace.
+         * An empty or blank value is stored as null.
+         */
         Success captureTrimmed() {
             ArrayList<Object> nextCaptures = new ArrayList<>(captures);
             nextCaptures.add(consumed.isBlank() ? null : consumed.trim());
             return new Success(consumed, rest, nextCaptures);
         }
 
+        /**
+         * Collects captured values into a list, retaining capture order. Null values are not allowed.
+         *
+         * @throws TableTestParseException if any of the captured values are null
+         */
         Success collectCapturesToList() {
+            if (captures.stream().anyMatch(Objects::isNull)) {
+                throw new TableTestParseException("Cannot collect null values to list: " + captures);
+            }
             return new Success(consumed, rest, List.of(List.copyOf(captures)));
         }
 
+        /**
+         * Collects captured values into a set, retaining capture order. Null values are not allowed.
+         *
+         * @throws TableTestParseException if any of the captured values are null
+         */
         Success collectCapturesToSet() {
-            Set<Object> set = new LinkedHashSet<>(captures.size());
-            set.addAll(captures);
+            if (captures.stream().anyMatch(Objects::isNull)) {
+                throw new TableTestParseException("Cannot collect null values to set: " + captures);
+            }
+            Set<Object> set = new LinkedHashSet<>(captures);
             return new Success(consumed, rest, List.of(Collections.unmodifiableSet(set)));
         }
 
+        /**
+         * Collects captured values into a map, pairwise transforming them into key-value pairs.
+         * Capture order is retained, so first two captures becomes the first element of the map,
+         * the next two become the second, etc. Null values are not allowed.
+         *
+         * @throws TableTestParseException if there is an uneven number of captures or any of the values are null
+         */
         Success collectCapturesToMap() {
             if (captures.size() % 2 != 0) {
-                throw new IllegalStateException("Must have an even number of captures to collect to map");
+                throw new TableTestParseException("Must have an even number of captures to collect to map");
+            }
+            if (captures.stream().anyMatch(Objects::isNull)) {
+                throw new TableTestParseException("Cannot collect null values to map: " + captures);
             }
             Map<String, Object> captureGroup =
                 IntStream.range(0, captures.size())

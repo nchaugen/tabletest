@@ -18,6 +18,8 @@ package io.github.nchaugen.tabletest.parser;
 import io.github.nchaugen.tabletest.parser.ParseResult.Failure;
 import io.github.nchaugen.tabletest.parser.ParseResult.Success;
 
+import java.util.function.Function;
+
 /**
  * Utility class for creating parsers that capture matched input values.
  */
@@ -32,10 +34,7 @@ public class CaptureParser {
      * @return parser that captures matched values
      */
     public static Parser capture(Parser parser) {
-        return input -> switch (parser.parse(input)) {
-            case Failure ignored -> ignored;
-            case Success success -> success.capture();
-        };
+        return createCaptureFunction(parser, Success::capture);
     }
 
     /**
@@ -45,10 +44,7 @@ public class CaptureParser {
      * @return parser that captures matched values
      */
     public static Parser captureTrimmed(Parser parser) {
-        return input -> switch (parser.parse(input)) {
-            case Failure ignored -> ignored;
-            case Success success -> success.captureTrimmed();
-        };
+        return createCaptureFunction(parser, Success::captureTrimmed);
     }
 
     /**
@@ -57,11 +53,8 @@ public class CaptureParser {
      * @param parser parser capturing values
      * @return created parser
      */
-    public static Parser captureAsList(Parser parser) {
-        return input -> switch (parser.parse(input)) {
-            case Failure ignored -> ignored;
-            case Success success -> success.collectCapturesToList();
-        };
+    public static Parser collectToList(Parser parser) {
+        return createCaptureFunction(parser, Success::collectCapturesToList);
     }
 
     /**
@@ -70,11 +63,8 @@ public class CaptureParser {
      * @param parser parser capturing values
      * @return created parser
      */
-    public static Parser captureAsSet(Parser parser) {
-        return input -> switch (parser.parse(input)) {
-            case Failure ignored -> ignored;
-            case Success success -> success.collectCapturesToSet();
-        };
+    public static Parser collectToSet(Parser parser) {
+        return createCaptureFunction(parser, Success::collectCapturesToSet);
     }
 
     /**
@@ -83,10 +73,14 @@ public class CaptureParser {
      * @param parser parser capturing values
      * @return created parser
      */
-    public static Parser captureAsMap(Parser parser) {
+    public static Parser collectToMap(Parser parser) {
+        return createCaptureFunction(parser, Success::collectCapturesToMap);
+    }
+
+    private static Parser createCaptureFunction(Parser parser, Function<Success, Success> function) {
         return input -> switch (parser.parse(input)) {
             case Failure ignored -> ignored;
-            case Success success -> success.collectCapturesToMap();
+            case Success success -> function.apply(success);
         };
     }
 }

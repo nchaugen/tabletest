@@ -4,180 +4,172 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.github.nchaugen.tabletest.parser.CaptureParser.*;
-import static io.github.nchaugen.tabletest.parser.CombinationParser.atLeast;
-import static io.github.nchaugen.tabletest.parser.CombinationParser.optional;
-import static io.github.nchaugen.tabletest.parser.CombinationParser.sequence;
-import static io.github.nchaugen.tabletest.parser.CombinationParser.zeroOrMore;
-import static io.github.nchaugen.tabletest.parser.ParseResult.failure;
-import static io.github.nchaugen.tabletest.parser.StringParser.anyWhitespace;
-import static io.github.nchaugen.tabletest.parser.StringParser.character;
-import static io.github.nchaugen.tabletest.parser.StringParser.characterExcept;
-import static io.github.nchaugen.tabletest.parser.StringParser.characters;
-import static io.github.nchaugen.tabletest.parser.StringParser.string;
-import static org.junit.jupiter.api.Assertions.*;
+import static io.github.nchaugen.tabletest.parser.CombinationParser.*;
+import static io.github.nchaugen.tabletest.parser.ParseAssertions.assertParseFailure;
+import static io.github.nchaugen.tabletest.parser.ParseAssertions.assertParseSuccess;
+import static java.util.Collections.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CaptureParserTest {
 
+    private static final Parser DIGIT = StringParser.characters("0123456789");
+    private static final Parser NON_DIGIT = StringParser.characterExcept("0123456789");
+    private static final Parser WHITESPACE = StringParser.characters(" \t");
+
     @Test
-    void shouldCaptureMatchedValues() {
-        // Simple expression parser example
-        Parser plusExpression = sequence(
-            capture(atLeast(1, characters("0123456789"))),
-            character('+'),
-            capture(atLeast(1, characters("0123456789")))
+    void successfully_parsed_values_are_captured_even_if_empty() {
+        assertAll(
+            () -> assertParseSuccess("23", List.of("1"), capture(optional(DIGIT)).parse("123")),
+            () -> assertParseSuccess("", List.of(""), capture(optional(DIGIT)).parse("")),
+            () -> assertParseSuccess("abc", List.of(""), capture(optional(DIGIT)).parse("abc"))
         );
-
-        // Verify capture works correctly
-        assertEquals(List.of("123", "456"), plusExpression.parse("123+456").captures());
-        assertEquals(List.of("1", "2"), plusExpression.parse("1+2").captures());
-
-        // Verify failure cases
-        assertEquals(failure("-2"), plusExpression.parse("1-2"));
-        assertEquals(failure("a+b"), plusExpression.parse("a+b"));
-        assertEquals(failure(""), plusExpression.parse("1+"));
-        assertEquals(failure("+2"), plusExpression.parse("+2"));
     }
 
     @Test
-    void shouldHandleEmptyCaptures() {
-        // Test capturing an optional value
-        Parser optionalDigit = capture(optional(characters("0123456789")));
-
-        // Should capture the digit when present
-        assertEquals(List.of("5"), optionalDigit.parse("5").captures());
-
-        // Should capture an empty string when not present
-        assertEquals(List.of(""), optionalDigit.parse("").captures());
+    void unsuccessfully_parsed_values_are_not_captured() {
+        assertAll(
+            () -> assertParseSuccess("23", List.of("1"), capture(DIGIT).parse("123")),
+            () -> assertParseFailure("", List.of(), capture(DIGIT).parse("")),
+            () -> assertParseFailure("abc", List.of(), capture(DIGIT).parse("abc"))
+        );
     }
 
     @Test
-    void shouldCaptureElementsAsGroup() {
-        // Create a list parser
-        Parser listParser = sequence(
-            character('['),
-            captureAsList(
-                optional(
-                    sequence(
-                        capture(atLeast(1, characterExcept(',', ']'))),
-                        zeroOrMore(
-                            sequence(
-                                character(','),
-                                anyWhitespace(),
-                                capture(atLeast(1, characterExcept(',', ']')))
-                            )
-                        )
-                    )
-                )
+    void capturing_optional_vs_optionally_capturing() {
+        assertAll(
+            () -> assertParseSuccess("", List.of(""), capture(optional(DIGIT)).parse("")),
+            () -> assertParseSuccess("", List.of(), optional(capture(DIGIT)).parse(""))
+        );
+    }
+
+    @Test
+    void capturing_multiple_values() {
+        assertAll(
+            () -> assertParseSuccess("", List.of("1", "2", "3"), zeroOrMore(capture(DIGIT)).parse("123")),
+            () -> assertParseSuccess("", List.of(), zeroOrMore(capture(DIGIT)).parse(""))
+        );
+    }
+
+    @Test
+    void capturing_trimmed_values_removes_whitespace() {
+        Parser spaceousDigit = sequence(zeroOrMore(WHITESPACE), optional(DIGIT), zeroOrMore(WHITESPACE));
+        assertAll(
+            () -> assertParseSuccess("", List.of("1"), captureTrimmed(spaceousDigit).parse("1")),
+            () -> assertParseSuccess("", List.of("2"), captureTrimmed(spaceousDigit).parse("\t2")),
+            () -> assertParseSuccess("", List.of("3"), captureTrimmed(spaceousDigit).parse("3\t")),
+            () -> assertParseSuccess("", List.of("4"), captureTrimmed(spaceousDigit).parse(" 4 "))
+        );
+    }
+
+    @Test
+    void unsuccessfully_parsed_values_are_not_captured_trimmed() {
+        assertAll(
+            () -> assertParseSuccess("23", List.of("1"), captureTrimmed(DIGIT).parse("123")),
+            () -> assertParseFailure("", List.of(), captureTrimmed(DIGIT).parse("")),
+            () -> assertParseFailure("abc", List.of(), captureTrimmed(DIGIT).parse("abc"))
+        );
+    }
+
+    @Test
+    void capturing_trimmed_saves_empty_and_blank_values_as_null() {
+        Parser optionalNonTrimmedDigit = zeroOrMore(WHITESPACE);
+        assertAll(
+            () -> assertParseSuccess("", singletonList(null), captureTrimmed(optionalNonTrimmedDigit).parse("")),
+            () -> assertParseSuccess("", singletonList(null), captureTrimmed(optionalNonTrimmedDigit).parse(" \t ")),
+            () -> assertParseSuccess("", singletonList(null), captureTrimmed(optionalNonTrimmedDigit).parse("   "))
+        );
+    }
+
+    @Test
+    void collect_captures_to_list() {
+        assertAll(
+            () -> assertParseSuccess(
+                "",
+                List.of(List.of("1", "2", "3")),
+                collectToList(zeroOrMore(capture(DIGIT))).parse("123")
             ),
-            character(']')
+            () -> assertParseSuccess(
+                "",
+                List.of(emptyList()),
+                collectToList(zeroOrMore(capture(DIGIT))).parse("")
+            ),
+            () -> assertParseSuccess(
+                "",
+                List.of(List.of("")),
+                collectToList(capture(zeroOrMore(DIGIT))).parse("")
+            ),
+            () -> assertThrows(
+                TableTestParseException.class,
+                () -> collectToList(captureTrimmed(zeroOrMore(DIGIT))).parse(""),
+                "Null values cannot be collected to a list"
+            )
         );
-
-        // Test empty list
-        assertEquals(List.of(List.of()), listParser.parse("[]").captures());
-
-        // Test single element list
-        assertEquals(List.of(List.of("a")), listParser.parse("[a]").captures());
-
-        // Test multi-element list
-        assertEquals(List.of(List.of("a", "b", "c")), listParser.parse("[a,b,c]").captures());
-        assertEquals(List.of(List.of("a", "b", "c")), listParser.parse("[a, b, c]").captures());
-
-        // Test failure cases
-        assertEquals(failure(",]"), listParser.parse("[a,]"));
-        assertEquals(failure(",b]"), listParser.parse("[,b]"));
     }
 
     @Test
-    void shouldCaptureAsMap() {
-        // Create a simple map parser
-        Parser keyValueParser = sequence(
-            anyWhitespace(),
-            capture(atLeast(1, characterExcept(' ', ':', ',', '}'))),
-            anyWhitespace(),
-            character(':'),
-            anyWhitespace(),
-            capture(atLeast(1, characterExcept(',', '}'))),
-            anyWhitespace()
-        );
-
-        Parser mapParser = sequence(
-            character('{'),
-            captureAsMap(
-                optional(
-                    sequence(
-                        keyValueParser,
-                        zeroOrMore(sequence(character(','), keyValueParser))
-                    )
-                )
+    void collect_captures_to_set() {
+        assertAll(
+            () -> assertParseSuccess(
+                "",
+                List.of(Set.of("1", "2", "3")),
+                collectToSet(zeroOrMore(capture(DIGIT))).parse("123")
             ),
-            character('}')
-        );
-
-        // Test empty map
-        assertEquals(List.of(Map.of()), mapParser.parse("{}").captures());
-
-        // Test single key-value pair
-        assertEquals(List.of(Map.of("name", "value")), mapParser.parse("{name:value}").captures());
-
-        // Test multiple key-value pairs
-        assertEquals(
-            List.of(Map.of("a", "1", "b", "2", "c", "3")),
-            mapParser.parse("{a:1, b:2, c:3}").captures()
-        );
-
-        // Test with whitespace
-        assertEquals(
-            List.of(Map.of("name", "John Doe ")),
-            mapParser.parse("{ name : John Doe }").captures()
-        );
-
-        // Test failure cases - odd number of elements should throw exception
-        Parser invalidMap = sequence(
-            character('{'),
-            captureAsMap(
-                sequence(
-                    capture(string("key")),
-                    character(':'),
-                    capture(string("value")),
-                    character(','),
-                    capture(string("orphanKey"))
-                )
+            () -> assertParseSuccess(
+                "",
+                List.of(emptySet()),
+                collectToSet(zeroOrMore(capture(DIGIT))).parse("")
             ),
-            character('}')
+            () -> assertParseSuccess(
+                "",
+                List.of(Set.of("")),
+                collectToSet(capture(zeroOrMore(DIGIT))).parse("")
+            ),
+            () -> assertThrows(
+                TableTestParseException.class,
+                () -> collectToSet(captureTrimmed(zeroOrMore(DIGIT))).parse(""),
+                "Null values cannot be collected to a set"
+            )
         );
-
-        assertThrows(IllegalStateException.class, () -> invalidMap.parse("{key:value,orphanKey}"));
     }
 
     @Test
-    void shouldHandleNestedCaptures() {
-        // Create nested capture example - a tagged value
-        Parser taggedValue = sequence(
-            character('<'),
-            capture(atLeast(1, characterExcept('>'))),
-            character('>'),
-            capture(
-                sequence(
-                    anyWhitespace(),
-                    capture(atLeast(1, characterExcept(' ', '<'))),
-                    anyWhitespace()
-                )
+    void collect_captures_to_map() {
+        assertAll(
+            () -> assertParseSuccess(
+                "",
+                List.of(Map.of("1", "2", "3", "4")),
+                collectToMap(zeroOrMore(capture(DIGIT))).parse("1234")
             ),
-            string("</"),
-            capture(atLeast(1, characterExcept('>'))),
-            character('>')
+            () -> assertParseSuccess(
+                "",
+                List.of(emptyMap()),
+                collectToMap(zeroOrMore(capture(DIGIT))).parse("")
+            ),
+            () -> assertParseSuccess(
+                "",
+                List.of(Map.of("1", "")),
+                collectToMap(sequence(capture(DIGIT), capture(zeroOrMore(DIGIT)))).parse("1")
+            ),
+            () -> assertParseSuccess(
+                "",
+                List.of(Map.of("", "1")),
+                collectToMap(sequence(capture(optional(NON_DIGIT)), capture(DIGIT))).parse("1")
+            ),
+            () -> assertThrows(
+                TableTestParseException.class,
+                () -> collectToMap(zeroOrMore(capture(DIGIT))).parse("123"),
+                "Uneven number of captures cannot be collected to a map"
+            ),
+            () -> assertThrows(
+                TableTestParseException.class,
+                () -> collectToMap(sequence(capture(DIGIT), captureTrimmed(zeroOrMore(DIGIT)))).parse("1"),
+                "Null values cannot be collected to a map"
+            )
         );
-
-        // XML-like element with nested captures
-        ParseResult result = taggedValue.parse("<tag> content </tag>");
-        List<Object> captures = result.captures();
-
-        assertEquals(4, captures.size());
-        assertEquals("tag", captures.get(0));
-        assertEquals("content", captures.get(1));
-        assertEquals(" content ", captures.get(2));
-        assertEquals("tag", captures.get(3));
     }
+
 }

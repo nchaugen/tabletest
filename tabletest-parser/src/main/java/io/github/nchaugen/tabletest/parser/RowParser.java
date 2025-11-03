@@ -16,9 +16,9 @@
 package io.github.nchaugen.tabletest.parser;
 
 import static io.github.nchaugen.tabletest.parser.CaptureParser.capture;
-import static io.github.nchaugen.tabletest.parser.CaptureParser.captureAsSet;
-import static io.github.nchaugen.tabletest.parser.CaptureParser.captureAsList;
-import static io.github.nchaugen.tabletest.parser.CaptureParser.captureAsMap;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.collectToSet;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.collectToList;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.collectToMap;
 import static io.github.nchaugen.tabletest.parser.CaptureParser.captureTrimmed;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.atLeast;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.either;
@@ -97,7 +97,7 @@ public class RowParser {
     static Parser mapValue() {
         return sequence(
             character('['),
-            captureAsMap(either(emptyMapValue(), keyValuePairs())),
+            collectToMap(either(emptyMapValue(), keyValuePairs())),
             character(']')
         );
     }
@@ -134,7 +134,7 @@ public class RowParser {
     static Parser setValue() {
         return sequence(
             character('{'),
-            captureAsSet(optional(elementValues())),
+            collectToSet(optional(elementValues())),
             character('}')
         );
     }
@@ -148,7 +148,7 @@ public class RowParser {
     static Parser listValue() {
         return sequence(
             character('['),
-            captureAsList(optional(elementValues())),
+            collectToList(optional(elementValues())),
             character(']')
         );
     }
