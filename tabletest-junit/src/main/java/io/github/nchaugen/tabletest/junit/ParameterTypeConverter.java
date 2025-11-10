@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.github.nchaugen.tabletest.junit.ExplicitConverterDetector.hasExplicitConverter;
 import static io.github.nchaugen.tabletest.junit.TableTestException.primitiveTypeDoesNotAllowNull;
 import static java.util.stream.Collectors.toUnmodifiableMap;
 import static java.util.stream.Collectors.toUnmodifiableSet;
@@ -59,7 +60,7 @@ public class ParameterTypeConverter {
      */
     public static Object convertValue(Object value, Parameter parameter) {
         // Let JUnit handle explicit converters
-        if (parameter.isAnnotationPresent(ConvertWith.class)) {
+        if (hasExplicitConverter(parameter)) {
             return value;
         }
 
