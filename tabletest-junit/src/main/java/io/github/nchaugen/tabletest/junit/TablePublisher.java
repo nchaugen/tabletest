@@ -47,7 +47,7 @@ public class TablePublisher {
                     case "" -> {} // do nothing if the config parameter is present without value
                     case "tabletest" -> filePublisher.accept(".table", __ -> resolveInput(context, tableTest));
                     case "markdown" -> filePublisher.accept(".md", MARKDOWN_RENDERER);
-                    case "asciidoc" -> filePublisher.accept(".asciidoc", ASCIIDOC_RENDERER);
+                    case "asciidoc" -> filePublisher.accept(".adoc", ASCIIDOC_RENDERER);
                     default -> throw new IllegalArgumentException("`" + format + "` not among supported table publisher formats [tabletest, markdown, asciidoc]");
                 }
             });

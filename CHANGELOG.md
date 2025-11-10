@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Fixed
+- Published AsciiDoc files now uses `.adoc` extension instead of `.asciidoc`
 
 ## [0.5.4] - 2025-11-03
 ### Added
