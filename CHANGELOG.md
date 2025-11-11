@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [0.5.5] - 2025-11-12
 ### Added
 - Configurable styling of lists and sets in AsciiDoc format
 ### Fixed
