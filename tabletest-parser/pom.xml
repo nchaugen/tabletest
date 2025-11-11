@@ -15,7 +15,7 @@
     <description>Java implementation for parsing the TableTest format</description>
 
     <properties>
-        <version.junit>6.0.0</version.junit>
+        <version.junit>6.0.1</version.junit>
     </properties>
 
     <dependencies>

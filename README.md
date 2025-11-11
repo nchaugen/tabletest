@@ -28,7 +28,7 @@ public static boolean parseBoolean(String input) {
 - **Self-documenting**: Tables serve as living documentation
 - **Collaborative**: Non-technical stakeholders can understand and contribute
 
-**Requirements**: Java 21+, JUnit 5.11.0-6.0.0 (except 5.13.0).
+**Requirements**: Java 21+, JUnit 5.11.0-6.0.1 (except 5.13.0).
 
 **IDE Support**: [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for working with tables.
 
@@ -266,7 +266,7 @@ Publishing to file is disabled by default. To enable it, add `tabletest.publishe
 
 TableTest is available from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit.
 
-TableTest is compatible with JUnit versions 5.11.0 to 6.0.0 (except 5.13.0).
+TableTest is compatible with JUnit versions 5.11.0 to 6.0.1 (except 5.13.0).
 
 Frameworks such as Quarkus and SpringBoot packages their own version of JUnit. TableTest is compatible with Quarkus version 3.21.2 and above, and SpringBoot version 3.4.0 and above.
 
@@ -286,7 +286,7 @@ Please note that TableTest requires Java version 21 or above.
     <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>6.0.0</version>
+        <version>6.0.1</version>
         <scope>test</scope>
     </dependency>
 </dependencies>
@@ -296,7 +296,7 @@ Please note that TableTest requires Java version 21 or above.
 ```kotlin
 dependencies { 
     testImplementation("io.github.nchaugen:tabletest-junit:0.5.5")
-    testImplementation("org.junit.jupiter:junit-jupiter:6.0.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 ```

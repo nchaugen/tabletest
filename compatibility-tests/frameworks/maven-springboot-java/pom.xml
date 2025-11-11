@@ -13,8 +13,8 @@
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <tabletest.version>0.5.5-SNAPSHOT</tabletest.version>
-        <springboot.version>3.5.4</springboot.version>
+        <tabletest.version>0.5.6-SNAPSHOT</tabletest.version>
+        <springboot.version>3.5.7</springboot.version>
     </properties>
 
     <!-- We import the Spring Boot BOM instead of using spring-boot-starter-parent so that
