@@ -353,28 +353,25 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
-                [%header,cols="1,1,1"]
+                [%header,cols="1,1"]
                 |===
                 |a
                 |b
-                |c
                 
                 a|{empty}
                 a|
                 [lowergreek]
-                . 1
-                . 2
-                . 3
-                
-                a|
-                [lowergreek]
-                . \\|\\|
+                . {empty}
+                  .. 1
+                . {empty}
+                  .. 2
+                  .. 3
                 
                 |===
                 """,
             configuredRenderer.render(TableParser.parse("""
-                a  | b   | c
-                {} | {1,2,3} | {"||"}
+                a  | b
+                {} | {{1},{2,3}}
                 """))
         );
     }
@@ -530,7 +527,6 @@ public class AsciidocRendererTest {
                 
                 a|
                 a::
-                [square]
                   ** 1
                   ** 2
                 b::

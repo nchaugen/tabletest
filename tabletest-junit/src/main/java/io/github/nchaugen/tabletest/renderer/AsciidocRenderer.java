@@ -148,7 +148,7 @@ public class AsciidocRenderer implements TableRenderer {
         }
 
         public String getStyle(int nestLevel) {
-            return style.isEmpty() ? "" : "\n[" + style.get(nestLevel % style.size()) + "]";
+            return style.isEmpty() || nestLevel >= style.size() ? "" : "\n[" + style.get(nestLevel) + "]";
         }
     }
 
