@@ -30,7 +30,6 @@ import static io.github.nchaugen.tabletest.junit.InputResolver.resolveInput;
 public class TablePublisher {
 
     private static final MarkdownRenderer MARKDOWN_RENDERER = new MarkdownRenderer();
-    private static final AsciidocRenderer ASCIIDOC_RENDERER = new AsciidocRenderer();
 
     public static void publishTable(ExtensionContext context, TableTest tableTest, Table table) {
 
@@ -47,7 +46,7 @@ public class TablePublisher {
                     case "" -> {} // do nothing if the config parameter is present without value
                     case "tabletest" -> filePublisher.accept(".table", __ -> resolveInput(context, tableTest));
                     case "markdown" -> filePublisher.accept(".md", MARKDOWN_RENDERER);
-                    case "asciidoc" -> filePublisher.accept(".adoc", ASCIIDOC_RENDERER);
+                    case "asciidoc" -> filePublisher.accept(".adoc", new AsciidocRenderer(context));
                     default -> throw new IllegalArgumentException("`" + format + "` not among supported table publisher formats [tabletest, markdown, asciidoc]");
                 }
             });

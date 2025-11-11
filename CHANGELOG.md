@@ -1,9 +1,12 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Added
+- Configurable styling of lists and sets in AsciiDoc format
 ### Fixed
-- Published AsciiDoc files now uses `.adoc` extension instead of `.asciidoc`
 - Detects `@ConvertWith` parameter annotation when used in custom composed annotations
+- Published AsciiDoc files now uses `.adoc` extension instead of `.asciidoc`
+- Corrected AsciiDoc rendering of collections containing an empty collection
 
 ## [0.5.4] - 2025-11-03
 ### Added

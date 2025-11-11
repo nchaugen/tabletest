@@ -17,15 +17,36 @@ package io.github.nchaugen.tabletest.renderer;
 
 import io.github.nchaugen.tabletest.parser.Row;
 import io.github.nchaugen.tabletest.parser.Table;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
+
 public class AsciidocRenderer implements TableRenderer {
+
+    private static final String CONFIG_PREFIX = "tabletest.publisher.asciidoc.";
+    private final ListFormat setFormat;
+    private final ListFormat listFormat;
+    private final ListFormat mapFormat;
+
+    public AsciidocRenderer(ExtensionContext context) {
+        ListType listType = getListTypeOverride(context, "list").orElse(ListType.ORDERED);
+        ListType setType = getListTypeOverride(context, "set").orElse(ListType.UNORDERED);
+        List<String> listStyle = getListStyleOverride(context, "list").orElse(emptyList());
+        List<String> setStyle = getListStyleOverride(context, "set").orElse(emptyList());
+
+        listFormat = new ListFormat(listType, listStyle);
+        setFormat = new ListFormat(setType, setStyle);
+        mapFormat = new ListFormat(ListType.DESCRIPTION, emptyList());
+    }
 
     @Override
     public String render(Table table) {
@@ -64,28 +85,28 @@ public class AsciidocRenderer implements TableRenderer {
     private String renderValue(Object value, int nestLevel) {
         return switch (value) {
             case null -> "";
-            case List<?> list -> renderAsList(list, nestLevel, BulletStyle.ORDERED);
-            case Set<?> set -> renderAsList(set, nestLevel, BulletStyle.UNORDERED);
-            case Map<?, ?> map -> renderAsDescriptionList(map, nestLevel);
+            case List<?> list -> renderAsList(list, nestLevel, listFormat);
+            case Set<?> set -> renderAsList(set, nestLevel, setFormat);
+            case Map<?, ?> map -> renderAsDescriptionList(map, nestLevel, mapFormat);
             default -> value.toString();
         };
     }
 
-    private String renderAsList(Collection<?> collection, int nestLevel, BulletStyle bulletStyle) {
+    private String renderAsList(Collection<?> collection, int nestLevel, ListFormat format) {
         return collection.isEmpty()
-            ? ""
-            : collection.stream()
+            ? "{empty}"
+            : format.getStyle(nestLevel) + collection.stream()
             .map(it -> renderValue(it, nestLevel + 1))
-            .map(it -> renderListElement(it, nestLevel, bulletStyle))
+            .map(it -> renderListElement(it, nestLevel, format))
             .collect(joiningRenderedListElements(nestLevel));
     }
 
-    private String renderAsDescriptionList(Map<?, ?> map, int nestLevel) {
+    private String renderAsDescriptionList(Map<?, ?> map, int nestLevel, ListFormat format) {
         return map.isEmpty()
-            ? ""
+            ? "{empty}"
             : map.entrySet().stream()
             .map(it -> renderEntryValue(it, nestLevel + 1))
-            .map(it -> renderDescriptionListElement(it, nestLevel))
+            .map(it -> renderDescriptionListElement(it, nestLevel, format))
             .collect(joiningRenderedListElements(nestLevel));
     }
 
@@ -97,43 +118,71 @@ public class AsciidocRenderer implements TableRenderer {
         return Collectors.joining("\n", "\n", nestLevel == 0 ? "\n" : "");
     }
 
-    private static String renderListElement(String renderedValue, int nestLevel, BulletStyle bulletStyle) {
-        return indentedBullet(nestLevel, bulletStyle) + (renderedValue.contains("\n") ? " {empty}" : " ") + renderedValue;
+    private static String renderListElement(String renderedValue, int nestLevel, ListFormat format) {
+        return indentedBullet(nestLevel, format) + (renderedValue.contains("\n") ? " {empty}" : " ") + renderedValue;
     }
 
-    private static String renderDescriptionListElement(Map.Entry<?, String> entryWithRenderedValue, int nestLevel) {
+    private static String renderDescriptionListElement(Map.Entry<?, String> entryWithRenderedValue, int nestLevel, ListFormat format) {
         Object key = entryWithRenderedValue.getKey();
         String renderedValue = entryWithRenderedValue.getValue();
         String keyValueSeparator = (renderedValue.isEmpty() || renderedValue.startsWith("\n")) ? "" : " ";
 
-        return indentedBullet(nestLevel, BulletStyle.DESCRIPTION, key) + keyValueSeparator + renderedValue;
+        return indentedBullet(nestLevel, format, key) + keyValueSeparator + renderedValue;
     }
 
-    private static String indentedBullet(int nestLevel, BulletStyle bulletStyle) {
-        return indentedBullet(nestLevel, bulletStyle, "");
+    private static String indentedBullet(int nestLevel, ListFormat format) {
+        return indentedBullet(nestLevel, format, "");
     }
 
-    private static String indentedBullet(int nestLevel, BulletStyle bulletStyle, Object key) {
-        return "  ".repeat(nestLevel) + key + bulletStyle.getBullet(nestLevel);
+    private static String indentedBullet(int nestLevel, ListFormat format, Object key) {
+        return "  ".repeat(nestLevel) + key + format.getBullet(nestLevel);
     }
 
-    enum BulletStyle {
+    record ListFormat(ListType type, List<String> style) {
+        private static final List<String> descriptionDelimiters = List.of("::", ":::", "::::", ";;");
+
+        public String getBullet(int nestLevel) {
+            return type == ListType.DESCRIPTION
+                ? descriptionDelimiters.get(nestLevel % descriptionDelimiters.size())
+                : type.bullet.repeat(nestLevel + 1);
+        }
+
+        public String getStyle(int nestLevel) {
+            return style.isEmpty() ? "" : "\n[" + style.get(nestLevel % style.size()) + "]";
+        }
+    }
+
+    enum ListType {
         ORDERED("."),
         UNORDERED("*"),
         DESCRIPTION("::");
 
-        private static final List<String> descriptionDelimiters = List.of("::", ":::", "::::", ";;");
+        final String bullet;
 
-        private final String bullet;
-
-        BulletStyle(String bullet) {
+        ListType(String bullet) {
             this.bullet = bullet;
         }
+    }
 
-        public String getBullet(int nestLevel) {
-            return this == DESCRIPTION
-                ? descriptionDelimiters.get(nestLevel % descriptionDelimiters.size())
-                : bullet.repeat(nestLevel + 1);
-        }
+    private Optional<ListType> getListTypeOverride(ExtensionContext context, String collectionType) {
+        return context.getConfigurationParameter(CONFIG_PREFIX + collectionType + ".type")
+            .map(this::parseListType);
+    }
+
+    private ListType parseListType(String configValue) {
+        return switch (configValue.trim().toLowerCase()) {
+            case "ordered" -> ListType.ORDERED;
+            case "unordered" -> ListType.UNORDERED;
+            default -> null;
+        };
+    }
+
+    private Optional<List<String>> getListStyleOverride(ExtensionContext context, String collectionType) {
+        return context.getConfigurationParameter(CONFIG_PREFIX + collectionType + ".style")
+            .map(this::parseListStyle);
+    }
+
+    private List<String> parseListStyle(String configValue) {
+        return Arrays.asList(configValue.toLowerCase().split("\\s*,\\s*"));
     }
 }
