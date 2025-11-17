@@ -1,6 +1,10 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Added
+- Adding custom AsciiDoc role `expectation` to cells in columns where header name ends in `?`
+### Fixed
+- Preventing table values from being misinterpreted as AsciiDoc markup when rendered
 
 ## [0.5.5] - 2025-11-12
 ### Added

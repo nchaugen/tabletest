@@ -52,8 +52,8 @@ public class AsciidocRenderer implements TableRenderer {
     public String render(Table table) {
         return String.join(
             "\n",
-            table.headers().stream().map(__ -> "1").collect(ASCIIDOC_ATTRIBUTE_LIST),
-            table.headers().stream().map(this::render).collect(ASCIIDOC_HEADER_ROW),
+            table.headers().stream().map(AsciidocRenderer::columnSpecifier).collect(ASCIIDOC_ATTRIBUTE_LIST),
+            table.headers().stream().map(header -> render(header, isExpectation(header))).collect(ASCIIDOC_HEADER_ROW),
             table.rows().stream().map(this::render).collect(MULTILINE)
         );
     }
@@ -70,52 +70,62 @@ public class AsciidocRenderer implements TableRenderer {
     private static final Collector<CharSequence, ?, String>
         MULTILINE = Collectors.joining("\n", "", "|===\n");
 
+    private static String columnSpecifier(String header) {
+        return "1";
+    }
+
     private String render(Row row) {
-        return row.values().stream().map(this::render).collect(ASCIIDOC_ROW);
+        return row
+            .mapWithHeader((header, value) -> render(value, isExpectation(header)))
+            .collect(ASCIIDOC_ROW);
     }
 
-    private String render(Object value) {
-        return renderValue(value).replace("|", "\\|");
+    private boolean isExpectation(String header) {
+        return header.trim().endsWith("?");
     }
 
-    private String renderValue(Object value) {
-        return renderValue(value, 0);
+    private String render(Object value, boolean isExpectation) {
+        return renderValue(value, isExpectation).replace("|", "\\|");
     }
 
-    private String renderValue(Object value, int nestLevel) {
+    private String renderValue(Object value, boolean isExpectation) {
+        return renderValue(value, 0, isExpectation);
+    }
+
+    private String renderValue(Object value, int nestLevel, boolean isExpectation) {
         return switch (value) {
-            case null -> "";
-            case List<?> list -> renderAsList(list, nestLevel, listFormat);
-            case Set<?> set -> renderAsList(set, nestLevel, setFormat);
-            case Map<?, ?> map -> renderAsDescriptionList(map, nestLevel, mapFormat);
-            default -> value.toString();
+            case null -> isExpectation ? "[.expectation]" : "";
+            case List<?> list -> renderAsList(list, nestLevel, listFormat, isExpectation);
+            case Set<?> set -> renderAsList(set, nestLevel, setFormat, isExpectation);
+            case Map<?, ?> map -> renderAsDescriptionList(map, nestLevel, mapFormat, isExpectation);
+            default -> isExpectation ? "[.expectation]#+" + value + "+#" : "+" + value + "+";
         };
     }
 
-    private String renderAsList(Collection<?> collection, int nestLevel, ListFormat format) {
+    private String renderAsList(Collection<?> collection, int nestLevel, ListFormat format, boolean isExpectation) {
         return collection.isEmpty()
-            ? "{empty}"
+            ? isExpectation ? "[.expectation]#{empty}#" : "{empty}"
             : format.getStyle(nestLevel) + collection.stream()
-            .map(it -> renderValue(it, nestLevel + 1))
+            .map(it -> renderValue(it, nestLevel + 1, false))
             .map(it -> renderListElement(it, nestLevel, format))
-            .collect(joiningRenderedListElements(nestLevel));
+            .collect(joiningRenderedListElements(nestLevel, isExpectation));
     }
 
-    private String renderAsDescriptionList(Map<?, ?> map, int nestLevel, ListFormat format) {
+    private String renderAsDescriptionList(Map<?, ?> map, int nestLevel, ListFormat format, boolean isExpectation) {
         return map.isEmpty()
-            ? "{empty}"
+            ? isExpectation ? "[.expectation]#{empty}#" : "{empty}"
             : map.entrySet().stream()
             .map(it -> renderEntryValue(it, nestLevel + 1))
             .map(it -> renderDescriptionListElement(it, nestLevel, format))
-            .collect(joiningRenderedListElements(nestLevel));
+            .collect(joiningRenderedListElements(nestLevel, isExpectation));
     }
 
     private Map.Entry<?, String> renderEntryValue(Map.Entry<?, ?> entry, int nextNestLevel) {
-        return Map.entry(entry.getKey(), renderValue(entry.getValue(), nextNestLevel));
+        return Map.entry(entry.getKey(), renderValue(entry.getValue(), nextNestLevel, false));
     }
 
-    private static Collector<CharSequence, ?, String> joiningRenderedListElements(int nestLevel) {
-        return Collectors.joining("\n", "\n", nestLevel == 0 ? "\n" : "");
+    private static Collector<CharSequence, ?, String> joiningRenderedListElements(int nestLevel, boolean isExpectation) {
+        return Collectors.joining("\n",  (isExpectation ? "[.expectation]\n" : "\n"), nestLevel == 0 ? "\n" : "");
     }
 
     private static String renderListElement(String renderedValue, int nestLevel, ListFormat format) {
@@ -123,7 +133,7 @@ public class AsciidocRenderer implements TableRenderer {
     }
 
     private static String renderDescriptionListElement(Map.Entry<?, String> entryWithRenderedValue, int nestLevel, ListFormat format) {
-        Object key = entryWithRenderedValue.getKey();
+        Object key = "+" + entryWithRenderedValue.getKey() + "+";
         String renderedValue = entryWithRenderedValue.getValue();
         String keyValueSeparator = (renderedValue.isEmpty() || renderedValue.startsWith("\n")) ? "" : " ";
 
