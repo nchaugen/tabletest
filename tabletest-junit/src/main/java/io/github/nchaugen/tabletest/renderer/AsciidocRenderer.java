@@ -33,6 +33,9 @@ import static java.util.Collections.emptyList;
 public class AsciidocRenderer implements TableRenderer {
 
     private static final String CONFIG_PREFIX = "tabletest.publisher.asciidoc.";
+    private static final String EMPTY = "{empty}";
+    public static final String NEWLINE = "\n";
+
     private final ListFormat setFormat;
     private final ListFormat listFormat;
     private final ListFormat mapFormat;
@@ -49,12 +52,12 @@ public class AsciidocRenderer implements TableRenderer {
     }
 
     @Override
-    public String render(Table table) {
+    public String render(Table table, ColumnRoles columnRoles) {
         return String.join(
-            "\n",
+            NEWLINE,
             table.headers().stream().map(AsciidocRenderer::columnSpecifier).collect(ASCIIDOC_ATTRIBUTE_LIST),
-            table.headers().stream().map(header -> render(header, isExpectation(header))).collect(ASCIIDOC_HEADER_ROW),
-            table.rows().stream().map(this::render).collect(MULTILINE)
+            table.header().mapIndexed((i, header) -> render(header, columnRoles.roleFor(i))).collect(ASCIIDOC_HEADER_ROW),
+            table.rows().stream().map(row -> render(row, columnRoles)).collect(MULTILINE)
         );
     }
 
@@ -62,80 +65,77 @@ public class AsciidocRenderer implements TableRenderer {
         ASCIIDOC_ATTRIBUTE_LIST = Collectors.joining(",", "[%header,cols=\"", "\"]\n|===");
 
     private static final Collector<CharSequence, ?, String>
-        ASCIIDOC_HEADER_ROW = Collectors.joining("\n|", "|", "\n");
+        ASCIIDOC_HEADER_ROW = Collectors.joining("\n|", "|", NEWLINE);
 
     private static final Collector<CharSequence, ?, String>
-        ASCIIDOC_ROW = Collectors.joining("\na|", "a|", "\n");
+        ASCIIDOC_ROW = Collectors.joining("\na|", "a|", NEWLINE);
 
     private static final Collector<CharSequence, ?, String>
-        MULTILINE = Collectors.joining("\n", "", "|===\n");
+        MULTILINE = Collectors.joining(NEWLINE, "", "|===\n");
 
     private static String columnSpecifier(String header) {
         return "1";
     }
 
-    private String render(Row row) {
+    private String render(Row row, ColumnRoles columnRoles) {
         return row
-            .mapWithHeader((header, value) -> render(value, isExpectation(header)))
+            .mapIndexed((i, value) -> render(value, columnRoles.roleFor(i)))
             .collect(ASCIIDOC_ROW);
     }
 
-    private boolean isExpectation(String header) {
-        return header.trim().endsWith("?");
+    private String render(Object value, CellRole role) {
+        return renderValue(value, 0, role).replace("|", "\\|");
     }
 
-    private String render(Object value, boolean isExpectation) {
-        return renderValue(value, isExpectation).replace("|", "\\|");
-    }
-
-    private String renderValue(Object value, boolean isExpectation) {
-        return renderValue(value, 0, isExpectation);
-    }
-
-    private String renderValue(Object value, int nestLevel, boolean isExpectation) {
+    private String renderValue(Object value, int nestLevel, CellRole role) {
         return switch (value) {
-            case null -> isExpectation ? "[.expectation]" : "";
-            case List<?> list -> renderAsList(list, nestLevel, listFormat, isExpectation);
-            case Set<?> set -> renderAsList(set, nestLevel, setFormat, isExpectation);
-            case Map<?, ?> map -> renderAsDescriptionList(map, nestLevel, mapFormat, isExpectation);
-            default -> isExpectation ? "[.expectation]#+" + value + "+#" : "+" + value + "+";
+            case null -> withRole("", role);
+            case List<?> list -> renderCollection(list, nestLevel, listFormat, role);
+            case Set<?> set -> renderCollection(set, nestLevel, setFormat, role);
+            case Map<?, ?> map -> renderDictionary(map, nestLevel, mapFormat, role);
+            default -> withRole(asLiteral(value), role);
         };
     }
 
-    private String renderAsList(Collection<?> collection, int nestLevel, ListFormat format, boolean isExpectation) {
-        return collection.isEmpty()
-            ? isExpectation ? "[.expectation]#{empty}#" : "{empty}"
-            : format.getStyle(nestLevel) + collection.stream()
-            .map(it -> renderValue(it, nestLevel + 1, false))
+    private String renderCollection(Collection<?> collection, int nestLevel, ListFormat format, CellRole role) {
+        if (collection.isEmpty()) {
+            return withRole(EMPTY, role);
+        }
+    
+        return format.getStyle(nestLevel) + collection.stream()
+            .map(it -> renderValue(it, nestLevel + 1, CellRole.NORMAL))
             .map(it -> renderListElement(it, nestLevel, format))
-            .collect(joiningRenderedListElements(nestLevel, isExpectation));
+            .collect(joiningRenderedListElements(nestLevel, role));
     }
 
-    private String renderAsDescriptionList(Map<?, ?> map, int nestLevel, ListFormat format, boolean isExpectation) {
-        return map.isEmpty()
-            ? isExpectation ? "[.expectation]#{empty}#" : "{empty}"
-            : map.entrySet().stream()
+    private String renderDictionary(Map<?, ?> map, int nestLevel, ListFormat format, CellRole role) {
+        if (map.isEmpty()) {
+            return withRole(EMPTY, role);
+        }
+    
+        return map.entrySet().stream()
             .map(it -> renderEntryValue(it, nestLevel + 1))
             .map(it -> renderDescriptionListElement(it, nestLevel, format))
-            .collect(joiningRenderedListElements(nestLevel, isExpectation));
+            .collect(joiningRenderedListElements(nestLevel, role));
     }
 
     private Map.Entry<?, String> renderEntryValue(Map.Entry<?, ?> entry, int nextNestLevel) {
-        return Map.entry(entry.getKey(), renderValue(entry.getValue(), nextNestLevel, false));
+        return Map.entry(entry.getKey(), renderValue(entry.getValue(), nextNestLevel, CellRole.NORMAL));
     }
 
-    private static Collector<CharSequence, ?, String> joiningRenderedListElements(int nestLevel, boolean isExpectation) {
-        return Collectors.joining("\n",  (isExpectation ? "[.expectation]\n" : "\n"), nestLevel == 0 ? "\n" : "");
+    private static Collector<CharSequence, ?, String> joiningRenderedListElements(int nestLevel, CellRole role) {
+        String prefix = role == CellRole.NORMAL ? NEWLINE : roleMarker(role) + NEWLINE;
+        return Collectors.joining(NEWLINE, prefix, nestLevel == 0 ? NEWLINE : "");
     }
 
     private static String renderListElement(String renderedValue, int nestLevel, ListFormat format) {
-        return indentedBullet(nestLevel, format) + (renderedValue.contains("\n") ? " {empty}" : " ") + renderedValue;
+        return indentedBullet(nestLevel, format) + (renderedValue.contains(NEWLINE) ? " " + EMPTY : " ") + renderedValue;
     }
 
     private static String renderDescriptionListElement(Map.Entry<?, String> entryWithRenderedValue, int nestLevel, ListFormat format) {
-        Object key = "+" + entryWithRenderedValue.getKey() + "+";
+        String key = asLiteral(entryWithRenderedValue.getKey());
         String renderedValue = entryWithRenderedValue.getValue();
-        String keyValueSeparator = (renderedValue.isEmpty() || renderedValue.startsWith("\n")) ? "" : " ";
+        String keyValueSeparator = (renderedValue.isEmpty() || renderedValue.startsWith(NEWLINE)) ? "" : " ";
 
         return indentedBullet(nestLevel, format, key) + keyValueSeparator + renderedValue;
     }
@@ -146,6 +146,24 @@ public class AsciidocRenderer implements TableRenderer {
 
     private static String indentedBullet(int nestLevel, ListFormat format, Object key) {
         return "  ".repeat(nestLevel) + key + format.getBullet(nestLevel);
+    }
+
+    private static String asLiteral(Object value) {
+        return "+" + value + "+";
+    }
+
+    private static String withRole(String content, CellRole role) {
+        if (role == CellRole.NORMAL) {
+            return content;
+        }
+        if (content.isEmpty()) {
+            return roleMarker(role);
+        }
+        return roleMarker(role) + "#" + content + "#";
+    }
+
+    private static String roleMarker(CellRole role) {
+        return "[." + role.cssClass() + "]";
     }
 
     record ListFormat(ListType type, List<String> style) {

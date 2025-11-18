@@ -73,17 +73,6 @@ public record Row(List<Object> values, List<String> headers) {
     }
 
     /**
-     * Maps each value with its header to a new value.
-     *
-     * @param <T> result type
-     * @param mapper function taking (header, value) and returning transformed value
-     * @return stream of transformed values
-     */
-    public <T>Stream<T> mapWithHeader(BiFunction<String, Object, T> mapper) {
-        return mapIndexed((i, value) -> mapper.apply(headers.get(i), value));
-    }
-
-    /**
      * Gets value at specified index.
      *
      * @param index zero-based index

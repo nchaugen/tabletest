@@ -18,6 +18,7 @@ package io.github.nchaugen.tabletest.renderer;
 import io.github.nchaugen.tabletest.parser.Row;
 import io.github.nchaugen.tabletest.parser.Table;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 public class MarkdownRenderer implements TableRenderer {
 
     @Override
-    public String render(Table table) {
+    public String render(Table table, ColumnRoles columnRoles) {
         return String.join("\n",
             table.headers().stream().map(this::render).collect(MARKDOWN_ROW),
             table.headers().stream().map(__ -> "---").collect(MARKDOWN_ROW),
@@ -52,26 +53,20 @@ public class MarkdownRenderer implements TableRenderer {
     private String renderValue(Object value) {
         return switch (value) {
             case null -> "";
-            case List<?> list -> renderList(list);
-            case Set<?> set -> renderSet(set);
-            case Map<?, ?> map -> renderMap(map);
+            case List<?> list -> renderCollection(list, "[", "]");
+            case Set<?> set -> renderCollection(set, "{", "}");
+            case Map<?, ?> map -> renderDictionary(map);
             default -> value.toString();
         };
     }
 
-    private String renderList(List<?> list) {
-        return list.stream()
+    private String renderCollection(Collection<?> collection, String prefix, String suffix) {
+        return collection.stream()
             .map(this::renderValue)
-            .collect(Collectors.joining(", ", "[", "]"));
+            .collect(Collectors.joining(", ", prefix, suffix));
     }
 
-    private String renderSet(Set<?> set) {
-        return set.stream()
-            .map(this::renderValue)
-            .collect(Collectors.joining(", ", "{", "}"));
-    }
-
-    private String renderMap(Map<?, ?> map) {
+    private String renderDictionary(Map<?, ?> map) {
         return map.isEmpty()
             ? "[:]"
             : map.entrySet().stream()

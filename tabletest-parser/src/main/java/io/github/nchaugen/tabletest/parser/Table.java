@@ -16,7 +16,6 @@
 package io.github.nchaugen.tabletest.parser;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -25,29 +24,37 @@ import static java.util.Objects.requireNonNull;
 /**
  * Immutable representation of a table with header row and data rows.
  */
-public final class Table {
-
-    private final Row header;
-    private final List<Row> data;
+public record Table(Row header, List<Row> rows) {
 
     /**
-     * Creates a table with the provided rows. First row becomes the header,
-     * remaining rows become data.
+     * Creates a table with the provided rows. First row expected to be the header,
+     * remaining rows expected to be the data.
      *
-     * @param rows list containing at least one row (header)
-     * @throws IllegalArgumentException if rows list is empty
+     * @param table list containing at least one row (header)
+     * @throws IllegalArgumentException if rows is empty
      */
-    public Table(List<Row> rows) {
-        if (rows == null || rows.isEmpty()) {
-            throw new IllegalArgumentException("Table must have at least one row");
-        }
-        this.header = rows.getFirst();
-        this.data = rows.subList(1, rows.size());
+    public Table(List<Row> table) {
+        this(validateAndGetHeader(table), getDataRows(table));
     }
 
-    private Table(Row header, List<Row> data) {
-        this.header = requireNonNull(header, "Header row cannot be null");
-        this.data = requireNonNull(data, "Data rows cannot be null");
+    private static Row validateAndGetHeader(List<Row> table) {
+        requireAtLeastOneRow(table);
+        return table.getFirst();
+    }
+
+    private static List<Row> getDataRows(List<Row> table) {
+        return table.subList(1, table.size());
+    }
+
+    private static void requireAtLeastOneRow(List<Row> table) {
+        if (table == null || table.isEmpty()) {
+            throw new IllegalArgumentException("Table must have at least one row");
+        }
+    }
+
+    public Table {
+        requireNonNull(header, "Header row cannot be null");
+        requireNonNull(rows, "Data rows cannot be null");
     }
 
     /**
@@ -56,7 +63,7 @@ public final class Table {
      * @return count of data rows
      */
     public int rowCount() {
-        return data.size();
+        return rows.size();
     }
 
     /**
@@ -76,7 +83,7 @@ public final class Table {
      * @return stream of transformed objects
      */
     public <T> Stream<T> map(Function<Row, Stream<T>> mapper) {
-        return data.stream().flatMap(mapper);
+        return rows.stream().flatMap(mapper);
     }
 
     /**
@@ -87,7 +94,7 @@ public final class Table {
      * @throws IndexOutOfBoundsException if index is invalid
      */
     public Row row(int index) {
-        return data.get(index);
+        return rows.get(index);
     }
 
     /**
@@ -110,37 +117,13 @@ public final class Table {
         return headers().get(index);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (Table) obj;
-        return Objects.equals(this.header, that.header) &&
-               Objects.equals(this.data, that.data);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(header, data);
-    }
-
-    @Override
-    public String toString() {
-        return "Table[" +
-               "header=" + header + ", " +
-               "data=" + data + ']';
-    }
-
     public Table withHeadersInRows() {
         return new Table(
             header,
-            data.stream()
+            rows.stream()
                 .map(row -> row.withHeaders(this.headers()))
                 .toList()
         );
     }
 
-    public List<Row> rows() {
-        return data;
-    }
 }

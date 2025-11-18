@@ -15,9 +15,18 @@
  */
 package io.github.nchaugen.tabletest.renderer;
 
-import io.github.nchaugen.tabletest.parser.Table;
+public enum CellRole {
+    NORMAL(""),
+    EXPECTATION("expectation"),
+    SCENARIO("scenario");
 
-@FunctionalInterface
-public interface TableRenderer {
-    String render(Table table, ColumnRoles columnRoles);
+    private final String cssClass;
+
+    CellRole(String cssClass) {
+        this.cssClass = cssClass;
+    }
+
+    String cssClass() {
+        return cssClass;
+    }
 }

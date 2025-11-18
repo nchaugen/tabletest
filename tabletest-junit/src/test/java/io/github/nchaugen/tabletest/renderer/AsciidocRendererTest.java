@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 
+import static io.github.nchaugen.tabletest.renderer.ColumnRoles.NO_ROLES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AsciidocRendererTest {
@@ -46,13 +47,46 @@ public class AsciidocRendererTest {
                 +a+:: +1+
                 +b+:: +2+
                 +c+:: +3+
-
+                
                 |===
                 """,
-            renderer.render(TableParser.parse("""
-                a? | b?      | c? | d? | e?
-                {} | [1,2,3] | 3  |    | [a:1,b:2,c:3]
-                """))
+            renderer.render(
+                TableParser.parse("""
+                    a? | b?      | c? | d? | e?
+                    {} | [1,2,3] | 3  |    | [a:1,b:2,c:3]
+                    """),
+                new ColumnRoles(-1, Set.of(0, 1, 2, 3, 4))
+            )
+        );
+    }
+
+    @Test
+    void shouldAddRoleForScenarioCells() {
+        assertEquals(
+            """
+                [%header,cols="1,1,1"]
+                |===
+                |[.scenario]#+scenario+#
+                |+input+
+                |[.expectation]#+output?+#
+                
+                a|[.scenario]#+add+#
+                a|+5+
+                a|[.expectation]#+5+#
+                
+                a|[.scenario]#+multiply+#
+                a|+3+
+                a|[.expectation]#+15+#
+                |===
+                """,
+            renderer.render(
+                TableParser.parse("""
+                    scenario | input | output?
+                    add      | 5     | 5
+                    multiply | 3     | 15
+                    """),
+                new ColumnRoles(0, Set.of(2))
+            )
         );
     }
 
@@ -71,10 +105,13 @@ public class AsciidocRendererTest {
                 a|+3+
                 |===
                 """,
-            renderer.render(TableParser.parse("""
-                a | b | c
-                1 |   | 3
-                """))
+            renderer.render(
+                TableParser.parse("""
+                    a | b | c
+                    1 |   | 3
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -93,10 +130,13 @@ public class AsciidocRendererTest {
                 a|+Text with \\| character+
                 |===
                 """,
-            renderer.render(TableParser.parse("""
-                a   | b   | 'a|b'
-                "|" | '|' | "Text with | character"
-                """))
+            renderer.render(
+                TableParser.parse("""
+                    a   | b   | 'a|b'
+                    "|" | '|' | "Text with | character"
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -122,10 +162,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            renderer.render(TableParser.parse("""
-                a  | b         | c
-                [] | [1,2,3] | ['|', "|"]
-                """))
+            renderer.render(
+                TableParser.parse("""
+                    a  | b         | c
+                    [] | [1,2,3] | ['|', "|"]
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -149,10 +192,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            renderer.render(TableParser.parse("""
-                a  | b    | c
-                [] | [[]] | [[[]]]
-                """))
+            renderer.render(
+                TableParser.parse("""
+                    a  | b    | c
+                    [] | [[]] | [[[]]]
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -180,10 +226,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            renderer.render(TableParser.parse("""
-                a
-                [[1,2,3],[a,b,c],[#,$,%]]
-                """))
+            renderer.render(
+                TableParser.parse("""
+                    a
+                    [[1,2,3],[a,b,c],[#,$,%]]
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -213,10 +262,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            configuredRenderer.render(TableParser.parse("""
-                a  | b         | c
-                [] | [1,2,3] | ['|', "|"]
-                """))
+            configuredRenderer.render(
+                TableParser.parse("""
+                    a  | b         | c
+                    [] | [1,2,3] | ['|', "|"]
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -246,10 +298,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            configuredRenderer.render(TableParser.parse("""
-                a  | b         | c
-                [] | [1,2,3] | ['|', "|"]
-                """))
+            configuredRenderer.render(
+                TableParser.parse("""
+                    a  | b         | c
+                    [] | [1,2,3] | ['|', "|"]
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -288,10 +343,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            configuredRenderer.render(TableParser.parse("""
-                a
-                [[1,2,3],[a,b,c],[#,$,%]]
-                """))
+            configuredRenderer.render(
+                TableParser.parse("""
+                    a
+                    [[1,2,3],[a,b,c],[#,$,%]]
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -316,10 +374,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            renderer.render(TableParser.parse("""
-                a  | b   | c
-                {} | {1,2,3} | {"||"}
-                """))
+            renderer.render(
+                TableParser.parse("""
+                    a  | b   | c
+                    {} | {1,2,3} | {"||"}
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -347,10 +408,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            renderer.render(TableParser.parse("""
-                a
-                {{1,2,3}, {a,b,c}, {#,$,%}}
-                """))
+            renderer.render(
+                TableParser.parse("""
+                    a
+                    {{1,2,3}, {a,b,c}, {#,$,%}}
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -381,10 +445,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            configuredRenderer.render(TableParser.parse("""
-                a  | b
-                {} | {{1},{2,3}}
-                """))
+            configuredRenderer.render(
+                TableParser.parse("""
+                    a  | b
+                    {} | {{1},{2,3}}
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -423,10 +490,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            configuredRenderer.render(TableParser.parse("""
-                a
-                {{1,2,3}, {a,b,c}, {#,$,%}}
-                """))
+            configuredRenderer.render(
+                TableParser.parse("""
+                    a
+                    {{1,2,3}, {a,b,c}, {#,$,%}}
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -451,10 +521,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            renderer.render(TableParser.parse("""
-                a   | b             | c
-                [:] | [a:1,b:2,c:3] | [b: "||"]
-                """))
+            renderer.render(
+                TableParser.parse("""
+                    a   | b             | c
+                    [:] | [a:1,b:2,c:3] | [b: "||"]
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -479,10 +552,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            renderer.render(TableParser.parse("""
-                a                | b
-                [a: [:], b: [:]] | [a: [A: 1],b: [B: 2]]
-                """))
+            renderer.render(
+                TableParser.parse("""
+                    a                | b
+                    [a: [:], b: [:]] | [a: [A: 1],b: [B: 2]]
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -512,10 +588,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            renderer.render(TableParser.parse("""
-                a                            | b
-                [a: [1, 2], b: {3, 4}, c: 5] | {[A: 1], [B: 2]}
-                """))
+            renderer.render(
+                TableParser.parse("""
+                    a                            | b
+                    [a: [1, 2], b: {3, 4}, c: 5] | {[A: 1], [B: 2]}
+                    """),
+                NO_ROLES
+            )
         );
     }
 
@@ -556,10 +635,13 @@ public class AsciidocRendererTest {
                 
                 |===
                 """,
-            configuredRenderer.render(TableParser.parse("""
-                a                            | b
-                [a: [1, 2], b: {3, 4}, c: 5] | {[A: 1], [B: 2]}
-                """))
+            configuredRenderer.render(
+                TableParser.parse("""
+                    a                            | b
+                    [a: [1, 2], b: {3, 4}, c: 5] | {[A: 1], [B: 2]}
+                    """),
+                NO_ROLES
+            )
         );
     }
 
