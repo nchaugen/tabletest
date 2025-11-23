@@ -23,34 +23,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
+public record AsciidocRenderer(AsciidocStyle style) implements TableRenderer {
 
-public class AsciidocRenderer implements TableRenderer {
-
-    private static final String CONFIG_PREFIX = "tabletest.publisher.asciidoc.";
     private static final String EMPTY = "{empty}";
     private static final String NEWLINE = "\n";
-    private static final String EXPLICIT_WHITESPACE_OR_PLUS = "(^ )|( $)|(\t+)|([ \t]{2,})|([+]+)";
-
-    private final ListFormat setFormat;
-    private final ListFormat listFormat;
-    private final ListFormat mapFormat;
-
-    public AsciidocRenderer(ExtensionContext context) {
-        ListType listType = getListTypeOverride(context, "list").orElse(ListType.ORDERED);
-        ListType setType = getListTypeOverride(context, "set").orElse(ListType.UNORDERED);
-        List<String> listStyle = getListStyleOverride(context, "list").orElse(emptyList());
-        List<String> setStyle = getListStyleOverride(context, "set").orElse(emptyList());
-
-        listFormat = new ListFormat(listType, listStyle);
-        setFormat = new ListFormat(setType, setStyle);
-        mapFormat = new ListFormat(ListType.DESCRIPTION, emptyList());
-    }
+    private static final String NEEDS_ENCODING = "(^ )|( $)|(\t+)|([ \t]{2,})|([+]+)";
 
     @Override
     public String render(Table table, ColumnRoles columnRoles, ExtensionContext context) {
@@ -93,14 +74,14 @@ public class AsciidocRenderer implements TableRenderer {
     private String renderValue(Object value, int nestLevel, CellRole role) {
         return switch (value) {
             case null -> withRole("", role);
-            case List<?> list -> renderCollection(list, nestLevel, listFormat, role);
-            case Set<?> set -> renderCollection(set, nestLevel, setFormat, role);
-            case Map<?, ?> map -> renderDictionary(map, nestLevel, mapFormat, role);
+            case List<?> list -> renderCollection(list, nestLevel, style.listFormat(), role);
+            case Set<?> set -> renderCollection(set, nestLevel, style.setFormat(), role);
+            case Map<?, ?> map -> renderDictionary(map, nestLevel, style.mapFormat(), role);
             default -> withRole(asLiteral(value), role);
         };
     }
 
-    private String renderCollection(Collection<?> collection, int nestLevel, ListFormat format, CellRole role) {
+    private String renderCollection(Collection<?> collection, int nestLevel, AsciidocListFormat format, CellRole role) {
         if (collection.isEmpty()) {
             return withRole(EMPTY, role);
         }
@@ -111,7 +92,7 @@ public class AsciidocRenderer implements TableRenderer {
             .collect(joiningRenderedListElements(nestLevel, role));
     }
 
-    private String renderDictionary(Map<?, ?> map, int nestLevel, ListFormat format, CellRole role) {
+    private String renderDictionary(Map<?, ?> map, int nestLevel, AsciidocListFormat format, CellRole role) {
         if (map.isEmpty()) {
             return withRole(EMPTY, role);
         }
@@ -131,11 +112,11 @@ public class AsciidocRenderer implements TableRenderer {
         return Collectors.joining(NEWLINE, prefix, nestLevel == 0 ? NEWLINE : "");
     }
 
-    private static String renderListElement(String renderedValue, int nestLevel, ListFormat format) {
+    private static String renderListElement(String renderedValue, int nestLevel, AsciidocListFormat format) {
         return indentedBullet(nestLevel, format) + (renderedValue.contains(NEWLINE) ? " " + EMPTY : " ") + renderedValue;
     }
 
-    private static String renderDescriptionListElement(Map.Entry<?, String> entryWithRenderedValue, int nestLevel, ListFormat format) {
+    private static String renderDescriptionListElement(Map.Entry<?, String> entryWithRenderedValue, int nestLevel, AsciidocListFormat format) {
         String key = asLiteral(entryWithRenderedValue.getKey());
         String renderedValue = entryWithRenderedValue.getValue();
         String keyValueSeparator = (renderedValue.isEmpty() || renderedValue.startsWith(NEWLINE)) ? "" : " ";
@@ -143,11 +124,11 @@ public class AsciidocRenderer implements TableRenderer {
         return indentedBullet(nestLevel, format, key) + keyValueSeparator + renderedValue;
     }
 
-    private static String indentedBullet(int nestLevel, ListFormat format) {
+    private static String indentedBullet(int nestLevel, AsciidocListFormat format) {
         return indentedBullet(nestLevel, format, "");
     }
 
-    private static String indentedBullet(int nestLevel, ListFormat format, Object key) {
+    private static String indentedBullet(int nestLevel, AsciidocListFormat format, Object key) {
         return "  ".repeat(nestLevel) + key + format.getBullet(nestLevel);
     }
 
@@ -158,17 +139,13 @@ public class AsciidocRenderer implements TableRenderer {
     private static String asLiteral(String value) {
         if (value.isEmpty()) return "+\"\"+";
 
-        return Arrays.stream(value.splitWithDelimiters(EXPLICIT_WHITESPACE_OR_PLUS, -1))
+        return Arrays.stream(value.splitWithDelimiters(NEEDS_ENCODING, -1))
             .filter(it -> !it.isEmpty())
-            .map(it -> isDelimiter(it) ? encodeDelimiter(it) : "++" + it + "++")
+            .map(it -> it.matches(NEEDS_ENCODING) ? encodeCharacters(it) : "++" + it + "++")
             .collect(Collectors.joining());
     }
 
-    private static boolean isDelimiter(String value) {
-        return value.matches(EXPLICIT_WHITESPACE_OR_PLUS);
-    }
-
-    private static String encodeDelimiter(String delimiter) {
+    private static String encodeCharacters(String delimiter) {
         return delimiter
             .replace("+", "&#43;")
             .replace(" ", "&#x2423;")
@@ -189,51 +166,4 @@ public class AsciidocRenderer implements TableRenderer {
         return "[." + role.cssClass() + "]";
     }
 
-    record ListFormat(ListType type, List<String> style) {
-        private static final List<String> descriptionDelimiters = List.of("::", ":::", "::::", ";;");
-
-        public String getBullet(int nestLevel) {
-            return type == ListType.DESCRIPTION
-                ? descriptionDelimiters.get(nestLevel % descriptionDelimiters.size())
-                : type.bullet.repeat(nestLevel + 1);
-        }
-
-        public String getStyle(int nestLevel) {
-            return style.isEmpty() || nestLevel >= style.size() ? "" : "\n[" + style.get(nestLevel) + "]";
-        }
-    }
-
-    enum ListType {
-        ORDERED("."),
-        UNORDERED("*"),
-        DESCRIPTION("::");
-
-        final String bullet;
-
-        ListType(String bullet) {
-            this.bullet = bullet;
-        }
-    }
-
-    private Optional<ListType> getListTypeOverride(ExtensionContext context, String collectionType) {
-        return context.getConfigurationParameter(CONFIG_PREFIX + collectionType + ".type")
-            .map(this::parseListType);
-    }
-
-    private ListType parseListType(String configValue) {
-        return switch (configValue.trim().toLowerCase()) {
-            case "ordered" -> ListType.ORDERED;
-            case "unordered" -> ListType.UNORDERED;
-            default -> null;
-        };
-    }
-
-    private Optional<List<String>> getListStyleOverride(ExtensionContext context, String collectionType) {
-        return context.getConfigurationParameter(CONFIG_PREFIX + collectionType + ".style")
-            .map(this::parseListStyle);
-    }
-
-    private List<String> parseListStyle(String configValue) {
-        return Arrays.asList(configValue.toLowerCase().split("\\s*,\\s*"));
-    }
 }

@@ -11,7 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AsciidocRendererTest {
 
-    private final AsciidocRenderer renderer = new AsciidocRenderer(new StubExtensionContext());
+    private final ExtensionContext context = new StubExtensionContext();
+    private final AsciidocRenderer renderer = new AsciidocRenderer(new DefaultAsciidocStyle());
 
     @Test
     void shouldAddRoleForExpectationCells() {
@@ -87,7 +88,7 @@ public class AsciidocRendererTest {
     }
 
     @Test
-    void shouldRenderNullEmptyStringAndExplicitdWhitespace() {
+    void shouldRenderNullEmptyStringAndExplicitWhitespace() {
         assertEquals(
             """
                 == ++Display Name++
@@ -149,7 +150,7 @@ public class AsciidocRendererTest {
     }
 
     @Test
-    void shouldRenderListAsOrderedList() {
+    void shouldRenderListAsOrderedListByDefault() {
         assertEquals(
             """
                 == ++Display Name++
@@ -255,9 +256,12 @@ public class AsciidocRendererTest {
 
     @Test
     void shouldRenderListAsConfiguredListType() {
-        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new StubExtensionContext(
-            Map.of("tabletest.publisher.asciidoc.list.type", "unordered")
-        ));
+        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new DefaultAsciidocStyle() {
+            @Override
+            public AsciidocListFormat listFormat() {
+                return AsciidocListFormat.unordered();
+            }
+        });
 
         assertEquals(
             """
@@ -293,52 +297,13 @@ public class AsciidocRendererTest {
     }
 
     @Test
-    void shouldRenderListAsDefaultTypeIfConfigValueUnknown() {
-        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new StubExtensionContext(
-            Map.of("tabletest.publisher.asciidoc.list.type", "bullet")
-        ));
-
-        assertEquals(
-            """
-                == ++Display Name++
-                
-                [%header,cols="1,1,1"]
-                |===
-                |++a++
-                |++b++
-                |++c++
-                
-                a|{empty}
-                a|
-                . ++1++
-                . ++2++
-                . ++3++
-                
-                a|
-                . ++\\|++
-                . ++\\|++
-                
-                |===
-                """,
-            configuredRenderer.render(
-                TableParser.parse("""
-                    a  | b         | c
-                    [] | [1,2,3] | ['|', "|"]
-                    """),
-                NO_ROLES,
-                context
-            )
-        );
-    }
-
-    @Test
     void shouldRenderNestedListsAsConfigured() {
-        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new StubExtensionContext(
-            Map.of(
-                "tabletest.publisher.asciidoc.list.type", "unordered",
-                "tabletest.publisher.asciidoc.list.style", "square,none"
-            )
-        ));
+        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new DefaultAsciidocStyle() {
+            @Override
+            public AsciidocListFormat listFormat() {
+                return AsciidocListFormat.unordered("square", "none");
+            }
+        });
 
         assertEquals(
             """
@@ -452,12 +417,12 @@ public class AsciidocRendererTest {
 
     @Test
     void shouldRenderSetAsConfiguredListType() {
-        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new StubExtensionContext(
-            Map.of(
-                "tabletest.publisher.asciidoc.set.type", "ordered",
-                "tabletest.publisher.asciidoc.set.style", "lowergreek"
-            )
-        ));
+        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new DefaultAsciidocStyle() {
+            @Override
+            public AsciidocListFormat setFormat() {
+                return AsciidocListFormat.ordered("lowergreek");
+            }
+        });
 
         assertEquals(
             """
@@ -492,12 +457,12 @@ public class AsciidocRendererTest {
 
     @Test
     void shouldRenderNestedSetsAsConfigured() {
-        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new StubExtensionContext(
-            Map.of(
-                "tabletest.publisher.asciidoc.set.type", "unordered",
-                "tabletest.publisher.asciidoc.set.style", "square,none"
-            )
-        ));
+        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new DefaultAsciidocStyle() {
+            @Override
+            public AsciidocListFormat setFormat() {
+                return AsciidocListFormat.unordered("square", "none");
+            }
+        });
 
         assertEquals(
             """
@@ -647,14 +612,17 @@ public class AsciidocRendererTest {
 
     @Test
     void shouldRenderNestedMixedCollectionsAsConfigured() {
-        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new StubExtensionContext(
-            Map.of(
-                "tabletest.publisher.asciidoc.list.type", "unordered",
-                "tabletest.publisher.asciidoc.list.style", "square",
-                "tabletest.publisher.asciidoc.set.style", "circle,disc"
-            )
-        ));
+        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new DefaultAsciidocStyle() {
+            @Override
+            public AsciidocListFormat listFormat() {
+                return AsciidocListFormat.unordered("square");
+            }
 
+            @Override
+            public AsciidocListFormat setFormat() {
+                return AsciidocListFormat.unordered("circle", "disc");
+            }
+        });
 
         assertEquals(
             """

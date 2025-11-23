@@ -16,6 +16,7 @@
 package io.github.nchaugen.tabletest.junit;
 
 import io.github.nchaugen.tabletest.parser.Table;
+import io.github.nchaugen.tabletest.renderer.ConfiguredAsciidocStyle;
 import io.github.nchaugen.tabletest.renderer.AsciidocRenderer;
 import io.github.nchaugen.tabletest.renderer.ColumnRoles;
 import io.github.nchaugen.tabletest.renderer.MarkdownRenderer;
@@ -56,7 +57,7 @@ public class TablePublisher {
                     case "" -> {} // do nothing if the config parameter is present without value
                     case "tabletest" -> filePublisher.accept(".table", (__, ___, ctx) -> resolveInput(ctx, tableTest));
                     case "markdown" -> filePublisher.accept(".md", MARKDOWN_RENDERER);
-                    case "asciidoc" -> filePublisher.accept(".adoc", new AsciidocRenderer(context));
+                    case "asciidoc" -> filePublisher.accept(".adoc", new AsciidocRenderer(new ConfiguredAsciidocStyle(context)));
                     default -> throw new IllegalArgumentException("`" + format + "` not among supported table publisher formats [tabletest, markdown, asciidoc]");
                 }
             });
