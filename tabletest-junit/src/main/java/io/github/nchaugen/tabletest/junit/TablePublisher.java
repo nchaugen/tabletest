@@ -16,7 +16,6 @@
 package io.github.nchaugen.tabletest.junit;
 
 import io.github.nchaugen.tabletest.parser.Table;
-import io.github.nchaugen.tabletest.renderer.ConfiguredAsciidocStyle;
 import io.github.nchaugen.tabletest.renderer.AsciidocRenderer;
 import io.github.nchaugen.tabletest.renderer.MarkdownRenderer;
 import io.github.nchaugen.tabletest.renderer.TableMetadata;

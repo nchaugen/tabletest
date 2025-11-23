@@ -37,7 +37,12 @@ public record AsciidocRenderer(AsciidocStyle style) implements TableRenderer {
     @Override
     public String render(Table table, TableMetadata metadata) {
         return Stream.of(
-                metadata.title() != null ? "== " + asLiteral(metadata.title()) + NEWLINE : null,
+                metadata.title() != null
+                    ? "== " + asLiteral(metadata.title()) + NEWLINE
+                    : null,
+                metadata.description() != null
+                    ? metadata.description().stripIndent() + (metadata.description().endsWith(NEWLINE) ? "" : NEWLINE)
+                    : null,
                 table.headers().stream().map(AsciidocRenderer::columnSpecifier).collect(ASCIIDOC_ATTRIBUTE_LIST),
                 table.header().mapIndexed((i, header) -> render(header, metadata.columnRoles().roleFor(i))).collect(ASCIIDOC_HEADER_ROW),
                 table.rows().stream().map(row -> render(row, metadata.columnRoles())).collect(MULTILINE)

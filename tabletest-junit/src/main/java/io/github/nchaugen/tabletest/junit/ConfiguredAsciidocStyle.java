@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.nchaugen.tabletest.renderer;
+package io.github.nchaugen.tabletest.junit;
 
+import io.github.nchaugen.tabletest.renderer.AsciidocListFormat;
+import io.github.nchaugen.tabletest.renderer.AsciidocListType;
+import io.github.nchaugen.tabletest.renderer.AsciidocStyle;
+import io.github.nchaugen.tabletest.renderer.DefaultAsciidocStyle;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.util.Arrays;

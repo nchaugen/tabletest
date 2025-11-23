@@ -1,5 +1,6 @@
 package io.github.nchaugen.tabletest.junit.examples;
 
+import io.github.nchaugen.tabletest.junit.Description;
 import io.github.nchaugen.tabletest.junit.TableTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,9 @@ public class LeapYearExampleTest {
     }
 
     @DisplayName("Leap Year Rules with Single Example")
+    @Description("""
+        The leap year rules should be well known.
+        """)
     @TableTest("""
         Scenario                        | Year | Is Leap Year?
         Not divisible by 4              | 2001 | No

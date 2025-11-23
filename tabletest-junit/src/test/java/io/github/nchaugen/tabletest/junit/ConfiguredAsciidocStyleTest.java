@@ -1,5 +1,6 @@
-package io.github.nchaugen.tabletest.renderer;
+package io.github.nchaugen.tabletest.junit;
 
+import io.github.nchaugen.tabletest.renderer.AsciidocListFormat;
 import org.junit.jupiter.api.MediaType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

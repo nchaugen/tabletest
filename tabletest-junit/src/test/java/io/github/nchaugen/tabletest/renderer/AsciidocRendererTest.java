@@ -14,11 +14,18 @@ public class AsciidocRendererTest {
     private final AsciidocRenderer renderer = new AsciidocRenderer(new DefaultAsciidocStyle());
 
     @Test
-    void shouldRenderTitleIfPresent() {
+    void shouldRenderTitleAndDescriptionIfPresent() {
         assertEquals(
             """
                 == ++Table Title++
                 
+                This is a description of the __table__.
+                
+                It can span multiple lines, and include lists and formatting:
+                
+                - List item 1
+                - List item 2
+
                 [%header,cols="1,1"]
                 |===
                 |++a++
@@ -37,6 +44,18 @@ public class AsciidocRendererTest {
                     @Override
                     public String title() {
                         return "Table Title";
+                    }
+
+                    @Override
+                    public String description() {
+                        return """
+                            This is a description of the __table__.
+                            
+                            It can span multiple lines, and include lists and formatting:
+                            
+                            - List item 1
+                            - List item 2
+                            """;
                     }
                 }
             )

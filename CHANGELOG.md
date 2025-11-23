@@ -6,6 +6,7 @@
 - AsciiDoc custom role `expectation` added to cells in columns where header name ends in `?`
 - Rendering explicit whitespace in AsciiDoc tables
 - Rendering test method display name as a table title for Markdown and AsciiDoc formats
+- Support for `@Description` annotation on test methods to provide a description for the table
 ### Fixed
 - Preventing table values from being misinterpreted as markup when rendered to AsciiDoc
 

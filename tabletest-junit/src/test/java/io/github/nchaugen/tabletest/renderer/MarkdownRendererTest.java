@@ -17,6 +17,12 @@ public class MarkdownRendererTest {
             """
                 ## Display Name
                 
+                This is a description of the __table__.
+                
+                It can span multiple lines, and include lists and formatting:
+                - List item 1
+                - List item 2
+
                 | a | b | c |
                 | --- | --- | --- |
                 | 1 | 2 | 3 |
@@ -30,6 +36,17 @@ public class MarkdownRendererTest {
                     @Override
                     public String title() {
                         return "Display Name";
+                    }
+
+                    @Override
+                    public String description() {
+                        return """
+                            This is a description of the __table__.
+                            
+                            It can span multiple lines, and include lists and formatting:
+                            - List item 1
+                            - List item 2
+                            """;
                     }
                 }
             )

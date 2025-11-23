@@ -28,6 +28,7 @@ import java.util.stream.IntStream;
 class JunitTableMetadata implements TableMetadata {
     private final ColumnRoles columnRoles;
     private final String title;
+    private final String description;
 
     public JunitTableMetadata(ExtensionContext context, Table table) {
         this.columnRoles = new ColumnRoles(
@@ -35,6 +36,7 @@ class JunitTableMetadata implements TableMetadata {
             findExpectationIndices(table)
         );
         this.title = context.getDisplayName();
+        this.description = findTableDescription(context);
     }
 
     @Override
@@ -49,7 +51,7 @@ class JunitTableMetadata implements TableMetadata {
 
     @Override
     public String description() {
-        return null;
+        return description;
     }
 
     private static int findScenarioIndex(ExtensionContext context, Table table) {
@@ -74,6 +76,13 @@ class JunitTableMetadata implements TableMetadata {
             .filter(i -> table.header(i).endsWith("?"))
             .boxed()
             .collect(Collectors.toSet());
+    }
+
+    private static String findTableDescription(ExtensionContext context) {
+        return context.getTestMethod()
+            .map(method -> method.getAnnotation(Description.class))
+            .map(Description::value)
+            .orElse(null);
     }
 
 }

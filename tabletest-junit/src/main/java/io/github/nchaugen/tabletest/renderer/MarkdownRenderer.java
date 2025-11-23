@@ -34,7 +34,12 @@ public class MarkdownRenderer implements TableRenderer {
     @Override
     public String render(Table table, TableMetadata metadata) {
         return Stream.of(
-                metadata.title() != null ? "## " + metadata.title() + NEWLINE : null,
+                metadata.title() != null
+                    ? "## " + metadata.title() + NEWLINE
+                    : null,
+                metadata.description() != null
+                    ? metadata.description().stripIndent() + (metadata.description().endsWith(NEWLINE) ? "" : NEWLINE)
+                    : null,
                 table.headers().stream().map(this::render).collect(MARKDOWN_ROW),
                 table.headers().stream().map(__ -> "---").collect(MARKDOWN_ROW),
                 table.rows().stream().map(this::render).collect(MULTILINE)

@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.nchaugen.tabletest.renderer;
+package io.github.nchaugen.tabletest.junit;
 
-public class DefaultAsciidocStyle implements AsciidocStyle {
-    @Override
-    public AsciidocListFormat listFormat() {
-        return AsciidocListFormat.ordered();
-    }
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    @Override
-    public AsciidocListFormat setFormat() {
-        return AsciidocListFormat.unordered();
-    }
-
-    @Override
-    public AsciidocListFormat mapFormat() {
-        return AsciidocListFormat.description();
-    }
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Description {
+    String value();
 }
