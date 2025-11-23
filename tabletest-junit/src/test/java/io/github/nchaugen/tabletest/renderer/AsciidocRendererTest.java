@@ -29,24 +29,24 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1,1,1,1"]
                 |===
-                |[.expectation]#+a?+#
-                |[.expectation]#+b?+#
-                |[.expectation]#+c?+#
-                |[.expectation]#+d?+#
-                |[.expectation]#+e?+#
+                |[.expectation]#++a?++#
+                |[.expectation]#++b?++#
+                |[.expectation]#++c?++#
+                |[.expectation]#++d?++#
+                |[.expectation]#++e?++#
                 
                 a|[.expectation]#{empty}#
                 a|[.expectation]
-                . +1+
-                . +2+
-                . +3+
+                . ++1++
+                . ++2++
+                . ++3++
                 
-                a|[.expectation]#+3+#
+                a|[.expectation]#++3++#
                 a|[.expectation]
                 a|[.expectation]
-                +a+:: +1+
-                +b+:: +2+
-                +c+:: +3+
+                ++a++:: ++1++
+                ++b++:: ++2++
+                ++c++:: ++3++
                 
                 |===
                 """,
@@ -66,17 +66,17 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1,1"]
                 |===
-                |[.scenario]#+scenario+#
-                |+input+
-                |[.expectation]#+output?+#
+                |[.scenario]#++scenario++#
+                |++input++
+                |[.expectation]#++output?++#
                 
-                a|[.scenario]#+add+#
-                a|+5+
-                a|[.expectation]#+5+#
+                a|[.scenario]#++add++#
+                a|++5++
+                a|[.expectation]#++5++#
                 
-                a|[.scenario]#+multiply+#
-                a|+3+
-                a|[.expectation]#+15+#
+                a|[.scenario]#++multiply++#
+                a|++3++
+                a|[.expectation]#++15++#
                 |===
                 """,
             renderer.render(
@@ -91,24 +91,30 @@ public class AsciidocRendererTest {
     }
 
     @Test
-    void shouldRenderNull() {
+    void shouldRenderNullEmptyStringAndExplicitdWhitespace() {
         assertEquals(
             """
-                [%header,cols="1,1,1"]
+                [%header,cols="1,1,1,1,1,1"]
                 |===
-                |+a+
-                |+b+
-                |+c+
+                |++a++
+                |++b++
+                |++c d++
+                |&#x2423;++e++&#x2423;
+                |++f++
+                |++g++
                 
-                a|+1+
                 a|
-                a|+3+
+                a|+""+
+                a|&#x2423;&#x2423;&#x2423;
+                a|++a bc++&#x2423;&#x2423;++def++
+                a|&#x21E5;
+                a|&#x21E5;&#x2423;
                 |===
                 """,
             renderer.render(
                 TableParser.parse("""
-                    a | b | c
-                    1 |   | 3
+                    a | b  | c d   | " e "     | f    | g
+                      | "" | "   " | a bc  def | '\t' | '\t '
                     """),
                 NO_ROLES
             )
@@ -121,18 +127,18 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1,1"]
                 |===
-                |+a+
-                |+b+
-                |+a\\|b+
+                |&#43;&#43;
+                |&#43;
+                |++a\\|b++
                 
-                a|+\\|+
-                a|+\\|+
-                a|+Text with \\| character+
+                a|++\\|++
+                a|++\\|++
+                a|++Text with \\| character++
                 |===
                 """,
             renderer.render(
                 TableParser.parse("""
-                    a   | b   | 'a|b'
+                    ++  | +   | 'a|b'
                     "|" | '|' | "Text with | character"
                     """),
                 NO_ROLES
@@ -146,19 +152,19 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1,1"]
                 |===
-                |+a+
-                |+b+
-                |+c+
+                |++a++
+                |++b++
+                |++c++
                 
                 a|{empty}
                 a|
-                . +1+
-                . +2+
-                . +3+
+                . ++1++
+                . ++2++
+                . ++3++
                 
                 a|
-                . +\\|+
-                . +\\|+
+                . ++\\|++
+                . ++\\|++
                 
                 |===
                 """,
@@ -178,9 +184,9 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1,1"]
                 |===
-                |+a+
-                |+b+
-                |+c+
+                |++a++
+                |++b++
+                |++c++
                 
                 a|{empty}
                 a|
@@ -208,21 +214,21 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1"]
                 |===
-                |+a+
+                |++a++
                 
                 a|
                 . {empty}
-                  .. +1+
-                  .. +2+
-                  .. +3+
+                  .. ++1++
+                  .. ++2++
+                  .. ++3++
                 . {empty}
-                  .. +a+
-                  .. +b+
-                  .. +c+
+                  .. ++a++
+                  .. ++b++
+                  .. ++c++
                 . {empty}
-                  .. +#+
-                  .. +$+
-                  .. +%+
+                  .. ++#++
+                  .. ++$++
+                  .. ++%++
                 
                 |===
                 """,
@@ -246,19 +252,19 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1,1"]
                 |===
-                |+a+
-                |+b+
-                |+c+
+                |++a++
+                |++b++
+                |++c++
                 
                 a|{empty}
                 a|
-                * +1+
-                * +2+
-                * +3+
+                * ++1++
+                * ++2++
+                * ++3++
                 
                 a|
-                * +\\|+
-                * +\\|+
+                * ++\\|++
+                * ++\\|++
                 
                 |===
                 """,
@@ -282,19 +288,19 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1,1"]
                 |===
-                |+a+
-                |+b+
-                |+c+
+                |++a++
+                |++b++
+                |++c++
                 
                 a|{empty}
                 a|
-                . +1+
-                . +2+
-                . +3+
+                . ++1++
+                . ++2++
+                . ++3++
                 
                 a|
-                . +\\|+
-                . +\\|+
+                . ++\\|++
+                . ++\\|++
                 
                 |===
                 """,
@@ -321,25 +327,25 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1"]
                 |===
-                |+a+
+                |++a++
                 
                 a|
                 [square]
                 * {empty}
                 [none]
-                  ** +1+
-                  ** +2+
-                  ** +3+
+                  ** ++1++
+                  ** ++2++
+                  ** ++3++
                 * {empty}
                 [none]
-                  ** +a+
-                  ** +b+
-                  ** +c+
+                  ** ++a++
+                  ** ++b++
+                  ** ++c++
                 * {empty}
                 [none]
-                  ** +#+
-                  ** +$+
-                  ** +%+
+                  ** ++#++
+                  ** ++$++
+                  ** ++%++
                 
                 |===
                 """,
@@ -359,18 +365,18 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1,1"]
                 |===
-                |+a+
-                |+b+
-                |+c+
+                |++a++
+                |++b++
+                |++c++
                 
                 a|{empty}
                 a|
-                * +1+
-                * +2+
-                * +3+
+                * ++1++
+                * ++2++
+                * ++3++
                 
                 a|
-                * +\\|\\|+
+                * ++\\|\\|++
                 
                 |===
                 """,
@@ -390,21 +396,21 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1"]
                 |===
-                |+a+
+                |++a++
                 
                 a|
                 * {empty}
-                  ** +1+
-                  ** +2+
-                  ** +3+
+                  ** ++1++
+                  ** ++2++
+                  ** ++3++
                 * {empty}
-                  ** +a+
-                  ** +b+
-                  ** +c+
+                  ** ++a++
+                  ** ++b++
+                  ** ++c++
                 * {empty}
-                  ** +#+
-                  ** +$+
-                  ** +%+
+                  ** ++#++
+                  ** ++$++
+                  ** ++%++
                 
                 |===
                 """,
@@ -431,17 +437,17 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1"]
                 |===
-                |+a+
-                |+b+
+                |++a++
+                |++b++
                 
                 a|{empty}
                 a|
                 [lowergreek]
                 . {empty}
-                  .. +1+
+                  .. ++1++
                 . {empty}
-                  .. +2+
-                  .. +3+
+                  .. ++2++
+                  .. ++3++
                 
                 |===
                 """,
@@ -468,25 +474,25 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1"]
                 |===
-                |+a+
+                |++a++
                 
                 a|
                 [square]
                 * {empty}
                 [none]
-                  ** +1+
-                  ** +2+
-                  ** +3+
+                  ** ++1++
+                  ** ++2++
+                  ** ++3++
                 * {empty}
                 [none]
-                  ** +a+
-                  ** +b+
-                  ** +c+
+                  ** ++a++
+                  ** ++b++
+                  ** ++c++
                 * {empty}
                 [none]
-                  ** +#+
-                  ** +$+
-                  ** +%+
+                  ** ++#++
+                  ** ++$++
+                  ** ++%++
                 
                 |===
                 """,
@@ -506,18 +512,18 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1,1"]
                 |===
-                |+a+
-                |+b+
-                |+c+
+                |++a++
+                |++b++
+                |++c++
                 
                 a|{empty}
                 a|
-                +a+:: +1+
-                +b+:: +2+
-                +c+:: +3+
+                ++a++:: ++1++
+                ++b++:: ++2++
+                ++c++:: ++3++
                 
                 a|
-                +b+:: +\\|\\|+
+                ++b++:: ++\\|\\|++
                 
                 |===
                 """,
@@ -537,18 +543,18 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1"]
                 |===
-                |+a+
-                |+b+
+                |++a++
+                |++b++
                 
                 a|
-                +a+:: {empty}
-                +b+:: {empty}
+                ++a++:: {empty}
+                ++b++:: {empty}
                 
                 a|
-                +a+::
-                  +A+::: +1+
-                +b+::
-                  +B+::: +2+
+                ++a++::
+                  ++A++::: ++1++
+                ++b++::
+                  ++B++::: ++2++
                 
                 |===
                 """,
@@ -568,23 +574,23 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1"]
                 |===
-                |+a+
-                |+b+
+                |++a++
+                |++b++
                 
                 a|
-                +a+::
-                  .. +1+
-                  .. +2+
-                +b+::
-                  ** +3+
-                  ** +4+
-                +c+:: +5+
+                ++a++::
+                  .. ++1++
+                  .. ++2++
+                ++b++::
+                  ** ++3++
+                  ** ++4++
+                ++c++:: ++5++
                 
                 a|
                 * {empty}
-                  +A+::: +1+
+                  ++A++::: ++1++
                 * {empty}
-                  +B+::: +2+
+                  ++B++::: ++2++
                 
                 |===
                 """,
@@ -613,25 +619,25 @@ public class AsciidocRendererTest {
             """
                 [%header,cols="1,1"]
                 |===
-                |+a+
-                |+b+
+                |++a++
+                |++b++
                 
                 a|
-                +a+::
-                  ** +1+
-                  ** +2+
-                +b+::
+                ++a++::
+                  ** ++1++
+                  ** ++2++
+                ++b++::
                 [disc]
-                  ** +3+
-                  ** +4+
-                +c+:: +5+
+                  ** ++3++
+                  ** ++4++
+                ++c++:: ++5++
                 
                 a|
                 [circle]
                 * {empty}
-                  +A+::: +1+
+                  ++A++::: ++1++
                 * {empty}
-                  +B+::: +2+
+                  ++B++::: ++2++
                 
                 |===
                 """,

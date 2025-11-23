@@ -34,7 +34,8 @@ public class AsciidocRenderer implements TableRenderer {
 
     private static final String CONFIG_PREFIX = "tabletest.publisher.asciidoc.";
     private static final String EMPTY = "{empty}";
-    public static final String NEWLINE = "\n";
+    private static final String NEWLINE = "\n";
+    private static final String EXPLICIT_WHITESPACE_OR_PLUS = "(^ )|( $)|(\t+)|([ \t]{2,})|([+]+)";
 
     private final ListFormat setFormat;
     private final ListFormat listFormat;
@@ -101,7 +102,7 @@ public class AsciidocRenderer implements TableRenderer {
         if (collection.isEmpty()) {
             return withRole(EMPTY, role);
         }
-    
+
         return format.getStyle(nestLevel) + collection.stream()
             .map(it -> renderValue(it, nestLevel + 1, CellRole.NORMAL))
             .map(it -> renderListElement(it, nestLevel, format))
@@ -112,7 +113,7 @@ public class AsciidocRenderer implements TableRenderer {
         if (map.isEmpty()) {
             return withRole(EMPTY, role);
         }
-    
+
         return map.entrySet().stream()
             .map(it -> renderEntryValue(it, nestLevel + 1))
             .map(it -> renderDescriptionListElement(it, nestLevel, format))
@@ -149,7 +150,27 @@ public class AsciidocRenderer implements TableRenderer {
     }
 
     private static String asLiteral(Object value) {
-        return "+" + value + "+";
+        return asLiteral(value.toString());
+    }
+
+    private static String asLiteral(String value) {
+        if (value.isEmpty()) return "+\"\"+";
+
+        return Arrays.stream(value.splitWithDelimiters(EXPLICIT_WHITESPACE_OR_PLUS, -1))
+            .filter(it -> !it.isEmpty())
+            .map(it -> isDelimiter(it) ? encodeDelimiter(it) : "++" + it + "++")
+            .collect(Collectors.joining());
+    }
+
+    private static boolean isDelimiter(String value) {
+        return value.matches(EXPLICIT_WHITESPACE_OR_PLUS);
+    }
+
+    private static String encodeDelimiter(String delimiter) {
+        return delimiter
+            .replace("+", "&#43;")
+            .replace(" ", "&#x2423;")
+            .replace("\t", "&#x21E5;");
     }
 
     private static String withRole(String content, CellRole role) {
