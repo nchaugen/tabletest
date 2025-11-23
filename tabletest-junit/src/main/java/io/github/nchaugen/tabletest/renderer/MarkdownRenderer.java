@@ -17,29 +17,30 @@ package io.github.nchaugen.tabletest.renderer;
 
 import io.github.nchaugen.tabletest.parser.Row;
 import io.github.nchaugen.tabletest.parser.Table;
-import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MarkdownRenderer implements TableRenderer {
 
     private static final String NEWLINE = "\n";
 
     @Override
-    public String render(Table table, ColumnRoles columnRoles, ExtensionContext context) {
-        return String.join(
-            NEWLINE,
-            "## " + context.getDisplayName(),
-            "",
-            table.headers().stream().map(this::render).collect(MARKDOWN_ROW),
-            table.headers().stream().map(__ -> "---").collect(MARKDOWN_ROW),
-            table.rows().stream().map(this::render).collect(MULTILINE)
-        );
+    public String render(Table table, TableMetadata metadata) {
+        return Stream.of(
+                metadata.title() != null ? "## " + metadata.title() + NEWLINE : null,
+                table.headers().stream().map(this::render).collect(MARKDOWN_ROW),
+                table.headers().stream().map(__ -> "---").collect(MARKDOWN_ROW),
+                table.rows().stream().map(this::render).collect(MULTILINE)
+            )
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining(NEWLINE));
     }
 
     private static final Collector<CharSequence, ?, String>

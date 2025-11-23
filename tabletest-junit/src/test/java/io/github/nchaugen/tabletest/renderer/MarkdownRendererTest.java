@@ -2,14 +2,13 @@ package io.github.nchaugen.tabletest.renderer;
 
 import io.github.nchaugen.tabletest.parser.TableParser;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtensionContext;
 
 import static io.github.nchaugen.tabletest.renderer.ColumnRoles.NO_ROLES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MarkdownRendererTest {
 
-    private final ExtensionContext context = new StubExtensionContext();
+    private static final TableMetadata NO_METADATA = new EmptyTableMetadata();
     private final MarkdownRenderer renderer = new MarkdownRenderer();
 
     @Test
@@ -27,8 +26,12 @@ public class MarkdownRendererTest {
                 a | b | c
                 1 | 2 | 3
                 """),
-                NO_ROLES,
-                context
+                new EmptyTableMetadata() {
+                    @Override
+                    public String title() {
+                        return "Display Name";
+                    }
+                }
             )
         );
     }
@@ -37,8 +40,6 @@ public class MarkdownRendererTest {
     void shouldRenderNull() {
         assertEquals(
             """
-                ## Display Name
-                
                 | a | b | c |
                 | --- | --- | --- |
                 | 1 |  | 3 |
@@ -48,8 +49,7 @@ public class MarkdownRendererTest {
                 a | b | c
                 1 |   | 3
                 """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -58,8 +58,6 @@ public class MarkdownRendererTest {
     void shouldRenderTableWithEscapedPipe() {
         assertEquals(
             """
-                ## Display Name
-                
                 | a | b | a\\|b |
                 | --- | --- | --- |
                 | \\| | \\| | Text with \\| character |
@@ -69,8 +67,7 @@ public class MarkdownRendererTest {
                 a   | b   | 'a|b'
                 "|" | '|' | "Text with | character"
                 """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -79,8 +76,6 @@ public class MarkdownRendererTest {
     void shouldRenderTableWithList() {
         assertEquals(
             """
-                ## Display Name
-                
                 | a | b | c |
                 | --- | --- | --- |
                 | [] | [1, 2, 3] | [\\|, \\|] |
@@ -90,8 +85,7 @@ public class MarkdownRendererTest {
                 a  | b         | c
                 [] | [1,2,3] | ['|', "|"]
                 """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -100,8 +94,6 @@ public class MarkdownRendererTest {
     void shouldRenderTableWithSet() {
         assertEquals(
             """
-                ## Display Name
-                
                 | a | b | c |
                 | --- | --- | --- |
                 | {} | {1, 2, 3} | {\\|\\|} |
@@ -111,8 +103,7 @@ public class MarkdownRendererTest {
                 a  | b   | c
                 {} | {1,2,3} | {"||"}
                 """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -121,8 +112,6 @@ public class MarkdownRendererTest {
     void shouldRenderTableWithMap() {
         assertEquals(
             """
-                ## Display Name
-                
                 | a | b | c |
                 | --- | --- | --- |
                 | [:] | [a: 1, b: 2, c: 3] | [b: \\|\\|] |
@@ -132,8 +121,7 @@ public class MarkdownRendererTest {
                 a   | b             | c
                 [:] | [a:1,b:2,c:3] | [b: "||"]
                 """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -142,8 +130,6 @@ public class MarkdownRendererTest {
     void shouldRenderTableWithNestedList() {
         assertEquals(
             """
-                ## Display Name
-                
                 | a | b | c |
                 | --- | --- | --- |
                 | [{}] | [[1], [2, 3]] | [[a: \\|], [b: [\\|]]] |
@@ -153,9 +139,25 @@ public class MarkdownRendererTest {
                 a    | b           | c
                 [{}] | [[1],[2,3]] | [[a: '|'], [b: ["|"]]]
                 """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
+    }
+
+    private static class EmptyTableMetadata implements TableMetadata {
+        @Override
+        public ColumnRoles columnRoles() {
+            return NO_ROLES;
+        }
+
+        @Override
+        public String title() {
+            return null;
+        }
+
+        @Override
+        public String description() {
+            return null;
+        }
     }
 }

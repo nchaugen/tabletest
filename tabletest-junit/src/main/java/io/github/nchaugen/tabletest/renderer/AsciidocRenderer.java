@@ -17,15 +17,16 @@ package io.github.nchaugen.tabletest.renderer;
 
 import io.github.nchaugen.tabletest.parser.Row;
 import io.github.nchaugen.tabletest.parser.Table;
-import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public record AsciidocRenderer(AsciidocStyle style) implements TableRenderer {
 
@@ -34,15 +35,15 @@ public record AsciidocRenderer(AsciidocStyle style) implements TableRenderer {
     private static final String NEEDS_ENCODING = "(^ )|( $)|(\t+)|([ \t]{2,})|([+]+)";
 
     @Override
-    public String render(Table table, ColumnRoles columnRoles, ExtensionContext context) {
-        return String.join(
-            NEWLINE,
-            "== " + asLiteral(context.getDisplayName()),
-            "",
-            table.headers().stream().map(AsciidocRenderer::columnSpecifier).collect(ASCIIDOC_ATTRIBUTE_LIST),
-            table.header().mapIndexed((i, header) -> render(header, columnRoles.roleFor(i))).collect(ASCIIDOC_HEADER_ROW),
-            table.rows().stream().map(row -> render(row, columnRoles)).collect(MULTILINE)
-        );
+    public String render(Table table, TableMetadata metadata) {
+        return Stream.of(
+                metadata.title() != null ? "== " + asLiteral(metadata.title()) + NEWLINE : null,
+                table.headers().stream().map(AsciidocRenderer::columnSpecifier).collect(ASCIIDOC_ATTRIBUTE_LIST),
+                table.header().mapIndexed((i, header) -> render(header, metadata.columnRoles().roleFor(i))).collect(ASCIIDOC_HEADER_ROW),
+                table.rows().stream().map(row -> render(row, metadata.columnRoles())).collect(MULTILINE)
+            )
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining(NEWLINE));
     }
 
     private static final Collector<CharSequence, ?, String>

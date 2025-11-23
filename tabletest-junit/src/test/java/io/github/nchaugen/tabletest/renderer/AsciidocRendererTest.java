@@ -2,24 +2,51 @@ package io.github.nchaugen.tabletest.renderer;
 
 import io.github.nchaugen.tabletest.parser.TableParser;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtensionContext;
 
-import java.util.*;
+import java.util.Set;
 
 import static io.github.nchaugen.tabletest.renderer.ColumnRoles.NO_ROLES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AsciidocRendererTest {
 
-    private final ExtensionContext context = new StubExtensionContext();
+    private static final TableMetadata NO_METADATA = new EmptyTableMetadata();
     private final AsciidocRenderer renderer = new AsciidocRenderer(new DefaultAsciidocStyle());
+
+    @Test
+    void shouldRenderTitleIfPresent() {
+        assertEquals(
+            """
+                == ++Table Title++
+                
+                [%header,cols="1,1"]
+                |===
+                |++a++
+                |++b++
+                
+                a|++1++
+                a|++2++
+                |===
+                """,
+            renderer.render(
+                TableParser.parse("""
+                    a | b
+                    1 | 2
+                    """),
+                new EmptyTableMetadata() {
+                    @Override
+                    public String title() {
+                        return "Table Title";
+                    }
+                }
+            )
+        );
+    }
 
     @Test
     void shouldAddRoleForExpectationCells() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1,1,1,1"]
                 |===
                 |[.expectation]#++a?++#
@@ -48,8 +75,12 @@ public class AsciidocRendererTest {
                     a? | b?      | c? | d? | e?
                     {} | [1,2,3] | 3  |    | [a:1,b:2,c:3]
                     """),
-                new ColumnRoles(-1, Set.of(0, 1, 2, 3, 4)),
-                context
+                new EmptyTableMetadata() {
+                    @Override
+                    public ColumnRoles columnRoles() {
+                        return new ColumnRoles(-1, Set.of(0, 1, 2, 3, 4));
+                    }
+                }
             )
         );
     }
@@ -58,8 +89,6 @@ public class AsciidocRendererTest {
     void shouldAddRoleForScenarioCells() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1,1"]
                 |===
                 |[.scenario]#++scenario++#
@@ -81,8 +110,12 @@ public class AsciidocRendererTest {
                     add      | 5     | 5
                     multiply | 3     | 15
                     """),
-                new ColumnRoles(0, Set.of(2)),
-                context
+                new EmptyTableMetadata() {
+                    @Override
+                    public ColumnRoles columnRoles() {
+                        return new ColumnRoles(0, Set.of(2));
+                    }
+                }
             )
         );
     }
@@ -91,8 +124,6 @@ public class AsciidocRendererTest {
     void shouldRenderNullEmptyStringAndExplicitWhitespace() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1,1,1,1,1"]
                 |===
                 |++a++
@@ -115,8 +146,7 @@ public class AsciidocRendererTest {
                     a | b  | c d   | " e "     | f    | g
                       | "" | "   " | a bc  def | '\t' | '\t '
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -125,8 +155,6 @@ public class AsciidocRendererTest {
     void shouldRenderEscapedPipe() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1,1"]
                 |===
                 |&#43;&#43;
@@ -143,8 +171,7 @@ public class AsciidocRendererTest {
                     ++  | +   | 'a|b'
                     "|" | '|' | "Text with | character"
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -153,8 +180,6 @@ public class AsciidocRendererTest {
     void shouldRenderListAsOrderedListByDefault() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1,1"]
                 |===
                 |++a++
@@ -178,8 +203,7 @@ public class AsciidocRendererTest {
                     a  | b         | c
                     [] | [1,2,3] | ['|', "|"]
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -188,8 +212,6 @@ public class AsciidocRendererTest {
     void shouldRenderEmptyList() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1,1"]
                 |===
                 |++a++
@@ -211,8 +233,7 @@ public class AsciidocRendererTest {
                     a  | b    | c
                     [] | [[]] | [[[]]]
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -221,8 +242,6 @@ public class AsciidocRendererTest {
     void shouldRenderNestedLists() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1"]
                 |===
                 |++a++
@@ -248,8 +267,7 @@ public class AsciidocRendererTest {
                     a
                     [[1,2,3],[a,b,c],[#,$,%]]
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -265,8 +283,6 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1,1"]
                 |===
                 |++a++
@@ -290,8 +306,7 @@ public class AsciidocRendererTest {
                     a  | b         | c
                     [] | [1,2,3] | ['|', "|"]
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -307,8 +322,6 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1"]
                 |===
                 |++a++
@@ -338,8 +351,7 @@ public class AsciidocRendererTest {
                     a
                     [[1,2,3],[a,b,c],[#,$,%]]
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -348,8 +360,6 @@ public class AsciidocRendererTest {
     void shouldRenderSetAsUnorderedList() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1,1"]
                 |===
                 |++a++
@@ -372,8 +382,7 @@ public class AsciidocRendererTest {
                     a  | b   | c
                     {} | {1,2,3} | {"||"}
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -382,8 +391,6 @@ public class AsciidocRendererTest {
     void shouldRenderNestedSets() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1"]
                 |===
                 |++a++
@@ -409,8 +416,7 @@ public class AsciidocRendererTest {
                     a
                     {{1,2,3}, {a,b,c}, {#,$,%}}
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -426,8 +432,6 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1"]
                 |===
                 |++a++
@@ -449,8 +453,7 @@ public class AsciidocRendererTest {
                     a  | b
                     {} | {{1},{2,3}}
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -466,8 +469,6 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1"]
                 |===
                 |++a++
@@ -497,8 +498,7 @@ public class AsciidocRendererTest {
                     a
                     {{1,2,3}, {a,b,c}, {#,$,%}}
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -507,8 +507,6 @@ public class AsciidocRendererTest {
     void shouldRenderMapAsDescriptionList() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1,1"]
                 |===
                 |++a++
@@ -531,8 +529,7 @@ public class AsciidocRendererTest {
                     a   | b             | c
                     [:] | [a:1,b:2,c:3] | [b: "||"]
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -541,8 +538,6 @@ public class AsciidocRendererTest {
     void shouldRenderNestedMaps() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1"]
                 |===
                 |++a++
@@ -565,8 +560,7 @@ public class AsciidocRendererTest {
                     a                | b
                     [a: [:], b: [:]] | [a: [A: 1],b: [B: 2]]
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -575,8 +569,6 @@ public class AsciidocRendererTest {
     void shouldRenderNestedMixedCollections() {
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1"]
                 |===
                 |++a++
@@ -604,8 +596,7 @@ public class AsciidocRendererTest {
                     a                            | b
                     [a: [1, 2], b: {3, 4}, c: 5] | {[A: 1], [B: 2]}
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
@@ -626,8 +617,6 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
-                == ++Display Name++
-                
                 [%header,cols="1,1"]
                 |===
                 |++a++
@@ -657,10 +646,25 @@ public class AsciidocRendererTest {
                     a                            | b
                     [a: [1, 2], b: {3, 4}, c: 5] | {[A: 1], [B: 2]}
                     """),
-                NO_ROLES,
-                context
+                NO_METADATA
             )
         );
     }
 
+    private static class EmptyTableMetadata implements TableMetadata {
+        @Override
+        public ColumnRoles columnRoles() {
+            return NO_ROLES;
+        }
+
+        @Override
+        public String title() {
+            return null;
+        }
+
+        @Override
+        public String description() {
+            return null;
+        }
+    }
 }
