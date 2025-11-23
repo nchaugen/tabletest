@@ -47,14 +47,14 @@ public class TablePublisher {
             context.publishFile(
                 context.getDisplayName() + extension,
                 MediaType.TEXT_PLAIN_UTF_8,
-                path -> Files.writeString(path, renderer.render(table, columnRoles))
+                path -> Files.writeString(path, renderer.render(table, columnRoles, context))
             );
 
         context.getConfigurationParameter("tabletest.publisher.format")
             .ifPresent(format -> {
                 switch (format.strip().toLowerCase()) {
                     case "" -> {} // do nothing if the config parameter is present without value
-                    case "tabletest" -> filePublisher.accept(".table", (__, ___) -> resolveInput(context, tableTest));
+                    case "tabletest" -> filePublisher.accept(".table", (__, ___, ctx) -> resolveInput(ctx, tableTest));
                     case "markdown" -> filePublisher.accept(".md", MARKDOWN_RENDERER);
                     case "asciidoc" -> filePublisher.accept(".adoc", new AsciidocRenderer(context));
                     default -> throw new IllegalArgumentException("`" + format + "` not among supported table publisher formats [tabletest, markdown, asciidoc]");

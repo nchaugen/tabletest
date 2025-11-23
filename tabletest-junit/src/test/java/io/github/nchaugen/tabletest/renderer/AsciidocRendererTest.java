@@ -1,20 +1,10 @@
 package io.github.nchaugen.tabletest.renderer;
 
 import io.github.nchaugen.tabletest.parser.TableParser;
-import org.junit.jupiter.api.MediaType;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExecutableInvoker;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.TestInstances;
-import org.junit.jupiter.api.function.ThrowingConsumer;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
-import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Function;
 
 import static io.github.nchaugen.tabletest.renderer.ColumnRoles.NO_ROLES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,6 +17,8 @@ public class AsciidocRendererTest {
     void shouldAddRoleForExpectationCells() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1,1,1,1"]
                 |===
                 |[.expectation]#++a?++#
@@ -55,7 +47,8 @@ public class AsciidocRendererTest {
                     a? | b?      | c? | d? | e?
                     {} | [1,2,3] | 3  |    | [a:1,b:2,c:3]
                     """),
-                new ColumnRoles(-1, Set.of(0, 1, 2, 3, 4))
+                new ColumnRoles(-1, Set.of(0, 1, 2, 3, 4)),
+                context
             )
         );
     }
@@ -64,6 +57,8 @@ public class AsciidocRendererTest {
     void shouldAddRoleForScenarioCells() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1,1"]
                 |===
                 |[.scenario]#++scenario++#
@@ -85,7 +80,8 @@ public class AsciidocRendererTest {
                     add      | 5     | 5
                     multiply | 3     | 15
                     """),
-                new ColumnRoles(0, Set.of(2))
+                new ColumnRoles(0, Set.of(2)),
+                context
             )
         );
     }
@@ -94,6 +90,8 @@ public class AsciidocRendererTest {
     void shouldRenderNullEmptyStringAndExplicitdWhitespace() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1,1,1,1,1"]
                 |===
                 |++a++
@@ -116,7 +114,8 @@ public class AsciidocRendererTest {
                     a | b  | c d   | " e "     | f    | g
                       | "" | "   " | a bc  def | '\t' | '\t '
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -125,6 +124,8 @@ public class AsciidocRendererTest {
     void shouldRenderEscapedPipe() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1,1"]
                 |===
                 |&#43;&#43;
@@ -141,7 +142,8 @@ public class AsciidocRendererTest {
                     ++  | +   | 'a|b'
                     "|" | '|' | "Text with | character"
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -150,6 +152,8 @@ public class AsciidocRendererTest {
     void shouldRenderListAsOrderedList() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1,1"]
                 |===
                 |++a++
@@ -173,7 +177,8 @@ public class AsciidocRendererTest {
                     a  | b         | c
                     [] | [1,2,3] | ['|', "|"]
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -182,6 +187,8 @@ public class AsciidocRendererTest {
     void shouldRenderEmptyList() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1,1"]
                 |===
                 |++a++
@@ -203,7 +210,8 @@ public class AsciidocRendererTest {
                     a  | b    | c
                     [] | [[]] | [[[]]]
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -212,6 +220,8 @@ public class AsciidocRendererTest {
     void shouldRenderNestedLists() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1"]
                 |===
                 |++a++
@@ -237,7 +247,8 @@ public class AsciidocRendererTest {
                     a
                     [[1,2,3],[a,b,c],[#,$,%]]
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -250,6 +261,8 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1,1"]
                 |===
                 |++a++
@@ -273,7 +286,8 @@ public class AsciidocRendererTest {
                     a  | b         | c
                     [] | [1,2,3] | ['|', "|"]
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -286,6 +300,8 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1,1"]
                 |===
                 |++a++
@@ -309,7 +325,8 @@ public class AsciidocRendererTest {
                     a  | b         | c
                     [] | [1,2,3] | ['|', "|"]
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -325,6 +342,8 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1"]
                 |===
                 |++a++
@@ -354,7 +373,8 @@ public class AsciidocRendererTest {
                     a
                     [[1,2,3],[a,b,c],[#,$,%]]
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -363,6 +383,8 @@ public class AsciidocRendererTest {
     void shouldRenderSetAsUnorderedList() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1,1"]
                 |===
                 |++a++
@@ -385,7 +407,8 @@ public class AsciidocRendererTest {
                     a  | b   | c
                     {} | {1,2,3} | {"||"}
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -394,6 +417,8 @@ public class AsciidocRendererTest {
     void shouldRenderNestedSets() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1"]
                 |===
                 |++a++
@@ -419,7 +444,8 @@ public class AsciidocRendererTest {
                     a
                     {{1,2,3}, {a,b,c}, {#,$,%}}
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -435,6 +461,8 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1"]
                 |===
                 |++a++
@@ -456,7 +484,8 @@ public class AsciidocRendererTest {
                     a  | b
                     {} | {{1},{2,3}}
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -472,6 +501,8 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1"]
                 |===
                 |++a++
@@ -501,7 +532,8 @@ public class AsciidocRendererTest {
                     a
                     {{1,2,3}, {a,b,c}, {#,$,%}}
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -510,6 +542,8 @@ public class AsciidocRendererTest {
     void shouldRenderMapAsDescriptionList() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1,1"]
                 |===
                 |++a++
@@ -532,7 +566,8 @@ public class AsciidocRendererTest {
                     a   | b             | c
                     [:] | [a:1,b:2,c:3] | [b: "||"]
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -541,6 +576,8 @@ public class AsciidocRendererTest {
     void shouldRenderNestedMaps() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1"]
                 |===
                 |++a++
@@ -563,7 +600,8 @@ public class AsciidocRendererTest {
                     a                | b
                     [a: [:], b: [:]] | [a: [A: 1],b: [B: 2]]
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -572,6 +610,8 @@ public class AsciidocRendererTest {
     void shouldRenderNestedMixedCollections() {
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1"]
                 |===
                 |++a++
@@ -599,7 +639,8 @@ public class AsciidocRendererTest {
                     a                            | b
                     [a: [1, 2], b: {3, 4}, c: 5] | {[A: 1], [B: 2]}
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
@@ -617,6 +658,8 @@ public class AsciidocRendererTest {
 
         assertEquals(
             """
+                == ++Display Name++
+                
                 [%header,cols="1,1"]
                 |===
                 |++a++
@@ -646,126 +689,10 @@ public class AsciidocRendererTest {
                     a                            | b
                     [a: [1, 2], b: {3, 4}, c: 5] | {[A: 1], [B: 2]}
                     """),
-                NO_ROLES
+                NO_ROLES,
+                context
             )
         );
     }
 
-    @SuppressWarnings("NullableProblems")
-    private record StubExtensionContext(Map<String, String> config) implements ExtensionContext {
-
-        public StubExtensionContext() {
-            this(Collections.emptyMap());
-        }
-
-        @Override
-        public Optional<ExtensionContext> getParent() {
-            return Optional.empty();
-        }
-
-        @Override
-        public ExtensionContext getRoot() {
-            return null;
-        }
-
-        @Override
-        public String getUniqueId() {
-            return "";
-        }
-
-        @Override
-        public String getDisplayName() {
-            return "";
-        }
-
-        @Override
-        public Set<String> getTags() {
-            return Set.of();
-        }
-
-        @Override
-        public Optional<AnnotatedElement> getElement() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Class<?>> getTestClass() {
-            return Optional.empty();
-        }
-
-        @Override
-        public List<Class<?>> getEnclosingTestClasses() {
-            return List.of();
-        }
-
-        @Override
-        public Optional<TestInstance.Lifecycle> getTestInstanceLifecycle() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Object> getTestInstance() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<TestInstances> getTestInstances() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Method> getTestMethod() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Throwable> getExecutionException() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<String> getConfigurationParameter(String key) {
-            return Optional.ofNullable(config.get(key));
-        }
-
-        @Override
-        public <T> Optional<T> getConfigurationParameter(String key, Function<? super String, ? extends T> transformer) {
-            return Optional.empty();
-        }
-
-        @Override
-        public void publishReportEntry(Map<String, String> map) {
-
-        }
-
-        @Override
-        public void publishFile(String name, MediaType mediaType, ThrowingConsumer<Path> action) {
-
-        }
-
-        @Override
-        public void publishDirectory(String name, ThrowingConsumer<Path> action) {
-
-        }
-
-        @Override
-        public Store getStore(Namespace namespace) {
-            return null;
-        }
-
-        @Override
-        public Store getStore(StoreScope scope, Namespace namespace) {
-            return null;
-        }
-
-        @Override
-        public ExecutionMode getExecutionMode() {
-            return null;
-        }
-
-        @Override
-        public ExecutableInvoker getExecutableInvoker() {
-            return null;
-        }
-    }
 }

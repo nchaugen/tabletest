@@ -5,6 +5,7 @@
 - AsciiDoc custom role `scenario` added to cells in scenario column
 - AsciiDoc custom role `expectation` added to cells in columns where header name ends in `?`
 - Rendering explicit whitespace in AsciiDoc tables
+- Rendering test method display name as a table title for Markdown and AsciiDoc formats
 ### Fixed
 - Preventing table values from being misinterpreted as markup when rendered to AsciiDoc
 

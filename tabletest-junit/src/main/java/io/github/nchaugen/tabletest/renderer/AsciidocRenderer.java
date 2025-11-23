@@ -53,9 +53,11 @@ public class AsciidocRenderer implements TableRenderer {
     }
 
     @Override
-    public String render(Table table, ColumnRoles columnRoles) {
+    public String render(Table table, ColumnRoles columnRoles, ExtensionContext context) {
         return String.join(
             NEWLINE,
+            "== " + asLiteral(context.getDisplayName()),
+            "",
             table.headers().stream().map(AsciidocRenderer::columnSpecifier).collect(ASCIIDOC_ATTRIBUTE_LIST),
             table.header().mapIndexed((i, header) -> render(header, columnRoles.roleFor(i))).collect(ASCIIDOC_HEADER_ROW),
             table.rows().stream().map(row -> render(row, columnRoles)).collect(MULTILINE)

@@ -1,6 +1,7 @@
 package io.github.nchaugen.tabletest.junit.examples;
 
 import io.github.nchaugen.tabletest.junit.TableTest;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Year;
@@ -29,6 +30,7 @@ public class LeapYearExampleTest {
         assertTrue(Year.isLeap(2000));
     }
 
+    @DisplayName("Leap Year Rules with Single Example")
     @TableTest("""
         Scenario                        | Year | Is Leap Year?
         Not divisible by 4              | 2001 | No
@@ -45,6 +47,7 @@ public class LeapYearExampleTest {
         return input.equalsIgnoreCase("yes");
     }
 
+    @DisplayName("Leap Year Rules with Multiple Examples")
     @TableTest("""
         Scenario                        | Year               | Is Leap Year?
         Not divisible by 4              | {1, 2001, 30001}   | No

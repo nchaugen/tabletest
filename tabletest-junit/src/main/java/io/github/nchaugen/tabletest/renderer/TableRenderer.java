@@ -16,8 +16,9 @@
 package io.github.nchaugen.tabletest.renderer;
 
 import io.github.nchaugen.tabletest.parser.Table;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 @FunctionalInterface
 public interface TableRenderer {
-    String render(Table table, ColumnRoles columnRoles);
+    String render(Table table, ColumnRoles columnRoles, ExtensionContext context);
 }
