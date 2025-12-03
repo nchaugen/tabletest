@@ -8,10 +8,10 @@ import java.util.Set;
 import static io.github.nchaugen.tabletest.renderer.ColumnRoles.NO_ROLES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AsciidocRendererTest {
+public class AsciidocTableRendererTest {
 
     private static final TableMetadata NO_METADATA = new EmptyTableMetadata();
-    private final AsciidocRenderer renderer = new AsciidocRenderer(new DefaultAsciidocStyle());
+    private final AsciidocTableRenderer renderer = new AsciidocTableRenderer(new DefaultAsciidocStyle());
 
     @Test
     void shouldRenderTitleAndDescriptionIfPresent() {
@@ -293,7 +293,7 @@ public class AsciidocRendererTest {
 
     @Test
     void shouldRenderListAsConfiguredListType() {
-        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new DefaultAsciidocStyle() {
+        AsciidocTableRenderer configuredRenderer = new AsciidocTableRenderer(new DefaultAsciidocStyle() {
             @Override
             public AsciidocListFormat listFormat() {
                 return AsciidocListFormat.unordered();
@@ -332,7 +332,7 @@ public class AsciidocRendererTest {
 
     @Test
     void shouldRenderNestedListsAsConfigured() {
-        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new DefaultAsciidocStyle() {
+        AsciidocTableRenderer configuredRenderer = new AsciidocTableRenderer(new DefaultAsciidocStyle() {
             @Override
             public AsciidocListFormat listFormat() {
                 return AsciidocListFormat.unordered("square", "none");
@@ -442,7 +442,7 @@ public class AsciidocRendererTest {
 
     @Test
     void shouldRenderSetAsConfiguredListType() {
-        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new DefaultAsciidocStyle() {
+        AsciidocTableRenderer configuredRenderer = new AsciidocTableRenderer(new DefaultAsciidocStyle() {
             @Override
             public AsciidocListFormat setFormat() {
                 return AsciidocListFormat.ordered("lowergreek");
@@ -479,7 +479,7 @@ public class AsciidocRendererTest {
 
     @Test
     void shouldRenderNestedSetsAsConfigured() {
-        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new DefaultAsciidocStyle() {
+        AsciidocTableRenderer configuredRenderer = new AsciidocTableRenderer(new DefaultAsciidocStyle() {
             @Override
             public AsciidocListFormat setFormat() {
                 return AsciidocListFormat.unordered("square", "none");
@@ -622,7 +622,7 @@ public class AsciidocRendererTest {
 
     @Test
     void shouldRenderNestedMixedCollectionsAsConfigured() {
-        AsciidocRenderer configuredRenderer = new AsciidocRenderer(new DefaultAsciidocStyle() {
+        AsciidocTableRenderer configuredRenderer = new AsciidocTableRenderer(new DefaultAsciidocStyle() {
             @Override
             public AsciidocListFormat listFormat() {
                 return AsciidocListFormat.unordered("square");

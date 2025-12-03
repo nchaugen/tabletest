@@ -103,7 +103,7 @@ public record Table(Row header, List<Row> rows) {
      * @return list of header values
      */
     public List<String> headers() {
-        return header.values().stream().map(Object::toString).map(String::trim).toList();
+        return header.values().stream().map(Object::toString).toList();
     }
 
     /**

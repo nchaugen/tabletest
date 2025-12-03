@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import static io.github.nchaugen.tabletest.renderer.ColumnRoles.NO_ROLES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MarkdownRendererTest {
+public class MarkdownTableRendererTest {
 
     private static final TableMetadata NO_METADATA = new EmptyTableMetadata();
-    private final MarkdownRenderer renderer = new MarkdownRenderer();
+    private final MarkdownTableRenderer renderer = new MarkdownTableRenderer();
 
     @Test
     void shouldRenderBasicTable() {

@@ -27,7 +27,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class MarkdownRenderer implements TableRenderer {
+public class MarkdownTableRenderer implements TableRenderer {
 
     private static final String NEWLINE = "\n";
 

@@ -16,33 +16,51 @@
 package io.github.nchaugen.tabletest.junit;
 
 import io.github.nchaugen.tabletest.parser.Table;
-import io.github.nchaugen.tabletest.renderer.AsciidocRenderer;
-import io.github.nchaugen.tabletest.renderer.MarkdownRenderer;
+import io.github.nchaugen.tabletest.renderer.AsciidocTableRenderer;
+import io.github.nchaugen.tabletest.renderer.AsciidocTestIndexRenderer;
+import io.github.nchaugen.tabletest.renderer.MarkdownTableRenderer;
+import io.github.nchaugen.tabletest.renderer.MarkdownTestIndexRenderer;
+import io.github.nchaugen.tabletest.renderer.TableFileEntry;
 import io.github.nchaugen.tabletest.renderer.TableMetadata;
 import io.github.nchaugen.tabletest.renderer.TableRenderer;
+import io.github.nchaugen.tabletest.renderer.TestIndexRenderer;
 import org.junit.jupiter.api.MediaType;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.nio.file.Files;
-import java.util.function.BiConsumer;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
-import static io.github.nchaugen.tabletest.junit.InputResolver.resolveInput;
+public class TablePublisher implements AfterAllCallback {
+
+    private static final TableRenderer MARKDOWN_TABLE_RENDERER = new MarkdownTableRenderer();
+    private static final TestIndexRenderer MARKDOWN_TEST_INDEX_RENDERER = new MarkdownTestIndexRenderer();
+    private static final TestIndexRenderer ASCIIDOC_TEST_INDEX_RENDERER = new AsciidocTestIndexRenderer();
 
 public class TablePublisher {
 
-    private static final MarkdownRenderer MARKDOWN_RENDERER = new MarkdownRenderer();
+
+        private final String extension;
+
+        Format(String extension) {
+            this.extension = extension;
+        }
+
+        void publishFile(ExtensionContext context, String fileName, Function<Path, String> renderer) {
+            context.publishFile(
+                fileName + extension,
+                MediaType.TEXT_PLAIN_UTF_8,
+                path -> Files.writeString(path, renderer.apply(path))
+            );
+        }
+    }
+
 
     public static void publishTable(ExtensionContext context, TableTest tableTest, Table table) {
-        TableMetadata metadata = new JunitTableMetadata(context, table);
-
-        BiConsumer<String, TableRenderer> filePublisher = (String extension, TableRenderer renderer) ->
-            context.publishFile(
-                context.getDisplayName() + extension,
-                MediaType.TEXT_PLAIN_UTF_8,
-                path -> Files.writeString(path, renderer.render(table, metadata))
-            );
-
-        context.getConfigurationParameter("tabletest.publisher.format")
+        getPublisherFormat(context)
             .ifPresent(format -> {
                 switch (format.strip().toLowerCase()) {
                     case "" -> {} // do nothing if the config parameter is present without value
@@ -51,8 +69,62 @@ public class TablePublisher {
                     case "asciidoc" -> filePublisher.accept(".adoc", new AsciidocRenderer(new ConfiguredAsciidocStyle(context)));
                     default -> throw new IllegalArgumentException("`" + format + "` not among supported table publisher formats [tabletest, markdown, asciidoc]");
                 }
-            });
+                TableMetadata metadata = new JunitTableMetadata(context, table);
 
+                TableRenderer renderer = switch (format) {
+                    case TABLETEST -> (__, ___) -> InputResolver.resolveInput(context, tableTest);
+                    case MARKDOWN -> MARKDOWN_TABLE_RENDERER;
+                    case ASCIIDOC -> new AsciidocTableRenderer(new ConfiguredAsciidocStyle(context));
+                };
+
+                format.publishFile(
+                    context, metadata.title(), (Path path) -> {
+                        TableFileIndex.save(metadata.title(), path, context);
+                        return renderer.render(table, metadata);
+                    }
+                );
+            });
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) throws Exception {
+        getPublisherFormat(context)
+            .ifPresent(format -> {
+                TestIndexRenderer renderer = switch (format) {
+                    case TABLETEST -> (__, ___, ____) -> "";
+                    case MARKDOWN -> MARKDOWN_TEST_INDEX_RENDERER;
+                    case ASCIIDOC -> ASCIIDOC_TEST_INDEX_RENDERER;
+                };
+
+                format.publishFile(
+                    context, context.getDisplayName(), (Path path) ->
+                        renderer.render(
+                            context.getDisplayName(),
+                            findDescription(context),
+                            relativizeToIndex(path, TableFileIndex.allForTestClass(context))
+                        )
+                );
+            });
+    }
+
+    private static Optional<Format> getPublisherFormat(ExtensionContext context) {
+        return context.getConfigurationParameter("tabletest.publisher.format")
+            .filter(it -> !it.isBlank())
+            .map(it -> it.strip().toUpperCase())
+            .map(Format::valueOf);
+    }
+
+    private static List<TableFileEntry> relativizeToIndex(Path indexPath, List<TableFileEntry> tableFiles) {
+        return tableFiles.stream()
+            .map(it -> new TableFileEntry(it.title(), indexPath.getParent().relativize(it.path())))
+            .toList();
+    }
+
+    private static String findDescription(ExtensionContext context) {
+        return context.getTestClass()
+            .map(it -> it.getAnnotation(Description.class))
+            .map(Description::value)
+            .orElse(null);
     }
 
 }

@@ -28,7 +28,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public record AsciidocRenderer(AsciidocStyle style) implements TableRenderer {
+public record AsciidocTableRenderer(AsciidocStyle style) implements TableRenderer {
 
     private static final String EMPTY = "{empty}";
     private static final String NEWLINE = "\n";
@@ -43,7 +43,7 @@ public record AsciidocRenderer(AsciidocStyle style) implements TableRenderer {
                 metadata.description() != null
                     ? metadata.description().stripIndent() + (metadata.description().endsWith(NEWLINE) ? "" : NEWLINE)
                     : null,
-                table.headers().stream().map(AsciidocRenderer::columnSpecifier).collect(ASCIIDOC_ATTRIBUTE_LIST),
+                table.headers().stream().map(AsciidocTableRenderer::columnSpecifier).collect(ASCIIDOC_ATTRIBUTE_LIST),
                 table.header().mapIndexed((i, header) -> render(header, metadata.columnRoles().roleFor(i))).collect(ASCIIDOC_HEADER_ROW),
                 table.rows().stream().map(row -> render(row, metadata.columnRoles())).collect(MULTILINE)
             )

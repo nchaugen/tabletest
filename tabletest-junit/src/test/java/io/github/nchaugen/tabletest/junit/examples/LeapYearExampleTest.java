@@ -1,14 +1,21 @@
 package io.github.nchaugen.tabletest.junit.examples;
 
 import io.github.nchaugen.tabletest.junit.Description;
+import io.github.nchaugen.tabletest.junit.TablePublisher;
 import io.github.nchaugen.tabletest.junit.TableTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.Year;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(TablePublisher.class)
+@DisplayName("Leap Year Rules")
+@Description("The following describes the rules for leap years.")
 public class LeapYearExampleTest {
 
     @Test
@@ -33,7 +40,9 @@ public class LeapYearExampleTest {
 
     @DisplayName("Leap Year Rules with Single Example")
     @Description("""
-        The leap year rules should be well known.
+        The [leap year](https://en.wikipedia.org/wiki/Leap_year) rules should be well-known.
+        * The year must be divisible by 4.
+        * If the year is divisible by 100, it must also be divisible by 400 to be a leap year.
         """)
     @TableTest("""
         Scenario                        | Year | Is Leap Year?
