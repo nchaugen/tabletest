@@ -1,15 +1,17 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [0.5.6] - 2025-12-09
 ### Added
 - Publishing to YAML format by default
-- AsciiDoc custom role `scenario` added to cells in scenario column
-- AsciiDoc custom role `expectation` added to cells in columns where header name ends in `?`
-- Rendering explicit whitespace in AsciiDoc tables
-- Rendering test method display name as a table title for Markdown and AsciiDoc formats
-- Support for `@Description` annotation on test methods to provide a description for the table
+- Role `scenario` added to cells in report scenario column
+- Role `expectation` added to cells in report columns where header name ends in `?`
+- Using `@DisplayName` as test and table title in reports
+- Added `@Description` annotation for test and table descriptions in reports
 ### Fixed
 - Preventing table values from being misinterpreted as markup when rendered to AsciiDoc
+- Including explicit whitespace in reports
 
 ## [0.5.5] - 2025-11-12
 ### Added
