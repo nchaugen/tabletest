@@ -17,7 +17,7 @@ class KotlinConversionFailureTest {
         52          | io.github.nchaugen.tabletest.junit.javadomain.Ages
             """
     )
-    fun fails_conversion_for_single_values_outside_type_range(value: String, type: Class<*>) {
+    fun `fails conversion for single values outside type range`(value: String, type: Class<*>) {
         assertThrowsWhenFallbackFails(value, type)
     }
 

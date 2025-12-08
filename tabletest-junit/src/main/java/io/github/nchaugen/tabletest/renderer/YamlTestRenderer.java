@@ -15,27 +15,29 @@
  */
 package io.github.nchaugen.tabletest.renderer;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
+import org.snakeyaml.engine.v2.api.Dump;
+import org.snakeyaml.engine.v2.api.DumpSettings;
+import org.snakeyaml.engine.v2.common.FlowStyle;
+import org.snakeyaml.engine.v2.common.ScalarStyle;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class YamlTestRenderer implements TestIndexRenderer {
-    private final Yaml yaml;
+    private final Dump yaml;
 
     public YamlTestRenderer() {
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        options.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
-        options.setIndent(2);
-        options.setSplitLines(false);
-        options.setDereferenceAliases(true);
-        options.setAllowUnicode(true);
-        options.setLineBreak(DumperOptions.LineBreak.getPlatformLineBreak());
-        options.setPrettyFlow(true);
+        DumpSettings settings = DumpSettings.builder()
+            .setDefaultFlowStyle(FlowStyle.BLOCK)
+            .setIndent(2)
+            .setDefaultScalarStyle(ScalarStyle.DOUBLE_QUOTED)
+            .setSplitLines(false)
+            .setDereferenceAliases(true)
+            .setMultiLineFlow(true)
+            .setUseUnicodeEncoding(true)
+            .build();
 
-        yaml = new Yaml(options);
+        yaml = new Dump(settings);
     }
 
     @Override
@@ -46,6 +48,6 @@ public class YamlTestRenderer implements TestIndexRenderer {
         LinkedHashMap tables = new LinkedHashMap();
         tableFileEntries.forEach(it -> tables.put(it.title(), it.path().toString()));
         content.put("tables", tables);
-        return yaml.dump(content);
+        return yaml.dumpToString(content);
     }
 }

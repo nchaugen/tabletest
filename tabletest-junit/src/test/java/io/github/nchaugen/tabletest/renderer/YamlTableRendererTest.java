@@ -69,8 +69,7 @@ public class YamlTableRendererTest {
                 - "value": "e?"
                   "role": "expectation"
                 "rows":
-                - - "value": !!set {
-                      }
+                - - "value": !!set {}
                     "role": "expectation"
                   - "value":
                     - "1"
@@ -201,8 +200,7 @@ public class YamlTableRendererTest {
                 - "value": "b"
                 - "value": "c"
                 "rows":
-                - - "value": [
-                      ]
+                - - "value": []
                   - "value":
                     - "1"
                     - "2"
@@ -230,14 +228,11 @@ public class YamlTableRendererTest {
                 - "value": "b"
                 - "value": "c"
                 "rows":
-                - - "value": [
-                      ]
+                - - "value": []
                   - "value":
-                    - [
-                      ]
+                    - []
                   - "value":
-                    - - [
-                        ]
+                    - - []
                 """,
             renderer.render(
                 TableParser.parse("""
@@ -286,8 +281,7 @@ public class YamlTableRendererTest {
                 - "value": "b"
                 - "value": "c"
                 "rows":
-                - - "value": !!set {
-                      }
+                - - "value": !!set {}
                   - "value": !!set
                       "1": !!null "null"
                       "2": !!null "null"
@@ -348,8 +342,7 @@ public class YamlTableRendererTest {
                 - "value": "b"
                 - "value": "c"
                 "rows":
-                - - "value": {
-                      }
+                - - "value": {}
                   - "value":
                       "a": "1"
                       "b": "2"
@@ -376,10 +369,8 @@ public class YamlTableRendererTest {
                 - "value": "b"
                 "rows":
                 - - "value":
-                      "a": {
-                        }
-                      "b": {
-                        }
+                      "a": {}
+                      "b": {}
                   - "value":
                       "a":
                         "A": "1"

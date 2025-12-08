@@ -16,8 +16,10 @@
 package io.github.nchaugen.tabletest.renderer;
 
 import io.github.nchaugen.tabletest.parser.Table;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
+import org.snakeyaml.engine.v2.api.Dump;
+import org.snakeyaml.engine.v2.api.DumpSettings;
+import org.snakeyaml.engine.v2.common.FlowStyle;
+import org.snakeyaml.engine.v2.common.ScalarStyle;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,21 +27,15 @@ import java.util.stream.IntStream;
 
 public class YamlTableRenderer implements TableRenderer {
 
-    private final Yaml yaml;
-
-    public YamlTableRenderer() {
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        options.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
-        options.setIndent(2);
-        options.setSplitLines(false);
-        options.setDereferenceAliases(true);
-        options.setAllowUnicode(true);
-        options.setLineBreak(DumperOptions.LineBreak.getPlatformLineBreak());
-        options.setPrettyFlow(true);
-
-        yaml = new Yaml(options);
-    }
+    public static final DumpSettings SETTINGS = DumpSettings.builder()
+        .setDefaultFlowStyle(FlowStyle.BLOCK)
+        .setIndent(2)
+        .setDefaultScalarStyle(ScalarStyle.DOUBLE_QUOTED)
+        .setSplitLines(false)
+        .setDereferenceAliases(true)
+        .setMultiLineFlow(false)
+        .setUseUnicodeEncoding(true)
+        .build();
 
     @Override
     public String render(Table table, TableMetadata context) {
@@ -63,7 +59,7 @@ public class YamlTableRenderer implements TableRenderer {
                 .toList()
         );
 
-        return yaml.dump(content);
+        return new Dump(SETTINGS).dumpToString(content);
     }
 
     private static Map<String, Object> toValueMap(Object value, CellRole role) {

@@ -18,7 +18,7 @@
         <version.tabletest-parser>0.5.6-SNAPSHOT</version.tabletest-parser>
         <version.junit>6.0.1</version.junit>
         <version.kotlin>2.2.0</version.kotlin>
-        <version.snakeyaml>2.5</version.snakeyaml>
+        <version.snakeyaml>3.0.1</version.snakeyaml>
     </properties>
 
     <dependencies>
@@ -40,8 +40,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
+            <groupId>org.snakeyaml</groupId>
+            <artifactId>snakeyaml-engine</artifactId>
             <version>${version.snakeyaml}</version>
         </dependency>
         <dependency>
