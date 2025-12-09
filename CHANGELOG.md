@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.5.7] - 2025-12-09
+### Fixed
+- Reverted accidental usage of JUnit MediaType moved in JUnit 5.14 to restore compatibility with JUnit 5.12 upwards 
+
 ## [0.5.6] - 2025-12-09
 ### Added
 - Publishing to YAML format by default

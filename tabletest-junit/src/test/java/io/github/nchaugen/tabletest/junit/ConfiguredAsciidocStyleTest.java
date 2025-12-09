@@ -1,7 +1,7 @@
 package io.github.nchaugen.tabletest.junit;
 
 import io.github.nchaugen.tabletest.renderer.AsciidocListFormat;
-import org.junit.jupiter.api.MediaType;
+import org.junit.jupiter.api.extension.MediaType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExecutableInvoker;
@@ -199,6 +199,10 @@ class ConfiguredAsciidocStyleTest {
 
         @Override
         public void publishFile(String name, MediaType mediaType, ThrowingConsumer<Path> action) {
+        }
+
+        @Override
+        public void publishFile(String name, org.junit.jupiter.api.MediaType mediaType, ThrowingConsumer<Path> action) {
         }
 
         @Override

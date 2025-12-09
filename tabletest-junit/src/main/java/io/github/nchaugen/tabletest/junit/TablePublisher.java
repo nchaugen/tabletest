@@ -26,7 +26,7 @@ import io.github.nchaugen.tabletest.renderer.TableRenderer;
 import io.github.nchaugen.tabletest.renderer.TestIndexRenderer;
 import io.github.nchaugen.tabletest.renderer.YamlTableRenderer;
 import io.github.nchaugen.tabletest.renderer.YamlTestRenderer;
-import org.junit.jupiter.api.MediaType;
+import org.junit.jupiter.api.extension.MediaType;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 

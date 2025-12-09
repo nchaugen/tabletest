@@ -1,8 +1,10 @@
 # TableTest
 
-TableTest extends JUnit for data-driven testing using a concise table format. Express system behaviour through multiple examples, reducing test code while improving readability and maintainability.
+TableTest extends JUnit for data-driven testing using a concise table format. Express system behaviour through multiple
+examples, reducing test code while improving readability and maintainability.
 
 ```java
+
 @TableTest("""
     Scenario                     | Example Years      | Is Leap Year?
     Not divisible by 4           | {1, 2001, 30001}   | No
@@ -22,6 +24,7 @@ public static boolean parseBoolean(String input) {
 ```
 
 **Benefits:**
+
 - **Readable**: Clear input/output relationships in structured tables
 - **Maintainable**: Add test cases by adding table rows
 - **Concise**: Eliminates repetitive test code
@@ -30,15 +33,18 @@ public static boolean parseBoolean(String input) {
 
 **Requirements**: Java 21+, JUnit 5.11.0-6.0.1 (except 5.13.0).
 
-**IDE Support**: [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for working with tables.
+**IDE Support**: [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides
+auto-formatting, syntax highlighting, and shortcuts for working with tables.
 
 **Latest Updates**: See the [changelog](CHANGELOG.md) for details on recent releases and changes.
 
 **User Guide**: See the [user guide](USERGUIDE.md) for more details on how to use TableTest.
 
-**Blog Posts**: See [this blog post](https://nchaugen.com/2025/08/31/table-driven-testing.html) for a short introduction to table-driven testing and TableTest.
+**Blog Posts**: See [this blog post](https://nchaugen.com/2025/08/31/table-driven-testing.html) for a short introduction
+to table-driven testing and TableTest.
 
 ## Table of Contents
+
 - [Usage](#usage)
 - [Value Formats](#value-formats)
 - [Value Conversion](#value-conversion)
@@ -47,13 +53,16 @@ public static boolean parseBoolean(String input) {
 - [IDE Support](#ide-support)
 - [License](#license)
 
-
 ## Usage
-Annotate test methods with `@TableTest` and provide table data as a multi-line string or [external file](#table-in-external-file).
 
-Tables use pipes (`|`) to separate columns. The first row contains headers, the following rows contain test data. Each data row invokes the test method with cell values as arguments.
+Annotate test methods with `@TableTest` and provide table data as a multi-line string
+or [external file](#table-in-external-file).
+
+Tables use pipes (`|`) to separate columns. The first row contains headers, the following rows contain test data. Each
+data row invokes the test method with cell values as arguments.
 
 ```java
+
 @TableTest("""
     Scenario                              | Year | Is leap year?
     Years not divisible by 4              | 2001 | false
@@ -67,16 +76,20 @@ public void leapYearCalculation(Year year, boolean expectedResult) {
 ```
 
 **Key points:**
+
 - One parameter per data column (scenario column excluded)
 - Parameters map by position, not name
 - Values automatically convert to parameter types
 - Test methods must be non-private, non-static, void return
 
-Technically `@TableTest` is a [JUnit `@ParameterizedTest`](https://junit.org/junit5/docs/current/user-guide/index.html#writing-tests-parameterized-tests) with a custom-format argument source. 
-
+Technically `@TableTest` is a [JUnit
+`@ParameterizedTest`](https://junit.org/junit5/docs/current/user-guide/index.html#writing-tests-parameterized-tests)
+with a custom-format argument source.
 
 ## Value Formats
-The TableTest format supports four types of values: 
+
+The TableTest format supports four types of values:
+
 - **Single values** specified with or without quotes (`abc`, `"a|b"`, `' '`)
 - **Lists** of elements enclosed in brackets (`[1, 2, 3]`)
 - **Sets** of elements enclosed in curly braces (`{a, b, c}`)
@@ -97,14 +110,15 @@ void testValues(String single, List<?> list, Set<?> set, Map<String, ?> map) {
 }
 ```
 
-
 ## Value Conversion
+
 TableTest converts table values to method parameter types using this priority:
 
 1. **Factory method** (in test class or `@FactorySources`)
 2. **Built-in conversion** (primitives, dates, enums, etc.)
 
 ### Factory Methods
+
 Factory methods are `public static` methods in a public class that accept one parameter and return the target type:
 
 ```java
@@ -117,14 +131,22 @@ public static LocalDate parseDate(String input) {
 }
 ```
 
-TableTest will look for a factory method present in either the test class, including inherited methods, or in one of the classes listed by a `@FactorySources` annotation. The first factory method found will be used. If required, TableTest will first convert the cell value to match the factory method parameter type, before invoking the factory method to convert it to the test method parameter type.
+TableTest will look for a factory method present in either the test class, including inherited methods, or in one of the
+classes listed by a `@FactorySources` annotation. The first factory method found will be used. If required, TableTest
+will first convert the cell value to match the factory method parameter type, before invoking the factory method to
+convert it to the test method parameter type.
 
-There is no specific naming pattern for factory methods, any method fulfilling the requirements above will be considered. Only one factory method per target type is possible per class.
+There is no specific naming pattern for factory methods, any method fulfilling the requirements above will be
+considered. Only one factory method per target type is possible per class.
 
 ### Built-In Conversion
-TableTest falls back to [JUnit's built-in type converters](https://junit.org/junit5/docs/current/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit) if no factory method is found. 
+
+TableTest falls back
+to [JUnit's built-in type converters](https://junit.org/junit5/docs/current/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-implicit)
+if no factory method is found.
 
 ```java
+
 @TableTest("""
     Number | Text | Date       | Class
     1      | abc  | 2025-01-20 | java.lang.Integer
@@ -135,11 +157,14 @@ void singleValues(short number, String text, LocalDate date, Class<?> type) {
 ```
 
 ### Parameterized Types
-TableTest will convert elements in compound values like List, Set, and Map to match parameterized types. Nested values are also traversed and converted. Map keys remain String type and are not converted.
+
+TableTest will convert elements in compound values like List, Set, and Map to match parameterized types. Nested values
+are also traversed and converted. Map keys remain String type and are not converted.
 
 In the example below, the list of grades inside the map is converted to `List<Integer>`:
 
 ```java
+
 @TableTest("""
     Grades                                       | Highest Grade?
     [Alice: [95, 87, 92], Bob: [78, 85, 90]]     | 95
@@ -151,9 +176,12 @@ void testParameterizedTypes(Map<String, List<Integer>> grades, int expectedHighe
 ```
 
 ### Null Values
-Blank cells will translate to `null` for all parameter types except primitives. For primitives, it will cause an exception as they cannot represent a `null` value.
+
+Blank cells will translate to `null` for all parameter types except primitives. For primitives, it will cause an
+exception as they cannot represent a `null` value.
 
 ```java
+
 @TableTest("""
     String | Integer | List | Map | Set
            |         |      |     |
@@ -167,14 +195,16 @@ void blankConvertsToNull(String string, Integer integer, List<?> list, Map<Strin
 }
 ```
 
-
 ## Additional Features
+
 TableTest contains a number of other useful features for expressing examples in a table format.
 
 ### Scenario Names
+
 Add descriptive names to test rows by providing a scenario name in the first column:
 
 ```java
+
 @TableTest("""
     Scenario     | Input | Output
     Basic case   | 1     | one
@@ -185,16 +215,22 @@ void test(int input, String output) {
 }
 ```
 
-Scenario names make the tables better documentation and will be used as test display names. This makes the test failures more clear and debugging easier. 
+Scenario names make the tables better documentation and will be used as test display names. This makes the test failures
+more clear and debugging easier.
 
-Optionally scenario names can be accessed in test methods by declaring it as a test method parameter tagged with annotation `@Scenario`.
+Optionally scenario names can be accessed in test methods by declaring it as a test method parameter tagged with
+annotation `@Scenario`.
 
 ### Value Sets
-TableTest allows using a set in a single-value column to express that any of the listed values give the same result. This is a powerful feature that can be used to contract multiple rows that have identical expectations. 
 
-TableTest will create multiple test invocations for a row with a value set, one for each value in the set. The test method will be invoked 12 times, three times for each row, once for each value in the `Example years` set.
+TableTest allows using a set in a single-value column to express that any of the listed values give the same result.
+This is a powerful feature that can be used to contract multiple rows that have identical expectations.
+
+TableTest will create multiple test invocations for a row with a value set, one for each value in the set. The test
+method will be invoked 12 times, three times for each row, once for each value in the `Example years` set.
 
 ```java
+
 @TableTest("""
     Scenario                              | Example years      | Is leap year?
     Years not divisible by 4              | {2001, 2002, 2003} | false
@@ -207,25 +243,30 @@ public void testLeapYear(Year year, boolean expectedResult) {
 }
 ```
 
-Scenario names will be augmented to include the value from the set being used for the current test invocation. This makes it easier to see which values caused problems in case of test failures. 
+Scenario names will be augmented to include the value from the set being used for the current test invocation. This
+makes it easier to see which values caused problems in case of test failures.
 
-Value sets can be used multiple times in the same row. TableTest will then perform a cartesian product, generating test invocations for all possible combinations of values. Use this judiciously, as the number of test cases grows multiplicatively with each additional set, as does the test execution time.
-
+Value sets can be used multiple times in the same row. TableTest will then perform a cartesian product, generating test
+invocations for all possible combinations of values. Use this judiciously, as the number of test cases grows
+multiplicatively with each additional set, as does the test execution time.
 
 ### Comments and Blank Lines
-Lines starting with `//` (ignoring leading whitespace) are treated as comments and ignored. Comments allow adding explanations or temporarily disabling data rows.
+
+Lines starting with `//` (ignoring leading whitespace) are treated as comments and ignored. Comments allow adding
+explanations or temporarily disabling data rows.
 
 Blank lines are also ignored and can be used to visually group related rows.
 
 ```java
+
 @TableTest("""
     String         | Length?
     
     Hello world    | 11
-
+    
     // The next row is currently disabled
     // "World, hello" | 12
-
+    
     // Special characters must be quoted
     '|'            | 1
     '[:]'          | 3
@@ -236,11 +277,15 @@ void testComment(String string, int expectedLength) {
 ```
 
 ### Table in External File
-Tables can be loaded from external files using the `resource` attribute. The file must be located as a resource relative to the test class. Typically, it is stored in the test `resources` directory or one of its subdirectories.
 
-By default, the file is assumed to use UTF-8 encoding. If your file uses a different encoding, specify it with the `encoding` attribute.
+Tables can be loaded from external files using the `resource` attribute. The file must be located as a resource relative
+to the test class. Typically, it is stored in the test `resources` directory or one of its subdirectories.
+
+By default, the file is assumed to use UTF-8 encoding. If your file uses a different encoding, specify it with the
+`encoding` attribute.
 
 ```java
+
 @TableTest(resource = "/external.table")
 void testExternalTable(int a, int b, int sum) {
     assertEquals(sum, a + b);
@@ -253,34 +298,52 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 ```
 
 ### Publishing Tables to File
-TableTest can be configured to publish tables to file as they are being tested. This can be used to generate documentation from the tables.
+
+TableTest can be configured to publish tables to file as they are being tested. This can be used to generate
+documentation from the tables.
 
 The following formats are supported:
+
 - Markdown
 - AsciiDoc
 - TableTest
 
-Publishing to file is disabled by default. To enable it, add `tabletest.publisher.format = <format>` to your [JUnit configuration parameters](https://docs.junit.org/current/user-guide/#running-tests-config-params). `<format>` is one of `markdown`, `asciidoc`, or `tabletest`.
+Publishing to file is disabled by default. To enable it, add `tabletest.publisher.format = <format>` to
+your [JUnit configuration parameters](https://docs.junit.org/current/user-guide/#running-tests-config-params).
+`<format>` is one of `markdown`, `asciidoc`, or `tabletest`.
 
 ## Installation
 
-TableTest is available from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit.
+TableTest is available
+from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects
+using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit.
 
-TableTest is compatible with JUnit versions 5.11.0 to 6.0.1 (except 5.13.0).
+## JUnit Compatibility
 
-Frameworks such as Quarkus and SpringBoot packages their own version of JUnit. TableTest is compatible with Quarkus version 3.21.2 and above, and SpringBoot version 3.4.0 and above.
+The latest versions of TableTest introduce reporting support that is not compatible with older versions of JUnit. Please
+consult the following table for compatibility details:
 
-Please see the [compatibility tests](compatibility-tests) for examples of how to use TableTest with these frameworks. 
+| TableTest | JUnit                        | SpringBoot | Quarkus   |
+|-----------|------------------------------|------------|-----------|
+| <= 0.5.3  | 5.11.0-6.0.1 (except 5.13.0) | >= 3.4.0   | >= 3.21.2 |
+| 0.5.4     | 5.12.0-6.0.1 (except 5.13.0) | >= 3.5.0   | >= 3.21.2 |
+| 0.5.5     | 5.12.0-6.0.1 (except 5.13.0) | >= 3.5.0   | >= 3.21.2 |
+| 0.5.6     | 5.14.0-6.0.1                 | >= 3.4.0   | None      |
+| 0.5.7     | 5.12.0-6.0.1 (except 5.13.0) | >= 3.5.0   | >= 3.21.2 |
 
-Please note that TableTest requires Java version 21 or above. 
+Please see the [compatibility tests](compatibility-tests) for examples of how to use TableTest with these frameworks.
+
+Please note that TableTest requires Java version 21 or above.
 
 ### Maven (pom.xml)
+
 ```xml
+
 <dependencies>
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.5.6</version>
+        <version>0.5.7</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -293,32 +356,41 @@ Please note that TableTest requires Java version 21 or above.
 ```
 
 ### Gradle with Kotlin DSL (build.gradle.kts)
+
 ```kotlin
-dependencies { 
-    testImplementation("io.github.nchaugen:tabletest-junit:0.5.6")
+dependencies {
+    testImplementation("io.github.nchaugen:tabletest-junit:0.5.7")
     testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 ```
 
-
 ## IDE Support
-The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) enhances your development experience when working with TableTest format tables. The plugin provides:
+
+The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) enhances your development
+experience when working with TableTest format tables. The plugin provides:
 
 - Code assistance for table formatting
 - Syntax highlighting for table content
 - Visual feedback for invalid table syntax
 
-Installing the plugin streamlines the creation and maintenance of data-driven tests, making it easier to work with both inline and external table files.
-
+Installing the plugin streamlines the creation and maintenance of data-driven tests, making it easier to work with both
+inline and external table files.
 
 ## License
-TableTest is licensed under the liberal and business-friendly [Apache Licence, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) and is freely available on [GitHub](https://github.com/nchaugen/tabletest). 
 
-Additionally, `tabletest-junit` distributions prior to version 0.5.1 included the following modules from JUnit 5 which are released under [Eclipse Public License 2.0](https://raw.githubusercontent.com/junit-team/junit5/refs/heads/main/LICENSE.md):
+TableTest is licensed under the liberal and
+business-friendly [Apache Licence, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) and is freely
+available on [GitHub](https://github.com/nchaugen/tabletest).
+
+Additionally, `tabletest-junit` distributions prior to version 0.5.1 included the following modules from JUnit 5 which
+are released
+under [Eclipse Public License 2.0](https://raw.githubusercontent.com/junit-team/junit5/refs/heads/main/LICENSE.md):
+
 - `org.junit.jupiter:junit-jupiter-params`
 - `org.junit.platform:junit-platform-commons`
 
 Starting from version 0.5.1, these modules are no longer included in the `tabletest-junit` distribution.
 
-TableTest binaries are published to the repositories of Maven Central. The artefacts signatures can be validated against [this PGP public key](https://keyserver.ubuntu.com/pks/lookup?search=nchaugen%40gmail.com).
+TableTest binaries are published to the repositories of Maven Central. The artefacts signatures can be validated
+against [this PGP public key](https://keyserver.ubuntu.com/pks/lookup?search=nchaugen%40gmail.com).

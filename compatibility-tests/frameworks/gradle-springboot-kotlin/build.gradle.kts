@@ -18,7 +18,7 @@ repositories {
 // Allow overriding SpringBoot version via -Pspringboot.version
 val springBootVersion = (project.findProperty("springboot.version") as String?) ?: "3.5.7"
 // Allow overriding TableTest version via -Ptabletest.version
-val tabletestVersion = (project.findProperty("tabletest.version") as String?) ?: "0.5.6-SNAPSHOT"
+val tabletestVersion = (project.findProperty("tabletest.version") as String?) ?: "0.5.7-SNAPSHOT"
 
 dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
