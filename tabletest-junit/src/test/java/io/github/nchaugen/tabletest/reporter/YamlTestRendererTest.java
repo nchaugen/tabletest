@@ -1,4 +1,4 @@
-package io.github.nchaugen.tabletest.renderer;
+package io.github.nchaugen.tabletest.reporter;
 
 import org.junit.jupiter.api.Test;
 

@@ -15,23 +15,12 @@
  */
 package io.github.nchaugen.tabletest.reporter;
 
-import io.github.nchaugen.tabletest.junit.ConfiguredAsciidocStyle;
 import io.github.nchaugen.tabletest.junit.Description;
 import io.github.nchaugen.tabletest.junit.InputResolver;
 import io.github.nchaugen.tabletest.junit.JunitTableMetadata;
 import io.github.nchaugen.tabletest.junit.TableFileIndex;
 import io.github.nchaugen.tabletest.junit.TableTest;
 import io.github.nchaugen.tabletest.parser.Table;
-import io.github.nchaugen.tabletest.renderer.AsciidocTableRenderer;
-import io.github.nchaugen.tabletest.renderer.AsciidocTestIndexRenderer;
-import io.github.nchaugen.tabletest.renderer.MarkdownTableRenderer;
-import io.github.nchaugen.tabletest.renderer.MarkdownTestIndexRenderer;
-import io.github.nchaugen.tabletest.renderer.TableFileEntry;
-import io.github.nchaugen.tabletest.renderer.TableMetadata;
-import io.github.nchaugen.tabletest.renderer.TableRenderer;
-import io.github.nchaugen.tabletest.renderer.TestIndexRenderer;
-import io.github.nchaugen.tabletest.renderer.YamlTableRenderer;
-import io.github.nchaugen.tabletest.renderer.YamlTestRenderer;
 import org.junit.jupiter.api.extension.MediaType;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -47,18 +36,12 @@ public class TablePublisher implements TestWatcher, AfterAllCallback {
     private static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(TablePublisher.class);
 
-    private static final TableRenderer MARKDOWN_TABLE_RENDERER = new MarkdownTableRenderer();
-    private static final TestIndexRenderer MARKDOWN_TEST_INDEX_RENDERER = new MarkdownTestIndexRenderer();
-    private static final TestIndexRenderer ASCIIDOC_TEST_INDEX_RENDERER = new AsciidocTestIndexRenderer();
     private static final TestIndexRenderer YAML_TEST_INDEX_RENDERER = new YamlTestRenderer();
     private static final TableRenderer YAML_TABLE_RENDERER = new YamlTableRenderer();
 
     enum Format {
         TABLETEST(".table"),
-        MARKDOWN(".md"),
-        ASCIIDOC(".adoc"),
         YAML(".yaml");
-
 
         private final String extension;
 
@@ -86,8 +69,6 @@ public class TablePublisher implements TestWatcher, AfterAllCallback {
 
         TableRenderer renderer = switch (format) {
             case TABLETEST -> (__, ___) -> InputResolver.resolveInput(context, tableTest);
-            case MARKDOWN -> MARKDOWN_TABLE_RENDERER;
-            case ASCIIDOC -> new AsciidocTableRenderer(new ConfiguredAsciidocStyle(context));
             case YAML -> YAML_TABLE_RENDERER;
         };
 
@@ -223,8 +204,6 @@ public class TablePublisher implements TestWatcher, AfterAllCallback {
         Format format = getPublisherFormat(context);
         TestIndexRenderer renderer = switch (format) {
             case TABLETEST -> (__, ___, ____) -> "";
-            case MARKDOWN -> MARKDOWN_TEST_INDEX_RENDERER;
-            case ASCIIDOC -> ASCIIDOC_TEST_INDEX_RENDERER;
             case YAML -> YAML_TEST_INDEX_RENDERER;
         };
 

@@ -16,9 +16,6 @@
 package io.github.nchaugen.tabletest.reporter;
 
 import io.github.nchaugen.tabletest.parser.TableParser;
-import io.github.nchaugen.tabletest.renderer.ColumnRoles;
-import io.github.nchaugen.tabletest.renderer.TableMetadata;
-import io.github.nchaugen.tabletest.renderer.YamlTableRenderer;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

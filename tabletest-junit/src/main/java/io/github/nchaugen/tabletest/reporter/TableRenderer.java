@@ -13,16 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.nchaugen.tabletest.renderer;
+package io.github.nchaugen.tabletest.reporter;
 
-public enum AsciidocListType {
-    ORDERED("."),
-    UNORDERED("*"),
-    DESCRIPTION("::");
+import io.github.nchaugen.tabletest.parser.Table;
 
-    final String bullet;
-
-    AsciidocListType(String bullet) {
-        this.bullet = bullet;
-    }
+@FunctionalInterface
+public interface TableRenderer {
+    String render(Table table, TableMetadata context);
 }

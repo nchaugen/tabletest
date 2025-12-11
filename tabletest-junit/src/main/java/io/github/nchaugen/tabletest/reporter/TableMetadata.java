@@ -13,11 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.nchaugen.tabletest.renderer;
+package io.github.nchaugen.tabletest.reporter;
 
-import io.github.nchaugen.tabletest.parser.Table;
+import java.util.List;
 
-@FunctionalInterface
-public interface TableRenderer {
-    String render(Table table, TableMetadata context);
+public interface TableMetadata {
+    ColumnRoles columnRoles();
+    String title();
+    String description();
+
+    /**
+     * Returns the test execution results for each table row.
+     * Empty list if no results are available yet.
+     */
+    default List<RowResult> rowResults() {
+        return List.of();
+    }
 }

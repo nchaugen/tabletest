@@ -15,7 +15,7 @@
  */
 package io.github.nchaugen.tabletest.junit;
 
-import io.github.nchaugen.tabletest.renderer.TableFileEntry;
+import io.github.nchaugen.tabletest.reporter.TableFileEntry;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.nio.file.Path;

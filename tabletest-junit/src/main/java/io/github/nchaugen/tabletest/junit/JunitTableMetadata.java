@@ -16,8 +16,8 @@
 package io.github.nchaugen.tabletest.junit;
 
 import io.github.nchaugen.tabletest.parser.Table;
-import io.github.nchaugen.tabletest.renderer.ColumnRoles;
-import io.github.nchaugen.tabletest.renderer.TableMetadata;
+import io.github.nchaugen.tabletest.reporter.ColumnRoles;
+import io.github.nchaugen.tabletest.reporter.TableMetadata;
 import io.github.nchaugen.tabletest.reporter.RowResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
 

@@ -13,12 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.nchaugen.tabletest.renderer;
+package io.github.nchaugen.tabletest.reporter;
 
-import java.nio.file.Path;
+public enum CellRole {
+    NORMAL(""),
+    EXPECTATION("expectation"),
+    SCENARIO("scenario");
 
-public record TableFileEntry(
-    String title,
-    Path path
-) {
+    private final String cssClass;
+
+    CellRole(String cssClass) {
+        this.cssClass = cssClass;
+    }
+
+    String cssClass() {
+        return cssClass;
+    }
 }

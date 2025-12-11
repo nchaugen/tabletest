@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.nchaugen.tabletest.renderer;
+package io.github.nchaugen.tabletest.reporter;
 
-public interface AsciidocStyle {
-    AsciidocListFormat listFormat();
+import java.util.List;
 
-    AsciidocListFormat setFormat();
-
-    AsciidocListFormat mapFormat();
+@FunctionalInterface
+public interface TestIndexRenderer {
+    String render(String title, String description, List<TableFileEntry> tableFileEntries);
 }

@@ -1,11 +1,9 @@
 package io.github.nchaugen.tabletest.junit.examples;
 
 import io.github.nchaugen.tabletest.junit.Description;
-import io.github.nchaugen.tabletest.reporter.TablePublisher;
 import io.github.nchaugen.tabletest.junit.TableTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.Year;
 
@@ -13,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(TablePublisher.class)
 @DisplayName("Leap Year Rules")
 @Description("The following describes the rules for leap years.")
 public class LeapYearExampleTest {

@@ -1,11 +1,11 @@
-package io.github.nchaugen.tabletest.renderer;
+package io.github.nchaugen.tabletest.reporter;
 
 import io.github.nchaugen.tabletest.parser.TableParser;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static io.github.nchaugen.tabletest.renderer.ColumnRoles.NO_ROLES;
+import static io.github.nchaugen.tabletest.reporter.ColumnRoles.NO_ROLES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class YamlTableRendererTest {

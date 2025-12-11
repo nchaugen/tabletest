@@ -18,7 +18,6 @@ package io.github.nchaugen.tabletest.junit;
 import io.github.nchaugen.tabletest.parser.Row;
 import io.github.nchaugen.tabletest.parser.Table;
 import io.github.nchaugen.tabletest.parser.TableParser;
-import io.github.nchaugen.tabletest.reporter.TablePublisher;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.AnnotationBasedArgumentsProvider;
 import org.junit.jupiter.params.provider.Arguments;
@@ -68,8 +67,6 @@ class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest>
         String input = InputResolver.resolveInput(context, tableTest);
         Table table = TableParser.parse(input);
         Parameter[] parameters = resolveParameters(context, table.columnCount());
-
-        TablePublisher.publishTable(context, tableTest, table);
 
         return table.map(row -> toArguments(row, parameters));
     }

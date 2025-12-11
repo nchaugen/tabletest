@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.nchaugen.tabletest.renderer;
+package io.github.nchaugen.tabletest.reporter;
 
-import java.util.List;
+import java.nio.file.Path;
 
-@FunctionalInterface
-public interface TestIndexRenderer {
-    String render(String title, String description, List<TableFileEntry> tableFileEntries);
+public record TableFileEntry(
+    String title,
+    Path path
+) {
 }
