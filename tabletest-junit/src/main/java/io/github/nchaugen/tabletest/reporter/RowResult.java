@@ -13,22 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.nchaugen.tabletest.renderer;
+package io.github.nchaugen.tabletest.reporter;
 
-import io.github.nchaugen.tabletest.reporter.RowResult;
-
-import java.util.List;
-
-public interface TableMetadata {
-    ColumnRoles columnRoles();
-    String title();
-    String description();
-
-    /**
-     * Returns the test execution results for each table row.
-     * Empty list if no results are available yet.
-     */
-    default List<RowResult> rowResults() {
-        return List.of();
-    }
+/**
+ * Records the test execution result for a single table row.
+ *
+ * @param rowIndex     The index of the row in the table (0-based)
+ * @param passed       Whether the test passed for this row
+ * @param cause        The exception if the test failed, null if passed
+ * @param displayName  The display name of the test invocation
+ */
+public record RowResult(int rowIndex, boolean passed, Throwable cause, String displayName) {
 }

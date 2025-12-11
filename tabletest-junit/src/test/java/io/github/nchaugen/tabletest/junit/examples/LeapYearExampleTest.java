@@ -1,7 +1,7 @@
 package io.github.nchaugen.tabletest.junit.examples;
 
 import io.github.nchaugen.tabletest.junit.Description;
-import io.github.nchaugen.tabletest.junit.TablePublisher;
+import io.github.nchaugen.tabletest.reporter.TablePublisher;
 import io.github.nchaugen.tabletest.junit.TableTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

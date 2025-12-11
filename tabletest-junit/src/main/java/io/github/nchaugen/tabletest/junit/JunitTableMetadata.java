@@ -18,25 +18,33 @@ package io.github.nchaugen.tabletest.junit;
 import io.github.nchaugen.tabletest.parser.Table;
 import io.github.nchaugen.tabletest.renderer.ColumnRoles;
 import io.github.nchaugen.tabletest.renderer.TableMetadata;
+import io.github.nchaugen.tabletest.reporter.RowResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-class JunitTableMetadata implements TableMetadata {
+public class JunitTableMetadata implements TableMetadata {
     private final ColumnRoles columnRoles;
     private final String title;
     private final String description;
+    private final List<RowResult> rowResults;
 
     public JunitTableMetadata(ExtensionContext context, Table table) {
+        this(context, table, List.of());
+    }
+
+    public JunitTableMetadata(ExtensionContext context, Table table, List<RowResult> rowResults) {
         this.columnRoles = new ColumnRoles(
             findScenarioIndex(context, table),
             findExpectationIndices(table)
         );
         this.title = context.getDisplayName();
         this.description = findTableDescription(context);
+        this.rowResults = rowResults;
     }
 
     @Override
@@ -52,6 +60,11 @@ class JunitTableMetadata implements TableMetadata {
     @Override
     public String description() {
         return description;
+    }
+
+    @Override
+    public List<RowResult> rowResults() {
+        return rowResults;
     }
 
     private static int findScenarioIndex(ExtensionContext context, Table table) {

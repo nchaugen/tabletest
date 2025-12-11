@@ -27,7 +27,7 @@ public class TableFileIndex {
 
     public static final String TABLE_FILE_INDEX = "TableFileIndex";
 
-    static void save(String title, Path path, ExtensionContext context) {
+    public static void save(String title, Path path, ExtensionContext context) {
         getStore(context).put(
             TABLE_FILE_INDEX, Stream.concat(
                 allForTestClass(context).stream(),
@@ -36,7 +36,7 @@ public class TableFileIndex {
         );
     }
 
-    static List<TableFileEntry> allForTestClass(ExtensionContext context) {
+    public static List<TableFileEntry> allForTestClass(ExtensionContext context) {
         return getStore(context).getOrDefault(TABLE_FILE_INDEX, List.class, Collections.emptyList());
     }
 

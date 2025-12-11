@@ -59,7 +59,26 @@ public class YamlTableRenderer implements TableRenderer {
                 .toList()
         );
 
+        if (!context.rowResults().isEmpty()) {
+            content.put(
+                "rowResults", context.rowResults().stream()
+                    .map(this::toRowResultMap)
+                    .toList()
+            );
+        }
+
         return new Dump(SETTINGS).dumpToString(content);
+    }
+
+    private Map<String, Object> toRowResultMap(io.github.nchaugen.tabletest.reporter.RowResult result) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("rowIndex", result.rowIndex());
+        map.put("passed", result.passed());
+        map.put("displayName", result.displayName());
+        if (result.cause() != null) {
+            map.put("errorMessage", result.cause().getMessage());
+        }
+        return map;
     }
 
     private static Map<String, Object> toValueMap(Object value, CellRole role) {
