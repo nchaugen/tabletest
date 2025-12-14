@@ -18,14 +18,16 @@ package io.github.nchaugen.tabletest.junit;
 import org.junit.jupiter.params.converter.ConvertWith;
 
 import java.lang.reflect.Parameter;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.github.nchaugen.tabletest.junit.ExplicitConverterDetector.hasExplicitConverter;
 import static io.github.nchaugen.tabletest.junit.TableTestException.primitiveTypeDoesNotAllowNull;
 import static java.util.stream.Collectors.toUnmodifiableMap;
-import static java.util.stream.Collectors.toUnmodifiableSet;
 
 /**
  * A utility class that handles conversion of parsed table values to the appropriate parameter types
@@ -156,9 +158,11 @@ public class ParameterTypeConverter {
         // if this is a value set, the parameter type will be the element type
         ParameterType elementType = parameterType.isSet() ? parameterType.elementType() : parameterType;
 
-        return set.stream()
+        LinkedHashSet<Object> convertedSet = set.stream()
             .map(it -> convert(it, elementType, testClass))
-            .collect(toUnmodifiableSet());
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        return Collections.unmodifiableSet(convertedSet);
     }
 
     /**

@@ -31,7 +31,7 @@ public static boolean parseBoolean(String input) {
 - **Self-documenting**: Tables serve as living documentation
 - **Collaborative**: Non-technical stakeholders can understand and contribute
 
-**Requirements**: Java 21+, JUnit 5.11.0-6.0.1 (except 5.13.0).
+**Requirements**: Java 21+, JUnit 5.11+
 
 **IDE Support**: [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides
 auto-formatting, syntax highlighting, and shortcuts for working with tables.
@@ -297,20 +297,10 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 }
 ```
 
-### Publishing Tables to File
+### Publishing TablesTest results
 
-TableTest can be configured to publish tables to file as they are being tested. This can be used to generate
-documentation from the tables.
-
-The following formats are supported:
-
-- Markdown
-- AsciiDoc
-- TableTest
-
-Publishing to file is disabled by default. To enable it, add `tabletest.publisher.format = <format>` to
-your [JUnit configuration parameters](https://docs.junit.org/current/user-guide/#running-tests-config-params).
-`<format>` is one of `markdown`, `asciidoc`, or `tabletest`.
+Functionality for publishing TableTest results to AsciiDoc and Markdown format is available as
+extension [TableTest-Reporter](https://github.com/nchaugen/tabletest-reporter).
 
 ## Installation
 
@@ -318,22 +308,18 @@ TableTest is available
 from [Maven Central Repository](https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit). Projects
 using Maven or Gradle build files can simply add TableTest as a test scope dependency alongside JUnit.
 
-## JUnit Compatibility
+## Java and JUnit Compatibility
 
-The latest versions of TableTest introduce reporting support that is not compatible with older versions of JUnit. Please
-consult the following table for compatibility details:
+TableTest requires Java version 21 or above and is compatible with JUnit 5.11 and above.
 
-| TableTest | JUnit                        | SpringBoot | Quarkus   |
-|-----------|------------------------------|------------|-----------|
-| <= 0.5.3  | 5.11.0-6.0.1 (except 5.13.0) | >= 3.4.0   | >= 3.21.2 |
-| 0.5.4     | 5.12.0-6.0.1 (except 5.13.0) | >= 3.5.0   | >= 3.21.2 |
-| 0.5.5     | 5.12.0-6.0.1 (except 5.13.0) | >= 3.5.0   | >= 3.21.2 |
-| 0.5.6     | 5.14.0-6.0.1                 | >= 3.4.0   | None      |
-| 0.5.7     | 5.12.0-6.0.1 (except 5.13.0) | >= 3.5.0   | >= 3.21.2 |
+Frameworks such as Quarkus and SpringBoot packages their own version of JUnit. TableTest is compatible with Quarkus
+version 3.21.2 and above and SpringBoot version 3.4.0 and above. Please see
+the [compatibility tests](compatibility-tests) for examples of how to use TableTest with these frameworks.
 
-Please see the [compatibility tests](compatibility-tests) for examples of how to use TableTest with these frameworks.
+### Compatibility Notes
+Note that TableTest versions 0.5.4 - 0.5.7 needed JUnit 5.14 and above.
+JUnit 5.13.0 introduced breaking changes that broke compatibility with TableTest. This was fixed in JUnit 5.13.1.
 
-Please note that TableTest requires Java version 21 or above.
 
 ### Maven (pom.xml)
 

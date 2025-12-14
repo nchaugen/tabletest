@@ -1,6 +1,11 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Fixed
+- Sets retain order through conversion
+- Restored compatibility for JUnit 5.11-5.12
+### Removed
+- Reporting functionality moved to [TableTest-Reporter](https://github.com/nchaugen/tabletest-reporter)
 
 ## [0.5.7] - 2025-12-09
 ### Fixed

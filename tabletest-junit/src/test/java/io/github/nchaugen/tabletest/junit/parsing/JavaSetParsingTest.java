@@ -2,6 +2,7 @@ package io.github.nchaugen.tabletest.junit.parsing;
 
 import io.github.nchaugen.tabletest.junit.TableTest;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,4 +49,14 @@ public class JavaSetParsingTest {
         );
     }
 
+    @TableTest("""
+        Set                                                                            | Order?
+        {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}                                             | [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        {-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0}                                   | [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0]
+        {a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z} | [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]
+        {z, y, x, w, v, u, t, s, r, q, p, o, n, m, l, k, j, i, h, g, f, e, d, c, b, a} | [z, y, x, w, v, u, t, s, r, q, p, o, n, m, l, k, j, i, h, g, f, e, d, c, b, a]
+        """)
+    void testSetRetainsOrdering(Set<?> input, List<?> expectedOrder) {
+        assertEquals(expectedOrder, input.stream().toList());
+    }
 }
