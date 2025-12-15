@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [0.5.8] - 2025-12-15
 ### Fixed
 - Sets retain order through conversion
 - Restored compatibility for JUnit 5.11-5.12
