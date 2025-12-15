@@ -16,7 +16,7 @@ repositories {
 // Allow overriding Quarkus version via -Pquarkus.version
 val quarkusVersion = (project.findProperty("quarkus.version") as String?) ?: "3.29.2"
 // Allow overriding TableTest version via -Ptabletest.version
-val tabletestVersion = (project.findProperty("tabletest.version") as String?) ?: "0.5.8-SNAPSHOT"
+val tabletestVersion = (project.findProperty("tabletest.version") as String?) ?: "0.5.9-SNAPSHOT"
 
 dependencies {
     implementation(enforcedPlatform("io.quarkus:quarkus-bom:$quarkusVersion"))
