@@ -18,7 +18,6 @@
         <version.tabletest-parser>0.5.8-SNAPSHOT</version.tabletest-parser>
         <version.junit>6.0.1</version.junit>
         <version.kotlin>2.2.0</version.kotlin>
-        <version.snakeyaml>3.0.1</version.snakeyaml>
     </properties>
 
     <dependencies>
@@ -40,11 +39,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.snakeyaml</groupId>
-            <artifactId>snakeyaml-engine</artifactId>
-            <version>${version.snakeyaml}</version>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${version.junit}</version>
@@ -60,12 +54,6 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>
             <version>${version.kotlin}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-testkit</artifactId>
-            <version>6.0.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
