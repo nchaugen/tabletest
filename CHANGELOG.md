@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Added
+- AGENTS.md instruction to coding agents for how to use TableTest
 
 ## [0.5.8] - 2025-12-15
 ### Fixed
