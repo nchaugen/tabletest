@@ -1,6 +1,50 @@
-# TableTest Guide for AI Coding Assistants
+---
+name: tabletest
+description: Write effective TableTest-style tests for data-driven testing in JUnit using either Java or Kotlin. The table format makes tests more readable, maintainable, and collaborative - treating test data as first-class documentation of system behaviour. Use it when testing the same logic with multiple input/output combinations, when you have 2+ similar test methods differing only in data values, when business rules involve multiple cases/examples, or when adding new test cases should be as simple as adding a table row. Use standard JUnit @Test when testing a single scenario, when test logic differs significantly between cases, when complex setup/teardown varies per test, or when mocking behaviour differs per test case. 
+---
 
-This guide helps AI coding assistants write effective TableTest-style tests. TableTest is a JUnit extension for data-driven testing using readable table formats.
+# TableTest Skill
+
+**IMPORTANT**: This skill should be used whenever converting multiple similar @Test methods to TableTest format, or when writing new TableTest-based tests. Always invoke this skill BEFORE attempting manual implementation.
+
+
+## Installation
+
+### Maven
+
+Add this dependency to your `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>io.github.nchaugen</groupId>
+    <artifactId>tabletest-junit</artifactId>
+    <version>0.5.8</version>
+    <scope>test</scope>
+</dependency>
+
+Check https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit for the latest version.
+
+### Gradle
+
+Add this to your build.gradle:
+
+```groovy
+testImplementation 'io.github.nchaugen:tabletest-junit:0.5.8'
+```
+
+Or in build.gradle.kts:
+
+```kotlin
+testImplementation("io.github.nchaugen:tabletest-junit:0.5.8")
+```
+
+### Import Statement
+
+```java
+import io.github.nchaugen.tabletest.junit.TableTest;
+```
+
+Note: The annotation is in the .junit package, not .annotations.
 
 ## When to Use TableTest
 
@@ -55,9 +99,23 @@ void testDoubling(int input, int expected) {
     """)
 ```
 
-Use quotes when value contains: `|`,  `"`, or `'`. Use single quotes when it contains `"` and double quotes when it contains `'`. Also use quotes when it starts with `[` or `{`. Bracket and curly braces inside the string do not require quotes.
+**Quoting rules:**
 
-Escape sequence handling is a Java/Kotlin language concern, not a TableTest feature.
+Quote values when they contain or start with special characters:
+- Contains: `|`, `"`, or `'`
+- Starts with: `[` or `{` (prevents collection syntax interpretation)
+
+**Examples:**
+```
+Unquoted OK      | Needs Quotes           | Reason
+abc123           | "[1,2,3]"              | starts with [
+hello world      | "{a,b,c}"              | starts with {
+foo              | "a|b"                  | contains |
+normal text      | "say \"hello\""        | contains "
+Map.of(a, b)     | "[a:1,b:2]"            | starts with [
+```
+
+**Note:** Brackets and braces *inside* a string don't require quotes - only when they *start* the value. Escape sequence handling is a Java/Kotlin language concern, not a TableTest feature.
 
 ### Collection Values
 TableTest has special syntax to express collection values.
@@ -76,7 +134,7 @@ void testSum(List<Integer> numbers, int sum) {
     assertEquals(sum, numbers.stream().mapToInt(Integer::intValue).sum());
 }
 ```
- 
+
 #### Sets
 ```java
 @TableTest("""
@@ -238,6 +296,29 @@ void testTransactionFee(int amount, int expectedFee) {
 
 Scenario names appear in test reports, making failures immediately understandable.
 
+## Expectation Column Naming Convention
+
+Expectation columns (columns containing expected results) should end with a question mark to make test intent immediately clear:
+
+- `Valid?` - for validation tests
+- `Formatted?` - for formatter tests
+- `Expected?` - for general expectations
+- `Result?` - for computation results
+- `Throws?` - for exception tests
+
+```java
+@TableTest("""
+    Scenario          | Input      | Formatted?
+    Normalize spaces  | "[1,2,3]"  | "[1, 2, 3]"
+    Empty list        | "[]"       | "[]"
+    """)
+void testFormatter(String input, String formatted) {
+    // test implementation
+}
+```
+
+This convention is optional but recommended for clarity.
+
 ## Common Patterns
 
 ### Testing Business Rules
@@ -313,6 +394,39 @@ void testExceptions(String input, Class<? extends Throwable> expectedException) 
 }
 ```
 
+### Testing Value Transformations
+
+When testing formatters, converters, or transformers that operate on individual values, use a single-column table to minimize scaffolding. This approach simplifies test implementation by avoiding multi-column complexity when only testing single-value transformations:
+
+```java
+@TableTest("""
+    Scenario                 | Input                   | Formatted?
+    Normalize spacing        | "[1,2,3]"               | "[1, 2, 3]"
+    Remove extra spaces      | "[ [] ]"                | "[[]]"
+    Nested lists             | "[[1,2],[3,4]]"         | "[[1, 2], [3, 4]]"
+    Empty collection         | "[]"                    | "[]"
+    Normalize map spacing    | "[a:1,b:2]"             | "[a: 1, b: 2]"
+    """)
+void shouldFormatCollectionInCell(String input, String formatted) {
+    var tableInput = "value\n" + input;
+    var result = formatter.format(tableInput);
+    var lines = result.split("\n");
+    assertThat(lines[1]).isEqualTo(formatted);
+}
+```
+
+**Key benefits:**
+- Focuses on the transformation being tested (input → output)
+- Eliminates unnecessary multi-column scaffolding
+- Makes test data more readable and maintainable
+- Simplifies test implementation (just extract second line)
+
+**When to use:**
+- Testing formatters (code formatters, string formatters, etc.)
+- Testing converters (type converters, value transformers)
+- Testing serialization/deserialization of individual values
+- Any function that transforms a single input to a single output
+
 ## External Table Files
 
 For large tables or reusable test data:
@@ -331,14 +445,14 @@ File format identical to inline tables. Stored in `src/test/resources`.
 ```java
 @TableTest("""
     Scenario        | Input | Output
-
+    
     // Basic cases
     Zero            | 0     | 0
     Positive        | 5     | 25
-
+    
     // Edge cases
     Negative        | -3    | 9
-
+    
     // Temporarily disabled
     // Large number | 1000  | 1000000
     """)
@@ -402,12 +516,40 @@ Must quote strings with pipe or starting with bracket or curly bracket to avoid 
     """)
 ```
 
-## Summary
+## TableTest Consolidation Patterns
+When multiple standard JUnit test methods follow the same structure but vary only in inputs/outputs, consolidate them into a TableTest:
 
-TableTest excels at expressing business rules through examples. Use it when:
-- Multiple similar test cases exist
-- Business logic has clear input/output relationships
-- Tests should serve as documentation
-- Extending test coverage means adding rows, not duplicating methods
+**Good candidates for consolidation:**
+- Multiple tests with identical setup and assertion logic
+- Tests varying only in input data and expected outcomes
+- Validation tests checking different scenarios
 
-The table format makes tests more readable, maintainable, and collaborative - treating test data as first-class documentation of system behaviour.
+**Keep as separate @Test methods:**
+- Edge cases with null/empty inputs
+- Tests requiring complex setup (e.g., creating subdirectories)
+- Tests with fundamentally different assertion logic
+
+**TableTest best practices:**
+- Use `List<String>` for file lists: `[file1.txt, file2.txt]`
+- Use path notation for subdirectories: `[subdir/file.txt]`
+- Include `@Scenario String _scenario` when using `@TempDir` (parameter shift issue)
+- Create parent directories: `Files.createDirectories(filePath.getParent())`
+
+Example:
+```java
+@TableTest("""
+    Scenario          | Files                    | Expected
+    Single file       | [file.txt]               | [file]
+    Multiple files    | [a.txt, b.txt]           | [a, b]
+    Subdirectory      | [dir/file.txt]           | []
+    """)
+void discovers_files(@Scenario String _scenario, List<String> files, List<String> expected,
+                    @TempDir Path tempDir) throws IOException {
+    for (String file : files) {
+        Path path = tempDir.resolve(file);
+        Files.createDirectories(path.getParent());
+        Files.writeString(path, "content");
+    }
+    // assertions...
+}
+```
