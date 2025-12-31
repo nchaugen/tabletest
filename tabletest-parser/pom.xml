@@ -4,7 +4,7 @@
 
     <groupId>io.github.nchaugen</groupId>
     <artifactId>tabletest-parser</artifactId>
-    <version>0.5.9</version>
+    <version>0.5.10-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2025</inceptionYear>
@@ -68,7 +68,7 @@
         <connection>scm:git:${repository.url}</connection>
         <developerConnection>scm:git:${repository.url}</developerConnection>
         <url>${repository.url}</url>
-        <tag>tabletest-parser-0.5.9</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
