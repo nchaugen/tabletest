@@ -1,8 +1,10 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [0.5.9] - 2025-12-31
 ### Added
-- AGENTS.md instruction to coding agents for how to use TableTest
+- SKILL.md for teaching coding agents how to use TableTest
 - TableParser supports keeping string quotes to support table formatting tools
 
 ## [0.5.8] - 2025-12-15

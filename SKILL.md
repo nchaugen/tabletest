@@ -18,7 +18,7 @@ Add this dependency to your `pom.xml`:
 <dependency>
     <groupId>io.github.nchaugen</groupId>
     <artifactId>tabletest-junit</artifactId>
-    <version>0.5.8</version>
+    <version>0.5.9</version>
     <scope>test</scope>
 </dependency>
 
@@ -29,13 +29,13 @@ Check https://central.sonatype.com/artifact/io.github.nchaugen/tabletest-junit f
 Add this to your build.gradle:
 
 ```groovy
-testImplementation 'io.github.nchaugen:tabletest-junit:0.5.8'
+testImplementation 'io.github.nchaugen:tabletest-junit:0.5.9'
 ```
 
 Or in build.gradle.kts:
 
 ```kotlin
-testImplementation("io.github.nchaugen:tabletest-junit:0.5.8")
+testImplementation("io.github.nchaugen:tabletest-junit:0.5.9")
 ```
 
 ### Import Statement
