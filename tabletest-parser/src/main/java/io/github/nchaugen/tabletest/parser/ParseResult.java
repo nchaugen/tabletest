@@ -94,12 +94,13 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
             captures = Collections.unmodifiableList(new ArrayList<>(captures));
         }
 
+
         /**
          * Stores the parsed value as a capture. If nothing was consumed, an empty string is stored.
          */
-        Success capture() {
+        Success capture(Character quoteChar) {
             ArrayList<Object> nextCaptures = new ArrayList<>(captures);
-            nextCaptures.add(consumed);
+            nextCaptures.add(new StringValue(consumed, quoteChar));
             return new Success(consumed, rest, nextCaptures);
         }
 
@@ -109,7 +110,7 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
          */
         Success captureTrimmed() {
             ArrayList<Object> nextCaptures = new ArrayList<>(captures);
-            nextCaptures.add(consumed.isBlank() ? null : consumed.trim());
+            nextCaptures.add(consumed.isBlank() ? null : new StringValue(consumed.trim(), null));
             return new Success(consumed, rest, nextCaptures);
         }
 
@@ -152,10 +153,10 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
             if (captures.stream().anyMatch(Objects::isNull)) {
                 throw new TableTestParseException("Cannot collect null values to map: " + captures);
             }
-            Map<String, Object> captureGroup =
+            Map<Object, Object> captureGroup =
                 IntStream.range(0, captures.size())
                     .filter(i -> i % 2 == 0)
-                    .mapToObj(i -> Map.entry((String) captures.get(i), captures.get(i + 1)))
+                    .mapToObj(i -> Map.entry(captures.get(i), captures.get(i + 1)))
                     .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,

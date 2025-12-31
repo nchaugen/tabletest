@@ -14,11 +14,11 @@ Augend | Addend | Sum?
 
 ```
 
-Column values can be **single values**, **lists**, **sets**, or **maps**.
+Column values can be **strings**, **lists**, **sets**, or **maps**.
 
-### Single-Value Format
+### String Format
 
-Single values can appear with or without quotes. Unquoted values must not contain `[`, `|`, `,`, or `:` characters. These special characters require single or double quotes.
+String values can appear with or without quotes. Unquoted values must not contain `[`, `|`, `,`, or `:` characters. These special characters require single or double quotes.
 
 Whitespace around unquoted values is trimmed. To preserve leading or trailing whitespace, use quotes. Empty values are represented by adjacent quote pairs (`""` or `''`).
 
@@ -33,7 +33,7 @@ Hello world    | 11
 
 ### List Value Format
 
-Lists are enclosed in square brackets with comma-separated elements. Lists can contain single values or compound values (nested lists/maps). Empty lists are represented by `[]`.
+Lists are enclosed in square brackets with comma-separated elements. Lists can contain string values or compound values (nested lists/sets/maps). Empty lists are represented by `[]`.
 
 ```tabletest
 List             | Size?
@@ -48,7 +48,7 @@ List             | Size?
 
 ### Set Value Format
 
-Sets are enclosed in curly braces with comma-separated elements. Sets can contain single values or compound values (nested lists/sets/maps). Empty sets are represented by `{}`.
+Sets are enclosed in curly braces with comma-separated elements. Sets can contain string values or compound values (nested lists/sets/maps). Empty sets are represented by `{}`.
 
 ```tabletest
 Set              | Size?
@@ -63,7 +63,7 @@ Set              | Size?
 
 ### Map Value Format
 
-Maps use square brackets with comma-separated key-value pairs. Keys and values are separated by colons. Keys must be unquoted single values, while values can be single or compound. Empty maps are represented by `[:]`.
+Maps use square brackets with comma-separated key-value pairs. Colons separate keys and values. Keys must be unquoted strings, while values can be any value type. Empty maps are represented by `[:]`.
 
 ```tabletest
 Map                                      | Size?
@@ -94,17 +94,14 @@ Hello world | 11
 
 ## Usage
 
-TableParser converts strings in TableTest format into structured Table objects. TableTest format uses pipes (`|`) to separate columns and newlines to separate rows, with the first row treated as the header.
+TableParser converts strings in TableTest format into structured Table objects, providing access to headers, rows, and typed cell values (String, List, Set, or Map). Comments (lines starting with `//`) and blank lines are ignored during parsing. Whitespace around cell values is trimmed.
 
-### Basic Usage
-
-Here is an example of basic usage in Java:
+### Java
 
 ```java
 import io.github.nchaugen.tabletest.parser.Table;
 import io.github.nchaugen.tabletest.parser.TableParser;
 
-// Parse a multi-line string in TableTest format
 String tableText = """
     Name       | Age | Skills       | Attributes
     John Smith | 30  | [Java, SQL]  | [strength: 8, dexterity: 6]
@@ -113,38 +110,37 @@ String tableText = """
 
 Table table = TableParser.parse(tableText);
 
-// Access table properties 
-int rowCount = table.rowCount(); // 2 
+// Access table properties
+int rowCount = table.rowCount(); // 2
 int columnCount = table.columnCount(); // 4
 
-// Access headers 
+// Access headers
 String nameHeader = table.header(0); // "Name"
-List headers = table.headers(); // ["Name", "Age", "Skills", "Attributes"] 
+List headers = table.headers(); // ["Name", "Age", "Skills", "Attributes"]
 
-// Access row and cell data - properly typed as String, List, or Map 
+// Access row and cell data - properly typed as String, List, or Map
 String name = (String) table.row(0).value(0); // "John Smith"
 int age = Integer.parseInt((String) table.row(0).value(1)); // 30
 List<String> skills = (List<String>) table.row(0).value(2); // ["Java", "SQL"]
-Map<String, String> attrs = (Map<String, String>) table.row(0).value(3); // {"strength": "8", "dexterity": "6"}  
+Map<String, String> attrs = (Map<String, String>) table.row(0).value(3); // {"strength": "8", "dexterity": "6"}
 
-// Get all values in a row 
+// Get all values in a row
 List rowCells = table.row(1).values(); // ["Jane Doe", "28", ["Python", "JS"], {"wisdom": "9", "charisma": "10"}]
 
 // Process all rows in a functional style
 table.map(row -> {
-    String rowName = (String) row.cell(0);
-    List<String> rowSkills = (List<String>) row.cell(2);
+    String rowName = (String) row.value(0);
+    List<String> rowSkills = (List<String>) row.value(2);
     return rowName + " has " + rowSkills.size() + " skills: " + String.join(", ", rowSkills);
 }).forEach(System.out::println);
 ```
 
-Similarly used from Kotlin:
+### Kotlin
 
 ```kotlin
 import io.github.nchaugen.tabletest.parser.Table
 import io.github.nchaugen.tabletest.parser.TableParser
 
-// Parse a multi-line string in TableTest format
 val tableText = """
     Name       | Age | Skills       | Attributes
     John Smith | 30  | [Java, SQL]  | [strength: 8, dexterity: 6]
@@ -178,19 +174,25 @@ table.map { row ->
 }.forEach(::println)
 ```
 
-### Data Types
+### Preserving Quotes
 
-TableTest supports three types of cell values:
+By default, quotes are removed from string values during parsing. To preserve the original quotes, pass `true` as the second parameter:
 
-1. **Simple Values**: Plain text or quoted text with `"` or `'`. Represented as `String`.
-2. **Lists**: Values enclosed in square brackets like `[item1, item2]`. Represented as `List<Object>`.
-3. **Sets**: Values enclosed in curly braces like `{item1, item2}`. Represented as `Set<Object>`.
-4. **Maps**: Key-value pairs like `[key1: value1, key2: value2]`. Represented as `Map<String, Object>`.
+```java
+String tableText = """
+    Type       | Value
+    unquoted   | hello
+    single     | 'world'
+    double     | "test"
+    """;
 
-Lists, sets, and maps can contain nested structures of any type, allowing for complex data representation.
+// Default behaviour: quotes removed
+Table table = TableParser.parse(tableText);
+table.row(1).value(1); // "world" (quotes removed)
 
-### Special Features
+// Preserve quotes
+Table tableWithQuotes = TableParser.parse(tableText, true);
+tableWithQuotes.row(1).value(1); // "'world'" (quotes preserved)
+```
 
-- **Comments**: Lines beginning with `//` are ignored
-- **Empty Lines**: Blank lines are ignored
-- **Whitespace**: Leading/trailing whitespace in cells is trimmed
+This is useful when testing quote-handling logic or when the presence of quotes is semantically significant.

@@ -15,11 +15,11 @@
  */
 package io.github.nchaugen.tabletest.parser;
 
-import static io.github.nchaugen.tabletest.parser.CaptureParser.capture;
-import static io.github.nchaugen.tabletest.parser.CaptureParser.collectToSet;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.captureQuoted;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.captureUnquoted;
 import static io.github.nchaugen.tabletest.parser.CaptureParser.collectToList;
 import static io.github.nchaugen.tabletest.parser.CaptureParser.collectToMap;
-import static io.github.nchaugen.tabletest.parser.CaptureParser.captureTrimmed;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.collectToSet;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.atLeast;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.either;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.optional;
@@ -32,7 +32,7 @@ import static io.github.nchaugen.tabletest.parser.StringParser.characterExcept;
 import static io.github.nchaugen.tabletest.parser.StringParser.string;
 
 /**
- * Parser for TableTest format rows. Handles values containing single values, lists, and maps.
+ * Parser for TableTest format rows. Handles values containing string values, lists, sets, and maps.
  */
 public class RowParser {
 
@@ -76,7 +76,7 @@ public class RowParser {
 
     /**
      * Creates a parser for a single cell with surrounding whitespace.
-     * Cell values can be in one of three forms: a map value, a list value, a set value, or a single value.
+     * Cell values can be in one of three forms: a map value, a list value, a set value, or a string value.
      *
      * @return parser for table values
      */
@@ -85,7 +85,7 @@ public class RowParser {
     }
 
     private static Parser value() {
-        return either(mapValue(), listValue(), setValue(), singleValue());
+        return either(mapValue(), listValue(), setValue(), stringValue());
     }
 
     /**
@@ -117,7 +117,7 @@ public class RowParser {
     private static Parser mapKey() {
         return sequence(
             anyWhitespace(),
-            captureTrimmed(sequence(
+            captureUnquoted(sequence(
                 characterExcept(',', ':', '|', '[', ']', '{', '}', '\'', '"'),
                 atLeast(0, characterExcept(',', ':', '|', '[', ']'))
             )),
@@ -167,14 +167,18 @@ public class RowParser {
                 either(
                     singleQuotedValue(),
                     doubleQuotedValue(),
-                    captureTrimmed(sequence(
-                        characterExcept(',', ':', '|', '[', ']', '{', '}', '\'', '"'),
-                        atLeast(0, characterExcept(',', ':', '|', ']', '}'))
-                    ))
+                    unquotedElementValue()
                 )
             ),
             anyWhitespace()
         );
+    }
+
+    private static Parser unquotedElementValue() {
+        return captureUnquoted(sequence(
+            characterExcept(',', ':', '|', '[', ']', '{', '}', '\'', '"'),
+            atLeast(0, characterExcept(',', ':', '|', ']', '}'))
+        ));
     }
 
     private static Parser entries(Parser entry, Parser separator) {
@@ -182,19 +186,19 @@ public class RowParser {
     }
 
     /**
-     * Creates a parser for single values in three formats:
+     * Creates a parser for string values in three formats:
      * single-quoted, double-quoted, or unquoted.
      *
-     * @return parser for single values
+     * @return parser for string values
      */
-    static Parser singleValue() {
+    static Parser stringValue() {
         return either(singleQuotedValue(), doubleQuotedValue(), unquotedValue());
     }
 
     private static Parser singleQuotedValue() {
         return sequence(
             character('\''),
-            capture(zeroOrMore(characterExcept('\''))),
+            captureQuoted(zeroOrMore(characterExcept('\'')), '\''),
             character('\'')
         );
     }
@@ -202,13 +206,13 @@ public class RowParser {
     private static Parser doubleQuotedValue() {
         return sequence(
             character('"'),
-            capture(zeroOrMore(characterExcept('"'))),
+            captureQuoted(zeroOrMore(characterExcept('"')), '"'),
             character('"')
         );
     }
 
     private static Parser unquotedValue() {
-        return captureTrimmed(
+        return captureUnquoted(
             optional(
                 sequence(
                     characterExcept('[', '{', '|'),

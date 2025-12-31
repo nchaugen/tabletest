@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static io.github.nchaugen.tabletest.parser.CaptureParser.capture;
+import static io.github.nchaugen.tabletest.parser.CaptureParser.captureUnquoted;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.atLeast;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.either;
 import static io.github.nchaugen.tabletest.parser.CombinationParser.optional;
@@ -17,6 +17,7 @@ import static io.github.nchaugen.tabletest.parser.StringParser.characterExcept;
 import static io.github.nchaugen.tabletest.parser.StringParser.characters;
 import static io.github.nchaugen.tabletest.parser.StringParser.string;
 import static io.github.nchaugen.tabletest.parser.StringParser.whitespace;
+import static io.github.nchaugen.tabletest.parser.StringValue.unquoted;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -84,13 +85,13 @@ class CombinationParserTest {
 
         // Test with captured elements
         Parser expr = sequence(
-            capture(atLeast(1, characters("0123456789"))),
+            captureUnquoted(atLeast(1, characters("0123456789"))),
             character('+'),
-            capture(atLeast(1, characters("0123456789")))
+            captureUnquoted(atLeast(1, characters("0123456789")))
         );
         ParseResult result = expr.parse("123+456");
         assertTrue(result.isSuccess());
-        assertEquals(List.of("123", "456"), result.captures());
+        assertEquals(List.of(unquoted("123"), unquoted("456")), result.captures());
     }
 
     @Test

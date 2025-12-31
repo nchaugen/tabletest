@@ -16,9 +16,16 @@
 
     <properties>
         <version.junit>6.0.1</version.junit>
+        <version.tabletest-junit>0.5.8</version.tabletest-junit>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>io.github.nchaugen</groupId>
+            <artifactId>tabletest-junit</artifactId>
+            <version>${version.tabletest-junit}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

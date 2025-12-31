@@ -15,7 +15,7 @@ class KotlinConversionFailureTest {
         abc         | java.lang.Character
         invalid     | java.time.LocalDate
         52          | io.github.nchaugen.tabletest.junit.javadomain.Ages
-            """
+        """
     )
     fun `fails conversion for single values outside type range`(value: String, type: Class<*>) {
         assertThrowsWhenFallbackFails(value, type)

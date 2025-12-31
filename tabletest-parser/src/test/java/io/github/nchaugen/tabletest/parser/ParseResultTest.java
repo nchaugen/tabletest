@@ -4,13 +4,15 @@ import io.github.nchaugen.tabletest.parser.ParseResult.Success;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static io.github.nchaugen.tabletest.parser.ParseResult.failure;
 import static io.github.nchaugen.tabletest.parser.ParseResult.success;
+import static io.github.nchaugen.tabletest.parser.StringValue.doubleQuoted;
+import static io.github.nchaugen.tabletest.parser.StringValue.unquoted;
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ParseResultTest {
@@ -89,21 +91,21 @@ class ParseResultTest {
     class Capturing {
 
         @Test
-        void captureSavesConsumedString() {
+        void captureSavesConsumedStringWithQuoteCharacter() {
             Success success = success("consumed", "");
             assertEquals(List.of(), success.captures());
 
-            Success capturedSuccess = success.capture();
-            assertEquals(List.of("consumed"), capturedSuccess.captures());
+            Success capturedSuccess = success.capture('"');
+            assertEquals(List.of(doubleQuoted("consumed")), capturedSuccess.captures());
         }
 
         @Test
-        void captureTrimmedSavesConsumedStringWithoutWhitespace() {
+        void captureTrimmedSavesConsumedStringTrimmed() {
             Success success = success("  consumed\t\t", "");
             assertEquals(List.of(), success.captures());
 
             Success capturedSuccess = success.captureTrimmed();
-            assertEquals(List.of("consumed"), capturedSuccess.captures());
+            assertEquals(List.of(unquoted("consumed")), capturedSuccess.captures());
         }
 
         @Test
@@ -112,7 +114,7 @@ class ParseResultTest {
             assertEquals(List.of(), success.captures());
 
             Success capturedSuccess = success.captureTrimmed();
-            assertEquals(Collections.singletonList(null), capturedSuccess.captures());
+            assertEquals(singletonList(null), capturedSuccess.captures());
         }
 
         @Test
@@ -121,7 +123,7 @@ class ParseResultTest {
             assertEquals(List.of(), success.captures());
 
             Success capturedSuccess = success.captureTrimmed();
-            assertEquals(Collections.singletonList(null), capturedSuccess.captures());
+            assertEquals(singletonList(null), capturedSuccess.captures());
         }
 
         @Test

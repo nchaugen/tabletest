@@ -27,24 +27,26 @@ public class CaptureParser {
 
     private CaptureParser() {}
 
+
     /**
-     * Creates a parser that captures the matched value on success.
+     * Creates a parser that captures the matched value on success as an unquoted string.
      *
      * @param parser base parser to use
      * @return parser that captures matched values
      */
-    public static Parser capture(Parser parser) {
-        return createCaptureFunction(parser, Success::capture);
+    public static Parser captureUnquoted(Parser parser) {
+        return createCaptureFunction(parser, Success::captureTrimmed);
     }
 
     /**
-     * Creates a parser that captures a matched value that should be trimmed.
+     * Creates a parser that captures the matched value on success as a quoted string.
      *
      * @param parser base parser to use
+     * @param quoteChar the character used for quoting
      * @return parser that captures matched values
      */
-    public static Parser captureTrimmed(Parser parser) {
-        return createCaptureFunction(parser, Success::captureTrimmed);
+    public static Parser captureQuoted(Parser parser, char quoteChar) {
+        return createCaptureFunction(parser, success -> success.capture(quoteChar));
     }
 
     /**
