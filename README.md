@@ -329,7 +329,7 @@ JUnit 5.13.0 introduced breaking changes that broke compatibility with TableTest
     <dependency>
         <groupId>io.github.nchaugen</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>0.5.9</version>
+        <version>0.5.8</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -345,7 +345,7 @@ JUnit 5.13.0 introduced breaking changes that broke compatibility with TableTest
 
 ```kotlin
 dependencies {
-    testImplementation("io.github.nchaugen:tabletest-junit:0.5.9")
+    testImplementation("io.github.nchaugen:tabletest-junit:0.5.8")
     testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
