@@ -6,7 +6,7 @@ Prefer the version already used in the project. If adding a new dependency, chec
 
 ```xml
 <dependency>
-    <groupId>io.github.nchaugen</groupId>
+    <groupId>org.tabletest</groupId>
     <artifactId>tabletest-junit</artifactId>
     <version>VERSION</version>
     <scope>test</scope>
@@ -16,16 +16,16 @@ Prefer the version already used in the project. If adding a new dependency, chec
 ## Gradle
 
 ```groovy
-testImplementation "io.github.nchaugen:tabletest-junit:VERSION"
+testImplementation "org.tabletest:tabletest-junit:VERSION"
 ```
 
 ## Imports
 
 ```java
-import io.github.nchaugen.tabletest.junit.TableTest;
+import org.tabletest.junit.TableTest;
 ```
 
 Import `@Scenario` only when binding the scenario column:
 ```java
-import io.github.nchaugen.tabletest.junit.Scenario;
+import org.tabletest.junit.Scenario;
 ```

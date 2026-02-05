@@ -8,13 +8,13 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <tabletest.version>0.5.9-SNAPSHOT</tabletest.version>
+        <tabletest.version>1.0.0-SNAPSHOT</tabletest.version>
         <junit.version>6.0.1</junit.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.github.nchaugen</groupId>
+            <groupId>org.tabletest</groupId>
             <artifactId>tabletest-junit</artifactId>
             <version>${tabletest.version}</version>
             <scope>test</scope>

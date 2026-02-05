@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.nchaugen.tabletest</groupId>
+    <groupId>org.tabletest</groupId>
     <artifactId>maven-springboot-java</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -13,7 +13,7 @@
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <tabletest.version>0.5.9-SNAPSHOT</tabletest.version>
+        <tabletest.version>1.0.0-SNAPSHOT</tabletest.version>
         <springboot.version>3.5.7</springboot.version>
     </properties>
 
@@ -34,7 +34,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.github.nchaugen</groupId>
+            <groupId>org.tabletest</groupId>
             <artifactId>tabletest-junit</artifactId>
             <version>${tabletest.version}</version>
             <scope>test</scope>

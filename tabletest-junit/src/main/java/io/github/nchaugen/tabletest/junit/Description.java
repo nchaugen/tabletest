@@ -20,8 +20,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Please use {@link org.tabletest.junit.Description} instead
+ */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated(since = "1.0.0")
 public @interface Description {
     String value();
 }

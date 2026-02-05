@@ -11,11 +11,11 @@ TableTest allows you to express how the system is expected to behave through mul
   - [Nested Values](#nested-values)
 - [Value Conversion](#value-conversion)
   - [Built-In Conversion](#built-in-conversion)
-  - [Factory Method Conversion](#factory-method-conversion)
-  - [Factory Sources](#factory-sources)
-  - [Factory Methods in Kotlin](#factory-methods-in-kotlin)
-  - [Factory Method Search Strategy in Java](#factory-method-search-strategy-in-java)
-  - [Factory Method Search Strategy in Kotlin](#factory-method-search-strategy-in-kotlin)
+  - [Custom Converters](#custom-converters)
+  - [Customer Converter Sources](#custom-converter-sources)
+  - [Custom Converters in Kotlin](#custom-converters-in-kotlin)
+  - [Converter Search Strategy in Java](#converter-search-strategy-in-java)
+  - [Converter Search Strategy in Kotlin](#converter-search-strategy-in-kotlin)
   - [Overriding Built-In Conversion](#overriding-built-in-conversion)
 - [Additional Features](#additional-features)
   - [Scenario Names](#scenario-names)
@@ -176,20 +176,21 @@ void testParameterizedTypes(Map<String, List<Integer>> grades, int expectedHighe
 ```
 
 
-### Factory Method Conversion
-Before falling back to built-in conversion, TableTest will look for a factory method present in either the test class, in a class listed by a `@FactorySources` annotation. If found, TableTest will use this factory method to convert the parsed value to the required test parameter type.
+### Custom Conversion
+Before falling back to built-in conversion, TableTest will look for a custom converter method present in either the test class, or in a class listed by a `@TypeConverterSources` annotation. Custom converter methods are tagged with the `@TypeConverter` annotation. If found, TableTest will use this method to convert the parsed value to the required test parameter type.
 
-A factory method will be used when it:
-1. Is defined as a public static method in a public class
-2. Accepts exactly one parameter
-3. Returns an object of the target parameter type
-4. Is the only method matching the above criteria in the class
+A custom converter method will be used when it:
+1. Is annotated with `@TypeConverter`
+2. Is defined as a `public static` method in a `public class`
+3. Accepts exactly one parameter
+4. Returns an object of the target parameter type
+5. Is the only `@TypeConverter` method matching the above criteria in the class
 
-There is no specific naming pattern for factory methods, any method fulfilling the requirements above will be considered.
+There is no specific naming pattern for custom converter methods, any method fulfilling the requirements above will be considered.
 
-Having selected a factory method with a return type matching the test parameter type, TableTest will consider if the parsed value matches the parameter type of the factory method. If not, it will attempt to convert the value to match the parameter type.
+Having selected a custom converter method with a return type matching the test parameter type, TableTest will consider if the value matches the parameter type of the converter method. If it doesn't, TableTest will recursively attempt to convert the value to match the parameter type using the same mechanism.
 
-In the example below, the map with student grades is being passed to the test as a `StudentGrades` domain value using the `toStudentGrades` factory methods:
+In the example below, the map with student grades is being passed to the test as a `StudentGrades` domain value using the `toStudentGrades` custom converter method:
 
 ```java
 @TableTest("""
@@ -201,36 +202,38 @@ void testParameterizedTypes(StudentGrades grades, int expectedHighestGrade) {
     // test implementation
 }
 
+@TypeConverter
 public static StudentGrades toStudentGrades(Map<String, List<Integer>> grades) {
     // conversion logic
 }
 ```
 
 
-### Factory Sources
-To enable reuse of factory methods across test classes, TableTest provides a class annotation `@FactorySources` to list alternative classes to search for factory methods:
+### Custom Converter Sources
+To enable reuse of custom converter methods across test classes, TableTest provides a class annotation `@TypeConverterSources` to list alternative classes to search for custom converter methods:
 
 ```java
-@FactorySources({ClassWithFactoryMethods.class, AnotherClassWithFactoryMethods.class})
+@TypeConverterSources({ClassWithFCustomConverters.class, AnotherClassWithCustomConverters.class})
 public class ExampleTest {
     //TableTest methods
 }
 ```
 
 
-### Factory Methods in Kotlin
-For tests written in Kotlin, there are two ways to declare static factory methods:
+### Custom Converters in Kotlin
+For tests written in Kotlin, there are two locations to declare static `@TypeConverter` methods local to the test class:
 
-1. In the companion object of a test class using [`@JvmStatic` annotation](https://kotlinlang.org/docs/java-to-kotlin-interop.html#static-methods)
+1. In the companion object of a test class using [`@JvmStatic` annotation](https://kotlinlang.org/docs/java-to-kotlin-interop.html#static-methods) in addition to `@TypeConverter`.
 2. At [package-level](https://kotlinlang.org/docs/java-to-kotlin-interop.html#package-level-functions) in the file containing the test class.
 
-TableTest supports both factory methods declared in the test class. 
+TableTest supports both locations in a single test class. 
 
-Dedicated factory sources in Kotlin should be declared `object` with factory methods annotated with `@JvmStatic`:
+Dedicated custom converter sources in Kotlin should be declared `object` with custom converter methods annotated with `@JvmStatic` and `@TypeConverter`:
 
 ```kotlin
-object KotlinFactorySource { 
+object KotlinTypeConverterSource { 
     @JvmStatic
+    @TypeConverter
     fun toStudentGrades(input: Map<String, List<Int>>): StudentGrades {
         // implementation
     }
@@ -240,40 +243,40 @@ object KotlinFactorySource {
 Usage:
 
 ```kotlin
-@FactorySources(KotlinFactorySource::class)
+@TypeConverterSources(KotlinTypeConverterSource::class)
 class ExampleTest {
     // TableTest methods
 }
 ```
 
-Alternatively, regular Kotlin classes with factory methods defined as `@JvmStatic` in a companion object can also be referenced as a factory source.
+Alternatively, regular Kotlin classes with custom converter methods defined as `@JvmStatic` and `@TypeConverter` in a companion object can also be referenced as a custom converter source.
 
 
-### Factory Method Search Strategy in Java
-TableTest uses the following strategy to search for factory methods in Java test classes:
+### Custom Converter Search Strategy in Java
+TableTest uses the following strategy to search for custom converters in Java test classes:
 
 1. Search current test class, including inherited methods
 2. In case of a `@Nested` test class, search enclosing classes, starting with the direct outer class
-3. Search classes listed in a `@FactorySources` annotation on current test class in the order they are listed
-4. In case of a `@Nested` test class, search classes listed by `@FactorySources` of enclosing classes, starting with the direct outer class
+3. Search classes listed in a `@TypeConverterSources` annotation on current test class in the order they are listed
+4. In case of a `@Nested` test class, search classes listed by `@TypeConverterSources` of enclosing classes, starting with the direct outer class
 
-TableTest will stop searching as soon as it finds a matching factory method and use this for the conversion.
+TableTest will stop searching as soon as it finds a matching custom converter method and use this for the conversion.
 
 
-### Factory Method Search Strategy in Kotlin
-Kotlin does not support inheritance of static, companion object methods. Also, a `@Nested` test class must be declared `inner class` and these are not allowed to have companion objects. Hence, test class factory methods must be either declared in the companion object of the outer class (with `@JvmStatic`) or at package level in the same file as the test class.
+### Custom Converter Search Strategy in Kotlin
+Kotlin does not support inheritance of static, companion object methods. Also, a `@Nested` test class must be declared `inner class` and these are not allowed to have companion objects. Hence, test class custom converters must be either declared in the companion object of the outer class (with `@JvmStatic` in addition to `@TypeConverter`) or at package level in the same file as the test class .
 
 So for Kotlin, the search strategy becomes as follows:
 
 1. Search the current file (methods declared at package-level or in outer class companion object)
-2. Search classes listed by a `@FactorySources` annotation on current test class in the order they are listed
-3. In case of a `@Nested` test class, search classes listed by `@FactorySources` of enclosing classes, starting with direct outer
+2. Search classes listed by a `@TypeConverterSources` annotation on current test class in the order they are listed
+3. In case of a `@Nested` test class, search classes listed by `@TypeConverterSources` of enclosing classes, starting with direct outer
 
-As for Java, TableTest will stop searching as soon as it finds a matching factory method and use this for the conversion.
+As for Java, TableTest will stop searching as soon as it finds a matching `@TypeConverter` method and use this for the conversion.
 
 
 ### Overriding Built-In Conversion
-As TableTest will prefer using a factory method over the built-in conversion, it is possible to override the built-in conversion of specific types. The example below demonstrates this, allowing conversion to LocalDate to understand certain custom constant values.
+As TableTest will prefer using a custom converter over the built-in conversion, it is possible to override the built-in conversion of specific types. The example below demonstrates this, allowing conversion to LocalDate to understand certain custom constant values.
 
 ```java
 @TableTest("""
@@ -286,6 +289,7 @@ void testIsBefore(LocalDate thisDate, LocalDate otherDate, boolean expectedIsBef
   assertEquals(expectedIsBefore, thisDate.isBefore(otherDate));
 }
 
+@TypeConverter
 public static LocalDate parseLocalDate(String input) {
     return switch (input) {
         case "yesterday" -> LocalDate.parse("2025-06-06");
@@ -507,7 +511,7 @@ If you need special characters in Kotlin or external Table files, you have three
 
 
 ### Explicit Argument Conversion
-In addition to implicitly called factory methods and built-in conversion, TableTest supports JUnit [explicit argument conversion](https://junit.org/junit5/docs/current/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit). This can be used for explicit conversion to custom types.
+In addition to implicitly called custom converter methods and built-in conversion, TableTest supports JUnit [explicit argument conversion](https://junit.org/junit5/docs/current/user-guide/index.html#writing-tests-parameterized-tests-argument-conversion-explicit). This can be used for explicit conversion to custom types.
 
 As there is no parameter type information available in the ArgumentConverter interface, custom ArgumentConverters will receive the [parsed value](#value-conversion). In the example below, the value of the `source` parameter received by `PersonConverter.convert` will be of type `Map<String, String>`. However, since the `ArgumentConverter` interface specifies `source` parameter as type `Object`, the value needs to be inspected and processed using `instanceof`.
 

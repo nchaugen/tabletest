@@ -1,4 +1,4 @@
-import io.github.nchaugen.tabletest.junit.TableTest
+import org.tabletest.junit.TableTest
 import kotlin.test.assertEquals
 
 class SmokeTest {

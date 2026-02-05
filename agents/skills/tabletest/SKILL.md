@@ -108,6 +108,8 @@ void testHighestScore(Map<String, Integer> scores, int highest) { ... }
 
 JUnit converts many standard types automatically: primitives, `String`, `Path`, `File`, `URI`, `URL`, `UUID`, `LocalDate`, `LocalTime`, `LocalDateTime`, enums, and more. Prefer direct parameter types that JUnit can convert.
 
+Built-in conversion also applies to collection elements: `[com/example]` → `List<Path>`, `[Bob: 1980-03-04]` → `Map<String, LocalDate>`, `{https://claude.ai}` → `Set<URL>`.                   
+
 ```java
 @TableTest("""
     Scenario     | Class Name      | Resolved Path?
@@ -139,11 +141,54 @@ void resolvesInputDirectory(String buildDir, String junitProperty, String config
 }
 ```
 
+### Include All Outputs of a Concern
+
+When an operation produces multiple observable outputs, include them all as expectation columns in one table. Each row should give the complete picture of what happens for a given scenario. Don't split outputs of the same behavioural concern across separate test methods.
+
+```java
+// Good — all outputs of priority resolution in one table
+@TableTest("""
+    Scenario                  | Input Dir | JUnit Dir    | Resolved Path?       | Source?        | Searched Locations?
+    Configured input wins     | my-config | report/junit | my-config            | CONFIGURED     | [my-config]
+    JUnit property wins       |           | report/junit | report/junit         | JUNIT_PROPERTY | [report/junit, build/junit-jupiter]
+    Fallback wins             |           |              | build/junit-jupiter  | FALLBACK       | [build/junit-jupiter]
+    """)
+void resolvesWithPriority(String inputDir, String junitDir,
+                          String resolvedPath, ResolutionSource source, List<String> searchLocations) { ... }
+```
+
+```java
+// Bad — same outputs split across separate tests
+void resolvesPath(...)            // tests Resolved Path? only
+void reportsSource(...)           // tests Source? only
+void reportsSearchedLocations(...)// tests Searched Locations? only
+```
+
+Splitting forces the reader to cross-reference multiple tables to understand one behaviour. If the outputs all come from the same operation and concern, they belong together.
+
+Separate tests are appropriate when testing a **different concern** of the same operation (e.g. path normalization vs. priority resolution) or a different method entirely.
+
+### Match Table Structure to the Logic Being Tested
+
+The type of logic under test determines what each row should represent:
+
+- **Decision/priority logic**: Each row is a distinct decision point. Scenario names describe which rule takes precedence (e.g., "X wins over Y").
+- **Parsing/validation logic**: Each row is a distinct input variation. Scenario names describe the input condition (e.g. "Empty input", "With special characters").
+- **Transformation logic**: Each row is an input/output pair. Scenario names describe the transformation case.
+
+If rows feel out of place — parsing variations in a decision table, or decision branches in a parsing table — this signals the code under test may be mixing responsibilities. Consider whether the method should be split before adding more test rows.
+
 ### Name Expectation Columns Clearly
 
-End expectation columns with `?` to signal which columns are outputs being verified versus inputs being provided.
+End expectation columns with `?` **suffix** to signal which columns are outputs being verified versus inputs being provided.
 
 Examples: `Valid?`, `Formatted?`, `Result?`, `Throws?`, `Expected?`
+
+**Common mistake** — `?` as prefix instead of suffix:
+```
+?Source        ← WRONG
+Source?        ← CORRECT
+```
 
 ### Name Scenarios Descriptively
 
@@ -157,6 +202,64 @@ Describe the condition being tested, not the expected outcome. Good scenario nam
 | `Divisible by 4 but not 100` | `Is leap year`  |
 
 Scenario names appear in test failure messages, so clarity helps diagnose failures quickly.
+
+### Use Concrete Domain Values
+
+Column values should be concrete, meaningful data — not abstract flags or codes. Expectation column values should be traceable to input column values.
+
+**Good** — directory names as inputs, resolved dir traceable to an input column:
+```java
+@TableTest("""
+    Scenario             | Configured Dir | JUnit Dir    | Fallback State | Resolved Dir? | Source?
+    Configured wins      | my-config      | report/junit | yaml           | my-config     | CONFIGURED
+    JUnit property wins  |                | report/junit | yaml           | report/junit  | JUNIT_PROPERTY
+    Fallback wins        |                |              | yaml           | target/junit  | FALLBACK
+    """)
+```
+
+**Bad** — abstract flags, expectation values not traceable to inputs:
+```java
+@TableTest("""
+    Scenario             | Has Config | Override State | Fallback State | Resolved?
+    Configured wins      | true       | yaml           | yaml           | configured
+    Override wins        | false      | yaml           | yaml           | override
+    Fallback wins        | false      |                | yaml           | fallback
+    """)
+```
+In the bad example, `configured`, `override`, and `fallback` in Resolved? are names hardcoded in the test body, not visible in the table. The reader cannot understand the table without reading the test code.
+
+When a value is derived from an input column (e.g., fallback path = Build Dir + "/junit-jupiter"), include the source column so readers can trace the derivation:
+```java
+@TableTest("""
+    Scenario        | Build Dir | Build State | Resolved Dir?
+    Maven fallback  | target    | yaml        | target/junit-jupiter
+    Gradle fallback | build     | yaml        | build/junit-jupiter
+    """)
+```
+Here `target/junit-jupiter` is visibly derived from `Build Dir = target`.
+
+### Use Domain Terminology
+
+Column names should use domain or feature terminology that readers understand without knowing the implementation. Avoid parameter names, variable names, or internal API terms.
+
+| Good (Domain)          | Bad (Implementation)      |
+|------------------------|---------------------------|
+| `JUnit Dir`            | `Override`                |
+| `Build Output`         | `junitOutputDirOverride`  |
+| `Search Locations?`    | `Candidates?`             |
+
+### Use Value Sets for "Regardless Of" Relationships
+
+When one input takes precedence regardless of other inputs, use value sets to express this declaratively instead of listing every combination. Each `{...}` column generates a test per value.
+
+```java
+@TableTest("""
+    Scenario                   | Priority | Fallback State         | Resolved?
+    Priority wins regardless   | main     | {yaml, empty, missing} | main
+    """)
+```
+
+This single row generates 3 tests, all asserting `main` wins regardless of fallback state. See `references/value-sets.md` for full syntax.
 
 ### Null, Empty, and Blank Values
 
@@ -174,6 +277,8 @@ void resolves_values(String input, String resolved) {
     assertThat(transform(input)).isEqualTo(resolved);
 }
 ```
+
+**Note**: These are syntax examples, not test design patterns. Null/empty/blank variants of an input should typically be additional rows in the test that covers the feature, not in a separate test method. For example, if a resolver ignores blank JUnit dir values, add those as rows in the main resolution test rather than creating a separate "handles blank values" test.
 
 ---
 
@@ -193,7 +298,7 @@ void resolves_values(String input, String resolved) {
 2. Identify inputs and expected outputs for each scenario.
 3. Create table with scenario column first, inputs next, expectations last (suffix with `?`).
 4. Align method parameters to column order; do not bind the scenario column unless annotated with `@Scenario`.
-5. Add factory methods for custom type conversion when needed.
+5. Add type converters for custom type conversion when needed.
 
 ---
 
@@ -206,8 +311,13 @@ After writing, verify:
 - [ ] **Uniform assertions**: all rows use the same assertion logic; split into separate TableTests if logic differs per row
 - [ ] **Straightforward method**: no `if`/`switch` statements, no parsing or conversion logic; the method only arranges, acts, and asserts
 - [ ] **Parameter alignment**: parameters match data columns left-to-right (excluding scenario column)
-- [ ] **Parameter conversion**: factory methods or JUnit converters handle type conversion, keeping the test method free of parsing code
+- [ ] **Parameter conversion**: type converters or JUnit built-in converters handle type conversion, keeping the test method free of parsing code
 - [ ] **Valid syntax**: values requiring quotes are quoted, collections use correct bracket syntax
+- [ ] **Expectation columns present**: at least one column uses `?` suffix (not prefix)
+- [ ] **Concrete values**: expectation values are traceable to input column values where applicable
+- [ ] **Domain terminology**: column names use domain language, not implementation jargon or parameter names
+- [ ] **Complete outputs**: all observable outputs of the same behavioural concern are in one table, not split across separate tests
+- [ ] **Row coherence**: rows match the type of logic being tested (decision points for priority logic, input variations for parsing logic); out-of-place rows may signal mixed responsibilities in the code under test
 
 ---
 
@@ -218,8 +328,8 @@ Consult these references when needed:
 | Reference                           | When to use                                                                |
 |-------------------------------------|----------------------------------------------------------------------------|
 | `references/dependency-setup.md`    | Project lacks TableTest dependency                                         |
-| `references/value-sets.md`          | Multiple example inputs map to same expectation                            |
-| `references/factory-methods.md`     | Custom types need parsing logic                                            |
+| `references/value-sets.md`          | Multiple input values map to same expectation                              |
+| `references/type-converters.md`     | Custom types need parsing logic                                            |
 | `references/large-tables.md`        | Need comments, grouping, or external table files                           |
 | `references/example-patterns.md`    | Need inspiration for table design (business rules, boundaries, exceptions) |
 | `references/provided-parameters.md` | Using `@TempDir` or other injected parameters                              |

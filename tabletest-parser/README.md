@@ -99,8 +99,8 @@ TableParser converts strings in TableTest format into structured Table objects, 
 ### Java
 
 ```java
-import io.github.nchaugen.tabletest.parser.Table;
-import io.github.nchaugen.tabletest.parser.TableParser;
+import org.tabletest.parser.Table;
+import org.tabletest.parser.TableParser;
 
 String tableText = """
     Name       | Age | Skills       | Attributes
@@ -128,18 +128,26 @@ Map<String, String> attrs = (Map<String, String>) table.row(0).value(3); // {"st
 List rowCells = table.row(1).values(); // ["Jane Doe", "28", ["Python", "JS"], {"wisdom": "9", "charisma": "10"}]
 
 // Process all rows in a functional style
-table.map(row -> {
-    String rowName = (String) row.value(0);
-    List<String> rowSkills = (List<String>) row.value(2);
-    return rowName + " has " + rowSkills.size() + " skills: " + String.join(", ", rowSkills);
-}).forEach(System.out::println);
+table.
+
+map(row ->{
+String rowName = (String) row.value(0);
+List<String> rowSkills = (List<String>) row.value(2);
+    return rowName +" has "+rowSkills.
+
+size() +" skills: "+String.
+
+join(", ",rowSkills);
+}).
+
+forEach(System.out::println);
 ```
 
 ### Kotlin
 
 ```kotlin
-import io.github.nchaugen.tabletest.parser.Table
-import io.github.nchaugen.tabletest.parser.TableParser
+import org.tabletest.parser.Table
+import org.tabletest.parser.TableParser
 
 val tableText = """
     Name       | Age | Skills       | Attributes
