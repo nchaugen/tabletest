@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> TableTest has new Maven coordinates: `org.tabletest:tabletest-junit:1.0.0`
+>
+> Please update your dependencies to keep receiving updates.
+
 # TableTest
 
 TableTest extends JUnit for data-driven testing using a concise and readable table format. Express system behaviour through multiple examples, reducing test code while improving readability and maintainability.
@@ -307,7 +312,7 @@ Note that TableTest versions 0.5.4 - 0.5.7 needed JUnit 5.14 and above. JUnit 5.
     <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>6.0.1</version>
+        <version>6.0.3</version>
         <scope>test</scope>
     </dependency>
 </dependencies>
@@ -318,7 +323,7 @@ Note that TableTest versions 0.5.4 - 0.5.7 needed JUnit 5.14 and above. JUnit 5.
 ```kotlin
 dependencies {
     testImplementation("org.tabletest:tabletest-junit:1.0.0")
-    testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.0.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 ```

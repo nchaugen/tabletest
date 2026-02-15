@@ -14,9 +14,9 @@ repositories {
 }
 
 // Allow overriding JUnit version via -Pjunit.version
-def junitVersion = project.findProperty('junit.version') ?: '6.0.1'
+def junitVersion = project.findProperty('junit.version') ?: '6.0.3'
 // Allow overriding TableTest version via -Ptabletest.version
-def tabletestVersion = project.findProperty('tabletest.version') ?: '1.0.0-SNAPSHOT'
+def tabletestVersion = project.findProperty('tabletest.version') ?: '1.0.1-SNAPSHOT'
 
 dependencies {
     testImplementation "org.tabletest:tabletest-junit:${tabletestVersion}"

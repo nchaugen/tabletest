@@ -20,7 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <repository.url>git@github.com:nchaugen/tabletest.git</repository.url>
         <project.scm.id>github</project.scm.id>
-        <version.junit>6.0.1</version.junit>
+        <version.junit>6.0.3</version.junit>
         <version.tabletest-junit>0.5.8</version.tabletest-junit>
         <version.plugin.license>3.0</version.plugin.license>
         <version.plugin.clean>3.2.0</version.plugin.clean>

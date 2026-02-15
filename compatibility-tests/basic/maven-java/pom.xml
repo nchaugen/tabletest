@@ -8,8 +8,8 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <tabletest.version>1.0.0-SNAPSHOT</tabletest.version>
-        <junit.version>6.0.1</junit.version>
+        <tabletest.version>1.0.1-SNAPSHOT</tabletest.version>
+        <junit.version>6.0.3</junit.version>
     </properties>
 
     <dependencies>

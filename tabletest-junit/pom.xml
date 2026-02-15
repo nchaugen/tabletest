@@ -22,7 +22,7 @@
         <project.scm.id>github</project.scm.id>
         <version.tabletest-parser>1.0.0</version.tabletest-parser>
         <version.tabletest-reporter>0.3.0</version.tabletest-reporter>
-        <version.junit>6.0.1</version.junit>
+        <version.junit>6.0.3</version.junit>
         <version.kotlin>2.2.0</version.kotlin>
         <version.plugin.license>3.0</version.plugin.license>
         <version.plugin.clean>3.2.0</version.plugin.clean>
