@@ -4,14 +4,12 @@
 
 ## [1.0.0]
 ### Changed
-- TableTest annotations moved to package `org.tabletest.junit`
-- `@FactorySources` annotation replaced with `@TypeConverterSources` in new package
+- BREAKING CHANGE: Artefacts now published to Maven Central with group id `org.tabletest`
+- BREAKING CHANGE: TableTest annotations moved to package `org.tabletest.junit`. Please update imports.
+- BREAKING CHANGE: `@FactorySources` annotation replaced with `@TypeConverterSources` in new package
 - Old annotations in package `io.github.nchaugen.tabletest.junit` now deprecated (still works but will be removed in a future release)
-- Artefacts now published to Maven Central with group id `org.tabletest`
-- Independent versioning of tabletest-junit and tabletest-parser
 ### Added
 - `@TypeConverter` annotation for tagging custom converter methods (formerly refered to as "factory methods")
-- SKILL.md for teaching coding agents how to use TableTest
 
 ## [0.5.8] - 2025-12-15
 ### Fixed

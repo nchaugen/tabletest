@@ -20,6 +20,22 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Specifies classes to search for {@link TypeConverter} methods.
+ * <p>
+ * Use this annotation to share type converters across multiple test classes
+ * without duplication. Classes are searched in the order listed, after
+ * converters declared in the test class itself.
+ * <p>
+ * Example:
+ * <pre>
+ * &#64;TypeConverterSources({CommonConverters.class, DomainConverters.class})
+ * class MyTableTests { }
+ * </pre>
+ *
+ * @see TypeConverter
+ * @see TableTest
+ */
 @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TypeConverterSources {

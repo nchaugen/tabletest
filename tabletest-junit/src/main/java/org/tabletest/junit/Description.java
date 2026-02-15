@@ -20,6 +20,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Provides a human-readable description for a test class or method.
+ * <p>
+ * Descriptions are included in generated test reports and can contain
+ * multi-line text with Markdown or AsciiDoc formatting.
+ *
+ * @see TableTest
+ */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Description {

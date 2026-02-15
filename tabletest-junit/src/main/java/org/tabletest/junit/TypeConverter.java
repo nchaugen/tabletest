@@ -21,10 +21,20 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * {@code @TypeConverter} marks a method as used by {@link org.tabletest.junit.TableTest} to convert values
- * from one type to another.
- * <br>The method must be declared public static in a public class.
- * <br>It must take one parameter, the value to convert, and convert it to the return type.
+ * Marks a method as a type converter for {@link TableTest}.
+ * <p>
+ * The method must be {@code public static}, take one parameter (the source value),
+ * and return the converted target type.
+ * <p>
+ * Example:
+ * <pre>
+ * &#64;TypeConverter
+ * public static Money parseMoney(String value) {
+ *     return Money.parse(value);
+ * }
+ * </pre>
+ *
+ * @see TypeConverterSources
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
