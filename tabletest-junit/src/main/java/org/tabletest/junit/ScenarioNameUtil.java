@@ -136,7 +136,7 @@ public class ScenarioNameUtil {
      */
     private static Optional<Integer> findDeclaredScenarioIndex(Parameter[] parameters) {
         int[] scenarioIndices = IntStream.range(0, parameters.length)
-            .filter(index -> parameters[index].isAnnotationPresent(Scenario.class))
+            .filter(index -> isScenarioAnnotated(parameters[index]))
             .toArray();
 
         if (scenarioIndices.length > 1) {
@@ -144,6 +144,11 @@ public class ScenarioNameUtil {
         }
 
         return Arrays.stream(scenarioIndices).boxed().findFirst();
+    }
+
+    private static boolean isScenarioAnnotated(Parameter parameter) {
+        return parameter.isAnnotationPresent(Scenario.class)
+            || parameter.isAnnotationPresent(io.github.nchaugen.tabletest.junit.Scenario.class);
     }
 
     /**
