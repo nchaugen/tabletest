@@ -1,6 +1,6 @@
 package org.tabletest.parser;
 
-import io.github.nchaugen.tabletest.junit.TableTest;
+import org.tabletest.junit.TableTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
