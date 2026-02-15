@@ -4,7 +4,7 @@
 
     <groupId>org.tabletest</groupId>
     <artifactId>tabletest-junit</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2025</inceptionYear>
@@ -70,7 +70,7 @@
         <connection>scm:git:${repository.url}</connection>
         <developerConnection>scm:git:${repository.url}</developerConnection>
         <url>${repository.url}</url>
-        <tag>tabletest-junit-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
