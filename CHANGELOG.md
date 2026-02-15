@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [1.0.0]
+## [1.0.0] - 2026-02-15
 ### Changed
 - BREAKING CHANGE: Artefacts now published to Maven Central with group id `org.tabletest`
 - BREAKING CHANGE: TableTest annotations moved to package `org.tabletest.junit`. Please update imports.

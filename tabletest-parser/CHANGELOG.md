@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-02-15
+### Changed
+- BREAKING CHANGE: Artefact now published to Maven Central with group id `org.tabletest`
+- BREAKING CHANGE: Parser API moved to package `org.tabletest.parser`. Please update imports.
+
 ## [0.5.9] - 2025-12-31
 ### Added
 - TableParser supports keeping string quotes to support table formatting tools
