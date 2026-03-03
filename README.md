@@ -37,7 +37,9 @@ public static boolean parseBoolean(String input) {
 
 **Requirements**: Java 21+, JUnit 5.11+
 
-**IDE Support**: [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) provides auto-formatting, syntax highlighting, and shortcuts for working with tables.
+**IDE Support**: Plugins for [IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) and [VS Code](https://marketplace.visualstudio.com/items?itemName=tabletest.tabletest) provide auto-formatting, syntax highlighting, and shortcuts for working with tables.
+
+**Website**: [tabletest.org](https://tabletest.org) for documentation, tools overview, and more.
 
 **Latest Updates**: See the [changelog](CHANGELOG.md) for details on recent releases and changes.
 
@@ -53,6 +55,9 @@ public static boolean parseBoolean(String input) {
 - [Additional Features](#additional-features)
 - [Installation](#installation)
 - [IDE Support](#ide-support)
+- [Formatter](#formatter)
+- [Reporter](#reporter)
+- [Claude Code Plugin](#claude-code-plugin)
 - [License](#license)
 
 ## Usage
@@ -280,9 +285,9 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 }
 ```
 
-### Publishing TablesTest results
+### Publishing TableTest results
 
-Functionality for publishing TableTest results to AsciiDoc and Markdown format is available as extension [TableTest-Reporter](https://github.com/nchaugen/tabletest-reporter).
+Functionality for publishing TableTest results to AsciiDoc and Markdown format is available as the [Reporter](#reporter) tool.
 
 ## Installation
 
@@ -330,13 +335,53 @@ dependencies {
 
 ## IDE Support
 
+### IntelliJ
+
 The [TableTest plugin for IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) enhances your development experience when working with TableTest format tables. The plugin provides:
 
-- Code assistance for table formatting
-- Syntax highlighting for table content
-- Visual feedback for invalid table syntax
+- Auto-formatting with `Cmd+Option+L` (macOS) / `Ctrl+Alt+L`
+- Syntax highlighting for headers, delimiters, values, and comments
+- Language injection — automatic TableTest support in `@TableTest` annotations
 
-Installing the plugin streamlines the creation and maintenance of data-driven tests, making it easier to work with both inline and external table files.
+### VS Code
+
+The [TableTest extension for VS Code](https://marketplace.visualstudio.com/items?itemName=tabletest.tabletest) provides equivalent support for Visual Studio Code:
+
+- Auto-formatting via `Format Document` or the `TableTest: Format All Tables in Document` command
+- Syntax highlighting for table content
+- Language injection in Java and Kotlin files
+
+## Formatter
+
+The [TableTest Formatter](https://github.com/nchaugen/tabletest-formatter) provides consistent table layout across your codebase. It formats tables in Java files, Kotlin files, and standalone `.table` files.
+
+- **Spotless plugin** — natively supported in Spotless Gradle 8.3.0+ and Maven 3.3.0+, no extra dependencies needed
+- **CLI tool** — for standalone formatting or CI integration
+- **EditorConfig support** — reads indent style and size from `.editorconfig`
+
+The formatter returns input unchanged on parse errors, so it never breaks your build.
+
+## Reporter
+
+The [TableTest Reporter](https://github.com/nchaugen/tabletest-reporter) generates documentation from your TableTest tests. Run your tests, then run the reporter to turn test tables into readable AsciiDoc or Markdown output.
+
+- **Gradle and Maven plugins** — integrates into your build
+- **Pass/fail indicators** — rows are marked with test results in the generated output
+- **Custom templates** — extend or replace built-in templates using Pebble
+
+## Claude Code Plugin
+
+Two guided skills for writing TableTest-style tests from inside [Claude Code](https://claude.ai/claude-code):
+
+- **`/spec-by-example`** — clarify behaviour by working through concrete examples as a table
+- **`/tabletest`** — create `@TableTest` methods with guided table design and a quality checklist
+
+Install from the Claude Code CLI:
+
+```shell
+/plugin marketplace add https://tabletest.org/marketplace.json
+/plugin install tabletest@tabletest.org
+```
 
 ## License
 
