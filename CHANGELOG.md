@@ -1,6 +1,10 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Changed
+- Minimum Java version lowered from 21 to 17
+### Added
+- Java 8 compatible artifacts available as `tabletest-junit-java8` on the `java8` branch
 
 ## [1.0.0] - 2026-02-15
 ### Changed

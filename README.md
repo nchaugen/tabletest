@@ -35,7 +35,7 @@ public static boolean parseBoolean(String input) {
 - **Self-documenting**: Tables serve as living documentation
 - **Collaborative**: Non-technical stakeholders can understand and contribute
 
-**Requirements**: Java 21+, JUnit 5.11+
+**Requirements**: Java 17+, JUnit 5.11+
 
 **IDE Support**: Plugins for [IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) and [VS Code](https://marketplace.visualstudio.com/items?itemName=tabletest.tabletest) provide auto-formatting, syntax highlighting, and shortcuts for working with tables.
 
@@ -293,7 +293,9 @@ TableTest is available from [Maven Central Repository](https://central.sonatype.
 
 ## Java and JUnit Compatibility
 
-TableTest requires Java version 21 or above and is compatible with JUnit 5.11 and above.
+TableTest requires Java version 17 or above and is compatible with JUnit 5.11 and above.
+
+For projects on Java 8–16, separate Java 8 compatible artifacts are available as `org.tabletest:tabletest-junit-java8` from the [`java8` branch](https://github.com/nchaugen/tabletest/tree/java8).
 
 Frameworks such as Quarkus and SpringBoot packages their own version of JUnit. TableTest is compatible with Quarkus version 3.21.2 and above and SpringBoot version 3.4.0 and above. Please see the [compatibility tests](compatibility-tests) for examples of how to use TableTest with these frameworks.
 
