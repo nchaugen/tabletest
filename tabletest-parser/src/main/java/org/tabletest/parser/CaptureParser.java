@@ -80,9 +80,10 @@ public class CaptureParser {
     }
 
     private static Parser createCaptureFunction(Parser parser, Function<Success, Success> function) {
-        return input -> switch (parser.parse(input)) {
-            case Failure ignored -> ignored;
-            case Success success -> function.apply(success);
+        return input -> {
+            ParseResult result = parser.parse(input);
+            if (result instanceof Failure) return (Failure) result;
+            return function.apply((Success) result);
         };
     }
 }

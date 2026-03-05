@@ -74,14 +74,15 @@ public class TableParser {
     }
 
     private static Object unwrapValue(Object value, boolean keepQuotes) {
-        return switch (value) {
-            case null -> null;
-            case StringValue sv -> keepQuotes ? sv.withQuotes() : sv.value();
-            case List<?> list -> unwrapList(list, keepQuotes);
-            case Set<?> set -> unwrapSet(set, keepQuotes);
-            case Map<?, ?> map -> unwrapMap(map, keepQuotes);
-            default -> value;
-        };
+        if (value == null) return null;
+        if (value instanceof StringValue) {
+            StringValue sv = (StringValue) value;
+            return keepQuotes ? sv.withQuotes() : sv.value();
+        }
+        if (value instanceof List) return unwrapList((List<?>) value, keepQuotes);
+        if (value instanceof Set) return unwrapSet((Set<?>) value, keepQuotes);
+        if (value instanceof Map) return unwrapMap((Map<?, ?>) value, keepQuotes);
+        return value;
     }
 
     private static List<Object> unwrapList(List<?> list, boolean keepQuotes) {

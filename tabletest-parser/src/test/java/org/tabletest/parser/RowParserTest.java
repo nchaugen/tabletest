@@ -71,7 +71,7 @@ class RowParserTest {
         assertTrue(result.isSuccess());
         assertEquals(1, result.captures().size());
 
-        Object captured = result.captures().getFirst();
+        Object captured = result.captures().get(0);
         assertInstanceOf(Map.class, captured);
 
         Map<Object, Object> map = (Map<Object, Object>) captured;

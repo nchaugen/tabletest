@@ -54,25 +54,28 @@ public class ParameterTypeAnalyzer {
      * Recursively collects all Class types from a Type, excluding Map key types.
      */
     private static Stream<Class<?>> collectTypes(Type type) {
-        return switch (type) {
-            case Class<?> clazz -> Stream.of(clazz);
-
-            case ParameterizedType paramType when paramType.getRawType() instanceof Class<?> rawClass -> Stream.concat(
-                Stream.<Class<?>>of(rawClass),
-                Map.class.isAssignableFrom(rawClass)
-                    ? collectMapValueTypes(paramType)
-                    : collectAllTypeArguments(paramType)
-            );
-
-            case WildcardType wildcardType -> Stream.concat(
+        if (type instanceof Class<?>) return Stream.of((Class<?>) type);
+        if (type instanceof ParameterizedType) {
+            ParameterizedType paramType = (ParameterizedType) type;
+            if (paramType.getRawType() instanceof Class<?>) {
+                Class<?> rawClass = (Class<?>) paramType.getRawType();
+                return Stream.concat(
+                    Stream.<Class<?>>of(rawClass),
+                    Map.class.isAssignableFrom(rawClass)
+                        ? collectMapValueTypes(paramType)
+                        : collectAllTypeArguments(paramType)
+                );
+            }
+        }
+        if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            return Stream.concat(
                 collectBounds(wildcardType.getUpperBounds()),
                 collectBounds(wildcardType.getLowerBounds())
             );
-
-            case TypeVariable<?> typeVar -> collectBounds(typeVar.getBounds());
-
-            default -> Stream.empty();
-        };
+        }
+        if (type instanceof TypeVariable<?>) return collectBounds(((TypeVariable<?>) type).getBounds());
+        return Stream.empty();
     }
 
     /**

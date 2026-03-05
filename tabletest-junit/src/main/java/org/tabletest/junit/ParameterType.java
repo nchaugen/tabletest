@@ -50,7 +50,7 @@ public record ParameterType(List<? extends Class<?>> typeStack) {
      */
     public boolean isMatching(Class<?> valueClass) {
         return typeStack.isEmpty()
-            || typeStack.getFirst().isAssignableFrom(valueClass)
+            || typeStack.get(0).isAssignableFrom(valueClass)
             // if the value is a set and the parameter type not, this is a value set that will expand to multiple rows
             || Set.class.isAssignableFrom(valueClass);
     }
@@ -66,28 +66,28 @@ public record ParameterType(List<? extends Class<?>> typeStack) {
     }
 
     public String name() {
-        return typeStack.isEmpty() ? "<MISSING>" : typeStack.getFirst().getTypeName();
+        return typeStack.isEmpty() ? "<MISSING>" : typeStack.get(0).getTypeName();
     }
 
     /**
      * @return The Class of this parameter type, or null if none exists
      */
     public Class<?> toClass() {
-        return typeStack.isEmpty() ? null : typeStack.getFirst();
+        return typeStack.isEmpty() ? null : typeStack.get(0);
     }
 
     public boolean isPrimitive() {
-        return typeStack.size() == 1 && typeStack.getFirst().isPrimitive();
+        return typeStack.size() == 1 && typeStack.get(0).isPrimitive();
     }
 
     public boolean isSet() {
-        return !typeStack.isEmpty() && Set.class.isAssignableFrom(typeStack.getFirst());
+        return !typeStack.isEmpty() && Set.class.isAssignableFrom(typeStack.get(0));
     }
 
     public boolean isAssignableFrom(Class<?> type) {
         if (typeStack.isEmpty() || type == null) return false;
 
-        Class<?> targetType = typeStack.getFirst();
+        Class<?> targetType = typeStack.get(0);
         return targetType.isAssignableFrom(type)
             || isAssignableFromBoxed(targetType, type)
             || isAssignableFromUnboxed(targetType, type);

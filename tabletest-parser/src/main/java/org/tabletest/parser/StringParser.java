@@ -95,11 +95,12 @@ public class StringParser {
      * @return parser that succeeds if input starts with a character not among the given characters
      */
     public static Parser characterExcept(char... noneOf) {
-        return input -> switch (characters(noneOf).parse(input)) {
-            case Success __ -> failure(input);
-            case Failure __ -> input.isEmpty()
-                                    ? failure(input)
-                                    : success(String.valueOf(input.charAt(0)), input.substring(1));
+        return input -> {
+            ParseResult result = characters(noneOf).parse(input);
+            if (result instanceof Success) return failure(input);
+            return input.isEmpty()
+                ? failure(input)
+                : success(String.valueOf(input.charAt(0)), input.substring(1));
         };
     }
 

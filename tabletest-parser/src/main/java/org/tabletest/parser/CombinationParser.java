@@ -83,10 +83,10 @@ public class CombinationParser {
     }
 
     private static ParseResult atLeast(int n, Parser parser, ParseResult result) {
-        return switch (parser.parse(result.rest())) {
-            case Failure failure -> n < 1 ? result : failure;
-            case Success success -> atLeast(n - 1, parser, result.append(() -> success));
-        };
+        ParseResult next = parser.parse(result.rest());
+        if (next instanceof Failure) return n < 1 ? result : (Failure) next;
+        Success success = (Success) next;
+        return atLeast(n - 1, parser, result.append(() -> success));
     }
 
     private static ParseResult unsupportedCombine(ParseResult a, ParseResult b) {
@@ -101,9 +101,10 @@ public class CombinationParser {
      * @return a parser that always succeeds, with or without consuming input
      */
     public static Parser optional(Parser parser) {
-        return input -> switch (parser.parse(input)) {
-            case Success success -> success;
-            case Failure ignored -> success("", input);
+        return input -> {
+            ParseResult result = parser.parse(input);
+            if (result instanceof Success) return (Success) result;
+            return success("", input);
         };
     }
 }

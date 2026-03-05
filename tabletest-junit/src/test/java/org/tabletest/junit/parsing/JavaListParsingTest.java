@@ -13,7 +13,7 @@ public class JavaListParsingTest {
     void testListValueParsing(List<?> list, int expectedSize, Class<?> elementType) {
         assertEquals(expectedSize, list.size(), "List: " + list);
         if (!list.isEmpty()) {
-            assertInstanceOf(elementType, list.getFirst(), "First element type for: " + list);
+            assertInstanceOf(elementType, list.get(0), "First element type for: " + list);
         }
     }
 
@@ -28,7 +28,7 @@ public class JavaListParsingTest {
         String expectedFirstElement
     ) {
         assertEquals(1, input.size());
-        assertEquals(expectedFirstElement, input.getFirst());
+        assertEquals(expectedFirstElement, input.get(0));
     }
 
     @TableTest("""
@@ -42,7 +42,7 @@ public class JavaListParsingTest {
     void testCompoundListTypes(List<?> list, int expectedSize, Class<?> expectedElementType) {
         assertEquals(expectedSize, list.size());
         if (!list.isEmpty()) {
-            assertInstanceOf(expectedElementType, list.getFirst());
+            assertInstanceOf(expectedElementType, list.get(0));
         }
     }
 

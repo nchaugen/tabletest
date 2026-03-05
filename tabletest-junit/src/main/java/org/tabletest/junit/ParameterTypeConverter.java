@@ -105,12 +105,10 @@ public class ParameterTypeConverter {
         Class<?> testClass
     ) {
         if (targetType.isMatching(value.getClass())) {
-            return switch (value) {
-                case List<?> list -> convertList(list, targetType, testClass);
-                case Set<?> set -> convertSet(set, targetType, testClass);
-                case Map<?, ?> map -> convertMap(map, targetType, testClass);
-                default -> value;
-            };
+            if (value instanceof List<?>) return convertList((List<?>) value, targetType, testClass);
+            if (value instanceof Set<?>) return convertSet((Set<?>) value, targetType, testClass);
+            if (value instanceof Map<?, ?>) return convertMap((Map<?, ?>) value, targetType, testClass);
+            return value;
         }
 
         return TypeConversion.convert(

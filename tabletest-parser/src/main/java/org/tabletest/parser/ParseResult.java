@@ -26,7 +26,7 @@ import static java.util.Collections.*;
 /**
  * Represents the result of a parsing operation.
  */
-public sealed interface ParseResult permits ParseResult.Success, ParseResult.Failure {
+public interface ParseResult {
 
     static Success success(String consumed, String rest, List<Object> captures) {
         return new Success(consumed, rest, captures);
@@ -44,10 +44,7 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
      * Determines if the parse operation succeeded.
      */
     default boolean isSuccess() {
-        return switch(this) {
-            case Success __ -> true;
-            case Failure __ -> false;
-        };
+        return this instanceof Success;
     }
 
     /**
@@ -80,13 +77,11 @@ public sealed interface ParseResult permits ParseResult.Success, ParseResult.Fai
      * @return
      */
     default ParseResult append(Supplier<ParseResult> nextResult) {
-        return switch (this) {
-            case Failure ignored -> this;
-            case Success success -> switch (nextResult.get()) {
-                case Failure nextFailure -> nextFailure;
-                case Success nextSuccess -> success.append(nextSuccess);
-            };
-        };
+        if (this instanceof Failure) return this;
+        Success success = (Success) this;
+        ParseResult next = nextResult.get();
+        if (next instanceof Failure) return next;
+        return success.append((Success) next);
     }
 
     record Success(String consumed, String rest, List<Object> captures) implements ParseResult {

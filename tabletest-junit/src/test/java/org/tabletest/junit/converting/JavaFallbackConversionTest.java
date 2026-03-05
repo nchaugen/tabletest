@@ -235,7 +235,7 @@ public class JavaFallbackConversionTest {
     ) {
         assertEquals(stringToLocalDate, withConstructor.date());
         assertEquals(stringToLocalDate, withFactoryMethodInsideType.date());
-        assertEquals(stringToLocalDate, listWithFallbackConversion.getFirst().date());
+        assertEquals(stringToLocalDate, listWithFallbackConversion.get(0).date());
     }
 
 }

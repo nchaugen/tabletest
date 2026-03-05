@@ -27,19 +27,19 @@ class JavaImmutableCollectionParametersTest {
             // expected
         }
         try {
-            nestedList.getFirst().add("x");
+            nestedList.get(0).add("x");
             fail("modifying collections from the table should fail");
         } catch (Exception e) {
             // expected
         }
         try {
-            nestedSet.getFirst().add("x");
+            nestedSet.get(0).add("x");
             fail("modifying collections from the table should fail");
         } catch (Exception e) {
             // expected
         }
         try {
-            nestedMap.getFirst().put("x", "y");
+            nestedMap.get(0).put("x", "y");
             fail("modifying collections from the table should fail");
         } catch (Exception e) {
             // expected

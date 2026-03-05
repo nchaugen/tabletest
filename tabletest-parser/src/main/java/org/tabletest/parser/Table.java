@@ -39,7 +39,7 @@ public record Table(Row header, List<Row> rows) {
 
     private static Row validateAndGetHeader(List<Row> table) {
         requireAtLeastOneRow(table);
-        return table.getFirst();
+        return table.get(0);
     }
 
     private static List<Row> getDataRows(List<Row> table) {
