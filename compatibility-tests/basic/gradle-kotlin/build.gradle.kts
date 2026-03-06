@@ -4,7 +4,7 @@ plugins {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -14,7 +14,7 @@ repositories {
 }
 
 // Allow overriding JUnit version via -Pjunit.version
-val junitVersion = (project.findProperty("junit.version") as String?) ?: "6.0.3"
+val junitVersion = (project.findProperty("junit.version") as String?) ?: "5.11.0"
 // Allow overriding TableTest version via -Ptabletest.version
 val tabletestVersion = (project.findProperty("tabletest.version") as String?) ?: "1.0.1-SNAPSHOT"
 

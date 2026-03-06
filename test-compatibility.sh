@@ -6,11 +6,13 @@
 #   QUARKUS_VERSIONS="3.25.3 3.24.0 3.23.4 3.21.2"
 #   SPRINGBOOT_VERSIONS="3.5.4 3.4.8 3.4.0"
 #   TABLETEST_VERSION="1.0.1-SNAPSHOT"  # default TableTest version (can be overridden via env)
+#   TEST_GROUPS="basic frameworks"       # space-separated list of groups to run (all if unset)
 # Usage examples:
 #   ./test-compatibility.sh                    # run all with defaults
 #   JUNIT_VERSIONS="5.13.4 5.11.0" ./test-compatibility.sh
 #   QUARKUS_VERSIONS="3.25.3" SPRINGBOOT_VERSIONS="3.5.4" ./test-compatibility.sh
 #   TABLETEST_VERSION="1.0.1-SNAPSHOT" ./test-compatibility.sh
+#   TEST_GROUPS="basic" JUNIT_VERSIONS="5.11.0" QUARKUS_VERSIONS="" SPRINGBOOT_VERSIONS="" ./test-compatibility.sh
 
 # Colors for output
 YELLOW='\033[1;33m'
@@ -107,6 +109,12 @@ echo "Scanning compatibility-tests directory..."
 for group_dir in compatibility-tests/*/; do
     if [ -d "$group_dir" ]; then
         group_name=$(basename "$group_dir")
+
+        # Skip groups not in TEST_GROUPS if that variable is set
+        if [ -n "$TEST_GROUPS" ] && ! echo "$TEST_GROUPS" | grep -qw "$group_name"; then
+            continue
+        fi
+
         echo "Found test group: $group_name"
 
         for config_dir in "$group_dir"*/; do

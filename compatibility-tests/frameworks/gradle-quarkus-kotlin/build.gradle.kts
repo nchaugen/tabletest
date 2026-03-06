@@ -4,7 +4,7 @@ plugins {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -14,7 +14,7 @@ repositories {
 }
 
 // Allow overriding Quarkus version via -Pquarkus.version
-val quarkusVersion = (project.findProperty("quarkus.version") as String?) ?: "3.29.2"
+val quarkusVersion = (project.findProperty("quarkus.version") as String?) ?: "3.21.2"
 // Allow overriding TableTest version via -Ptabletest.version
 val tabletestVersion = (project.findProperty("tabletest.version") as String?) ?: "1.0.1-SNAPSHOT"
 

@@ -1,0 +1,108 @@
+name: Check Latest Versions
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Weekly on Monday at 08:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check-versions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Query latest compatible versions
+        id: versions
+        run: |
+          # JUnit latest (picks up both 5.x and 6.x; takes overall latest)
+          JUNIT_LATEST=$(curl -s https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter/maven-metadata.xml \
+            | grep -o '<version>[^<]*</version>' | grep -o '[0-9][^<]*' \
+            | grep -v 'SNAPSHOT\|RC\|M[0-9]' | sort -V | tail -1)
+
+          # Spring Boot latest (3.x/4.x)
+          SPRINGBOOT=$(curl -s https://repo1.maven.org/maven2/org/springframework/boot/spring-boot/maven-metadata.xml \
+            | grep -o '<version>[^<]*</version>' | grep -o '[0-9][^<]*' \
+            | grep -v 'SNAPSHOT\|RC\|M[0-9]' | sort -V | tail -1)
+
+          # Quarkus latest
+          QUARKUS=$(curl -s https://repo1.maven.org/maven2/io/quarkus/quarkus-core/maven-metadata.xml \
+            | grep -o '<version>[^<]*</version>' | grep -o '[0-9][^<]*' \
+            | grep -v 'SNAPSHOT\|CR\|Alpha\|Beta' | sort -V | tail -1)
+
+          echo "junit_latest=${JUNIT_LATEST}" >> $GITHUB_OUTPUT
+          echo "springboot_latest=${SPRINGBOOT}" >> $GITHUB_OUTPUT
+          echo "quarkus_latest=${QUARKUS}" >> $GITHUB_OUTPUT
+
+          echo "Queried versions: JUnit=${JUNIT_LATEST}, SpringBoot=${SPRINGBOOT}, Quarkus=${QUARKUS}"
+
+      - name: Load current versions
+        id: current
+        run: |
+          source compatibility-tests/latest-versions.env
+          echo "junit_current=${JUNIT_LATEST}" >> $GITHUB_OUTPUT
+          echo "springboot_current=${SPRINGBOOT_LATEST}" >> $GITHUB_OUTPUT
+          echo "quarkus_current=${QUARKUS_LATEST}" >> $GITHUB_OUTPUT
+
+      - name: Update latest-versions.env if changed
+        id: update
+        run: |
+          JUNIT_NEW="${{ steps.versions.outputs.junit_latest }}"
+          SPRINGBOOT_NEW="${{ steps.versions.outputs.springboot_latest }}"
+          QUARKUS_NEW="${{ steps.versions.outputs.quarkus_latest }}"
+
+          JUNIT_OLD="${{ steps.current.outputs.junit_current }}"
+          SPRINGBOOT_OLD="${{ steps.current.outputs.springboot_current }}"
+          QUARKUS_OLD="${{ steps.current.outputs.quarkus_current }}"
+
+          CHANGES=""
+          UPDATED=false
+
+          if [ -n "$JUNIT_NEW" ] && [ "$JUNIT_NEW" != "$JUNIT_OLD" ]; then
+            CHANGES="${CHANGES}- JUnit ${JUNIT_OLD} → ${JUNIT_NEW}\n"
+            UPDATED=true
+          else
+            JUNIT_NEW="$JUNIT_OLD"
+          fi
+
+          if [ -n "$SPRINGBOOT_NEW" ] && [ "$SPRINGBOOT_NEW" != "$SPRINGBOOT_OLD" ]; then
+            CHANGES="${CHANGES}- Spring Boot ${SPRINGBOOT_OLD} → ${SPRINGBOOT_NEW}\n"
+            UPDATED=true
+          else
+            SPRINGBOOT_NEW="$SPRINGBOOT_OLD"
+          fi
+
+          if [ -n "$QUARKUS_NEW" ] && [ "$QUARKUS_NEW" != "$QUARKUS_OLD" ]; then
+            CHANGES="${CHANGES}- Quarkus ${QUARKUS_OLD} → ${QUARKUS_NEW}\n"
+            UPDATED=true
+          else
+            QUARKUS_NEW="$QUARKUS_OLD"
+          fi
+
+          echo "updated=${UPDATED}" >> $GITHUB_OUTPUT
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          printf "${CHANGES}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          if [ "$UPDATED" = "true" ]; then
+            printf 'JUNIT_LATEST=%s\nSPRINGBOOT_LATEST=%s\nQUARKUS_LATEST=%s\n' \
+              "$JUNIT_NEW" "$SPRINGBOOT_NEW" "$QUARKUS_NEW" \
+              > compatibility-tests/latest-versions.env
+          fi
+
+      - name: Create pull request
+        if: steps.update.outputs.updated == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/update-latest-versions
+          title: 'chore: update latest framework versions'
+          body: |
+            Updated latest compatible framework versions:
+
+            ${{ steps.update.outputs.changes }}
+
+            These versions will be tested in the `compat-latest` CI job.
+          commit-message: 'chore: update latest framework versions'
+          labels: dependencies

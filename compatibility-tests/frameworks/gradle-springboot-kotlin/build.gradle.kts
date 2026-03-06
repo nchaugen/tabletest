@@ -6,7 +6,7 @@ plugins {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -16,7 +16,7 @@ repositories {
 }
 
 // Allow overriding SpringBoot version via -Pspringboot.version
-val springBootVersion = (project.findProperty("springboot.version") as String?) ?: "3.5.7"
+val springBootVersion = (project.findProperty("springboot.version") as String?) ?: "3.0.0"
 // Allow overriding TableTest version via -Ptabletest.version
 val tabletestVersion = (project.findProperty("tabletest.version") as String?) ?: "1.0.1-SNAPSHOT"
 
