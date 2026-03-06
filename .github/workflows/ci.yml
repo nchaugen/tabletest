@@ -14,7 +14,7 @@ jobs:
           java-version: '25'
           distribution: 'temurin'
       - name: Cache Maven repository
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-build-${{ hashFiles('**/pom.xml') }}
@@ -37,7 +37,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Cache Maven repository
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-java17-${{ hashFiles('compatibility-tests/**/pom.xml') }}
@@ -69,7 +69,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Cache Maven repository
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-java17-${{ hashFiles('compatibility-tests/**/pom.xml') }}
