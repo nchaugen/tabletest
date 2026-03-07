@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.joining;
 import static org.tabletest.junit.TableTestException.failedToReadExternalTable;
 
 public class InputResolver {
@@ -41,7 +41,7 @@ public class InputResolver {
     public static String loadResource(String resource, String encoding, Class<?> testClass) {
         try (InputStream resourceAsStream = resolveResourceStream(resource, testClass)) {
             return new BufferedReader(new InputStreamReader(resourceAsStream, encoding))
-                .lines().collect(Collectors.joining("\n"));
+                .lines().collect(joining("\n"));
         } catch (IOException cause) {
             throw new TableTestException(failedToReadExternalTable(resource, encoding), cause);
         }

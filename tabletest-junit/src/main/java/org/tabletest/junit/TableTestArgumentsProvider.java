@@ -25,6 +25,7 @@ import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static org.tabletest.junit.ParameterTypeConverter.convertValue;
 import static org.tabletest.junit.ScenarioNameUtil.hasScenarioName;
 import static org.tabletest.junit.ScenarioNameUtil.hasUndeclaredColumn;
@@ -105,7 +106,7 @@ public class TableTestArgumentsProvider {
         List<Object> convertedValues = row
             .skipFirstIf(hasUndeclaredColumn(row, parameters)) // first column is scenario name by convention
             .mapIndexed((index, cell) -> convertValue(cell, parameters[index]))
-            .toList();
+            .collect(toList());
 
         return generateValueCombinations(convertedValues, parameters, 0)
             .map(values ->

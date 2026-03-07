@@ -54,8 +54,8 @@ public class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<Tab
      */
     @Override
     protected Stream<? extends Arguments> provideArguments(ExtensionContext context, TableTest tableTest) {
-        String input = tableTest.resource().isBlank()
-            ? tableTest.value()
+        String input = tableTest.resource().trim().isEmpty()
+            ? String.join("\n", tableTest.value())
             : InputResolver.loadResource(tableTest.resource(), tableTest.encoding(), context.getRequiredTestClass());
         return provideArgumentsForInput(context, input);
     }

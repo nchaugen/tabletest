@@ -18,16 +18,19 @@ package org.tabletest.junit;
 import org.junit.jupiter.params.converter.ConvertWith;
 
 import java.lang.reflect.Parameter;
-import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 import static org.tabletest.junit.ExplicitConverterDetector.hasExplicitConverter;
 import static org.tabletest.junit.TableTestException.primitiveTypeDoesNotAllowNull;
-import static java.util.stream.Collectors.toUnmodifiableMap;
 
 /**
  * A utility class that handles conversion of parsed table values to the appropriate parameter types
@@ -134,9 +137,11 @@ public class ParameterTypeConverter {
         Class<?> testClass
     ) {
         ParameterType elementType = parameterType.elementType();
-        return list.stream()
-            .map(it -> convert(it, elementType, testClass))
-            .toList();
+        return unmodifiableList(
+            list.stream()
+                .map(it -> convert(it, elementType, testClass))
+                .collect(toList())
+        );
     }
 
     /**
@@ -158,9 +163,9 @@ public class ParameterTypeConverter {
 
         LinkedHashSet<Object> convertedSet = set.stream()
             .map(it -> convert(it, elementType, testClass))
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+            .collect(toCollection(LinkedHashSet::new));
 
-        return Collections.unmodifiableSet(convertedSet);
+        return unmodifiableSet(convertedSet);
     }
 
     /**
@@ -178,12 +183,11 @@ public class ParameterTypeConverter {
         Class<?> testClass
     ) {
         ParameterType elementType = parameterType.elementType();
-        return map.entrySet().stream()
-            .map(it -> Map.entry(
-                it.getKey(),
-                convert(it.getValue(), elementType, testClass)
-            ))
-            .collect(toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+        LinkedHashMap<Object, Object> result = new LinkedHashMap<>();
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            result.put(entry.getKey(), convert(entry.getValue(), elementType, testClass));
+        }
+        return unmodifiableMap(result);
     }
 
 }

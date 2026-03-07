@@ -73,7 +73,7 @@ public @interface TableTest {
      * Text-block syntax (""") is recommended for multi-line tables to maintain
      * readability.
      */
-    String value() default "";
+    String[] value() default {};
 
     /**
      * The path of the resource containing the table data.

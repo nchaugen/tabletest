@@ -29,7 +29,7 @@ TableTest allows you to express how the system is expected to behave through mul
 
 
 ## Usage
-TableTest-style test methods are declared using the `@TableTest` annotation. The annotation accepts a table of data as a multi-line string or as an [external resource](#table-in-external-file).
+TableTest-style test methods are declared using the `@TableTest` annotation. The annotation accepts a table of data as a text block (Java 15+), a string array (Java 8–14), a Kotlin raw string, or as an [external resource](#table-in-external-file).
 
 ```java
 @TableTest("""
@@ -43,6 +43,23 @@ public void leapYearCalculation(Year year, boolean expectedResult) {
     assertEquals(expectedResult, year.isLeap(), "Year " + year);
 }
 ```
+
+On Java 8–14, where text blocks are unavailable, pass each row as an element of a string array:
+
+```java
+@TableTest({
+    "Scenario                              | Year | Is leap year?",
+    "Years not divisible by 4              | 2001 | false",
+    "Years divisible by 4                  | 2004 | true",
+    "Years divisible by 100 but not by 400 | 2100 | false",
+    "Years divisible by 400                | 2000 | true"
+})
+public void leapYearCalculation(Year year, boolean expectedResult) {
+    assertEquals(expectedResult, year.isLeap(), "Year " + year);
+}
+```
+
+Each array element represents one row. Empty string elements and comment lines (`//`) are ignored.
 
 Tables use the pipe character (`|`) to separate columns and newline to separate rows. The first row is the header containing column names. The following lines are data rows.
 
@@ -478,6 +495,22 @@ When providing the table using text blocks in Java, all Java escape sequences li
     """)
 void testEscapeSequences(String input, int expectedLength) {
   assertEquals(expectedLength, input.length());
+}
+```
+
+#### Java String Arrays
+When providing the table as a string array, each element is a regular Java string literal.
+Escape sequences are processed by the Java compiler, behaving identically to text blocks:
+
+```java
+@TableTest({
+    "Scenario                                | Input      | Length?",
+    "Tab character processed by compiler     | a\tb       | 3",
+    "Quote marks processed by compiler       | Say \"hi\" | 8",
+    "Backslash processed by compiler         | path\\file | 9"
+})
+void testEscapeSequences(String input, int expectedLength) {
+    assertEquals(expectedLength, input.length());
 }
 ```
 

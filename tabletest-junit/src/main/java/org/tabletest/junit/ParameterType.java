@@ -16,6 +16,8 @@
 package org.tabletest.junit;
 
 import java.lang.reflect.Parameter;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +27,16 @@ import static org.tabletest.junit.ParameterTypeAnalyzer.typeStackOf;
 /**
  * Provides information about the parameter type, including generic type arguments.
  */
-public record ParameterType(List<? extends Class<?>> typeStack) {
+public class ParameterType {
+    private final List<? extends Class<?>> typeStack;
+
+    public ParameterType(List<? extends Class<?>> typeStack) {
+        this.typeStack = typeStack;
+    }
+
+    public List<? extends Class<?>> typeStack() {
+        return typeStack;
+    }
 
     /**
      * Creates a ParameterType instance for a method parameter
@@ -101,19 +112,41 @@ public record ParameterType(List<? extends Class<?>> typeStack) {
         return targetType.equals(PRIMITIVE_TO_WRAPPER.get(returnType));
     }
 
-    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER = Map.of(
-        boolean.class, Boolean.class,
-        byte.class, Byte.class,
-        char.class, Character.class,
-        short.class, Short.class,
-        int.class, Integer.class,
-        long.class, Long.class,
-        float.class, Float.class,
-        double.class, Double.class,
-        void.class, Void.class
-    );
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER;
+
+    static {
+        Map<Class<?>, Class<?>> map = new HashMap<>();
+        map.put(boolean.class, Boolean.class);
+        map.put(byte.class, Byte.class);
+        map.put(char.class, Character.class);
+        map.put(short.class, Short.class);
+        map.put(int.class, Integer.class);
+        map.put(long.class, Long.class);
+        map.put(float.class, Float.class);
+        map.put(double.class, Double.class);
+        map.put(void.class, Void.class);
+        PRIMITIVE_TO_WRAPPER = Collections.unmodifiableMap(map);
+    }
 
     public boolean isEmpty() {
         return typeStack.isEmpty();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ParameterType)) return false;
+        ParameterType other = (ParameterType) obj;
+        return typeStack.equals(other.typeStack);
+    }
+
+    @Override
+    public int hashCode() {
+        return typeStack.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "ParameterType[typeStack=" + typeStack + "]";
     }
 }
