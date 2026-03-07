@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ParameterizedTest
 @ArgumentsSource(io.github.nchaugen.tabletest.junit.TableArgumentsProvider.class)
-@Deprecated(since = "1.0.0")
+@Deprecated
 public @interface TableTest {
     /**
      * The table data in string format.

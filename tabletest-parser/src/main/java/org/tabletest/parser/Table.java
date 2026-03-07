@@ -20,11 +20,19 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Immutable representation of a table with header row and data rows.
  */
-public record Table(Row header, List<Row> rows) {
+public class Table {
+    private final Row header;
+    private final List<Row> rows;
+
+    public Table(Row header, List<Row> rows) {
+        this.header = requireNonNull(header, "Header row cannot be null");
+        this.rows = requireNonNull(rows, "Data rows cannot be null");
+    }
 
     /**
      * Creates a table with the provided rows. First row expected to be the header,
@@ -35,6 +43,14 @@ public record Table(Row header, List<Row> rows) {
      */
     public Table(List<Row> table) {
         this(validateAndGetHeader(table), getDataRows(table));
+    }
+
+    public Row header() {
+        return header;
+    }
+
+    public List<Row> rows() {
+        return rows;
     }
 
     private static Row validateAndGetHeader(List<Row> table) {
@@ -50,11 +66,6 @@ public record Table(Row header, List<Row> rows) {
         if (table == null || table.isEmpty()) {
             throw new IllegalArgumentException("Table must have at least one row");
         }
-    }
-
-    public Table {
-        requireNonNull(header, "Header row cannot be null");
-        requireNonNull(rows, "Data rows cannot be null");
     }
 
     /**
@@ -103,7 +114,9 @@ public record Table(Row header, List<Row> rows) {
      * @return list of header values
      */
     public List<String> headers() {
-        return header.values().stream().map(Object::toString).toList();
+        return header.values().stream()
+            .map(Object::toString)
+            .collect(toList());
     }
 
     /**
@@ -118,12 +131,32 @@ public record Table(Row header, List<Row> rows) {
     }
 
     public Table withHeadersInRows() {
+        List<String> hdrs = this.headers();
         return new Table(
             header,
             rows.stream()
-                .map(row -> row.withHeaders(this.headers()))
-                .toList()
+                .map(row -> row.withHeaders(hdrs))
+                .collect(toList())
         );
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Table)) return false;
+        Table other = (Table) obj;
+        return header.equals(other.header) && rows.equals(other.rows);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = header.hashCode();
+        result = 31 * result + rows.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Table[header=" + header + ", rows=" + rows + "]";
+    }
 }

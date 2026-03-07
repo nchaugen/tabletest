@@ -15,6 +15,7 @@
  */
 package org.tabletest.parser;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -22,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Parser for converting TableTest format text into Table object.
@@ -55,10 +58,10 @@ public class TableParser {
     public static Table parse(String input, boolean keepQuotes) {
         return new Table(
             Arrays.stream(input.split(ROW_SEPARATOR))
-                .filter(it -> !it.isBlank())
+                .filter(it -> !it.trim().isEmpty())
                 .map(line -> parseRow(line, keepQuotes))
                 .filter(Objects::nonNull)
-                .toList()
+                .collect(toList())
         ).withHeadersInRows();
     }
 
@@ -69,7 +72,7 @@ public class TableParser {
         }
         List<Object> values = parsedRow.captures().stream()
             .map(v -> unwrapValue(v, keepQuotes))
-            .toList();
+            .collect(toList());
         return values.isEmpty() ? null : new Row(values);
     }
 
@@ -86,7 +89,7 @@ public class TableParser {
     }
 
     private static List<Object> unwrapList(List<?> list, boolean keepQuotes) {
-        return list.stream().map(v -> unwrapValue(v, keepQuotes)).toList();
+        return list.stream().map(v -> unwrapValue(v, keepQuotes)).collect(toList());
     }
 
     private static LinkedHashSet<Object> unwrapSet(Set<?> set, boolean keepQuotes) {
@@ -102,7 +105,7 @@ public class TableParser {
     }
 
     private static Map.Entry<Object, Object> unwrapEntry(Map.Entry<?, ?> entry, boolean keepQuotes) {
-        return Map.entry(unwrapValue(entry.getKey(), keepQuotes), unwrapValue(entry.getValue(), keepQuotes));
+        return new AbstractMap.SimpleEntry<>(unwrapValue(entry.getKey(), keepQuotes), unwrapValue(entry.getValue(), keepQuotes));
     }
 
     private static Object putEntry(LinkedHashMap<Object, Object> m, Map.Entry<Object, Object> e) {

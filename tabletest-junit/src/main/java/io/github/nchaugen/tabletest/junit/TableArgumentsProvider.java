@@ -27,12 +27,12 @@ import static org.tabletest.junit.TableTestArgumentsProvider.provideArgumentsFor
 /**
  * Please use {@link org.tabletest.junit.TableArgumentsProvider} instead
  */
-@Deprecated(since = "1.0.0")
+@Deprecated
 public class TableArgumentsProvider extends AnnotationBasedArgumentsProvider<TableTest> {
 
     @Override
     protected Stream<? extends Arguments> provideArguments(ExtensionContext context, TableTest tableTest) {
-        String input = tableTest.resource().isBlank()
+        String input = tableTest.resource().trim().isEmpty()
             ? tableTest.value()
             : InputResolver.loadResource(tableTest.resource(), tableTest.encoding(), context.getRequiredTestClass());
         return provideArgumentsForInput(context, input);

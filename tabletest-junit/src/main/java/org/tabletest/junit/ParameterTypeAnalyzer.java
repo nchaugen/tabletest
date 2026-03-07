@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * Extracts the type stack of a method parameter.
  */
@@ -47,7 +49,7 @@ public class ParameterTypeAnalyzer {
      * @return A list of Class objects representing the types in the parameter
      */
     public static List<? extends Class<?>> typeStackOf(Parameter parameter) {
-        return collectTypes(parameter.getParameterizedType()).toList();
+        return collectTypes(parameter.getParameterizedType()).collect(toList());
     }
 
     /**

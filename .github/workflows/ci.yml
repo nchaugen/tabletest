@@ -56,7 +56,7 @@ jobs:
           TEST_GROUPS="basic frameworks" \
           JUNIT_VERSIONS="5.11.0" \
           QUARKUS_VERSIONS="3.21.2" \
-          SPRINGBOOT_VERSIONS="3.0.0" \
+          SPRINGBOOT_VERSIONS="3.4.0" \
           ./test-compatibility.sh
 
   compat-latest:
@@ -91,4 +91,58 @@ jobs:
           JUNIT_VERSIONS="$JUNIT_LATEST" \
           QUARKUS_VERSIONS="$QUARKUS_LATEST" \
           SPRINGBOOT_VERSIONS="$SPRINGBOOT_LATEST" \
+          ./test-compatibility.sh
+
+  java8-minimum:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+      - name: Download tabletest artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: tabletest-artifacts
+          path: ~/.m2/repository/org/tabletest
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Run basic-java8 minimum tests
+        run: |
+          TEST_GROUPS="basic-java8" \
+          JUNIT5_VERSIONS="5.11.0" \
+          QUARKUS_VERSIONS="" \
+          SPRINGBOOT_VERSIONS="" \
+          ./test-compatibility.sh
+
+  java8-latest:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+      - name: Download tabletest artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: tabletest-artifacts
+          path: ~/.m2/repository/org/tabletest
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Load latest versions
+        run: cat compatibility-tests/latest-versions.env >> $GITHUB_ENV
+      - name: Run basic-java8 latest tests
+        run: |
+          TEST_GROUPS="basic-java8" \
+          JUNIT5_VERSIONS="$JUNIT_5_LATEST" \
+          QUARKUS_VERSIONS="" \
+          SPRINGBOOT_VERSIONS="" \
           ./test-compatibility.sh

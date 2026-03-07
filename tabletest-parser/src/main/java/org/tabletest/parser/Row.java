@@ -15,20 +15,38 @@
  */
 package org.tabletest.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
+
 /**
  * Immutable representation of a table row with cell values.
- *
- * @param values list of cell values
  */
-public record Row(List<Object> values, List<String> headers) {
+public class Row {
+    private final List<Object> values;
+    private final List<String> headers;
+
+    public Row(List<Object> values, List<String> headers) {
+        this.values = unmodifiableList(new ArrayList<>(values));
+        this.headers = unmodifiableList(new ArrayList<>(headers));
+    }
 
     public Row(List<Object> values) {
-        this(values, List.of());
+        this(values, emptyList());
+    }
+
+    public List<Object> values() {
+        return values;
+    }
+
+    public List<String> headers() {
+        return headers;
     }
 
     /**
@@ -47,7 +65,10 @@ public record Row(List<Object> values, List<String> headers) {
      * @return new row with first value removed if test is false, otherwise this row is returned.
      */
     public Row skipFirstUnless(boolean test) {
-       return test ? this : new Row(values.stream().skip(1).toList(), headers.stream().skip(1).toList());
+        return test ? this : new Row(
+            values.stream().skip(1).collect(toList()),
+            headers.stream().skip(1).collect(toList())
+        );
     }
 
     /**
@@ -57,7 +78,10 @@ public record Row(List<Object> values, List<String> headers) {
      * @return new row with first value removed if test is true, otherwise this row is returned.
      */
     public Row skipFirstIf(boolean test) {
-       return test ? new Row(values.stream().skip(1).toList(), headers.stream().skip(1).toList()) : this;
+        return test ? new Row(
+            values.stream().skip(1).collect(toList()),
+            headers.stream().skip(1).collect(toList())
+        ) : this;
     }
 
     /**
@@ -67,7 +91,7 @@ public record Row(List<Object> values, List<String> headers) {
      * @param mapper function taking (index, value) and returning transformed value
      * @return stream of transformed values
      */
-    public <T>Stream<T> mapIndexed(BiFunction<Integer, Object, T> mapper) {
+    public <T> Stream<T> mapIndexed(BiFunction<Integer, Object, T> mapper) {
         return IntStream.range(0, values.size())
             .mapToObj(i -> mapper.apply(i, values.get(i)));
     }
@@ -92,5 +116,25 @@ public record Row(List<Object> values, List<String> headers) {
             throw new IndexOutOfBoundsException("Invalid header index: " + index);
         }
         return headers.get(index);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Row)) return false;
+        Row other = (Row) obj;
+        return values.equals(other.values) && headers.equals(other.headers);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = values.hashCode();
+        result = 31 * result + headers.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Row[values=" + values + ", headers=" + headers + "]";
     }
 }

@@ -37,8 +37,8 @@ public class ExplicitConverterDetector {
     }
 
     private static boolean isNotLanguageMetaAnnotation(Annotation it) {
-        return !it.annotationType().getPackageName().startsWith("java.lang.annotation")
-            && !it.annotationType().getPackageName().startsWith("kotlin.annotation");
+        return !it.annotationType().getPackage().getName().startsWith("java.lang.annotation")
+            && !it.annotationType().getPackage().getName().startsWith("kotlin.annotation");
     }
 
     private static boolean isOrHasExplicitConverter(Annotation it) {

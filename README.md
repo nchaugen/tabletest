@@ -1,8 +1,3 @@
-> [!IMPORTANT]
-> TableTest has new Maven coordinates: `org.tabletest:tabletest-junit:1.0.0`
->
-> Please update your dependencies to keep receiving updates.
-
 # TableTest
 
 TableTest extends JUnit for data-driven testing using a concise and readable table format. Express system behaviour through multiple examples, reducing test code while improving readability and maintainability.
@@ -35,7 +30,7 @@ public static boolean parseBoolean(String input) {
 - **Self-documenting**: Tables serve as living documentation
 - **Collaborative**: Non-technical stakeholders can understand and contribute
 
-**Requirements**: Java 17+, JUnit 5.11+
+**Requirements**: Java 8+, JUnit 5.11+
 
 **IDE Support**: Plugins for [IntelliJ](https://plugins.jetbrains.com/plugin/27334-tabletest) and [VS Code](https://marketplace.visualstudio.com/items?itemName=tabletest.tabletest) provide auto-formatting, syntax highlighting, and shortcuts for working with tables.
 
@@ -60,7 +55,7 @@ public static boolean parseBoolean(String input) {
 
 ## Usage
 
-Annotate test methods with `@TableTest` and provide table data as a multi-line string or [external file](#table-in-external-file).
+Annotate test methods with `@TableTest` and provide table data as a text block (Java 15+), a string array (Java 8–14), a Kotlin raw string, or an [external file](#table-in-external-file).
 
 Tables use pipes (`|`) to separate columns. The first row contains headers, the following rows contain test data. Each data row invokes the test method with cell values as arguments.
 
@@ -293,15 +288,28 @@ TableTest is available from [Maven Central Repository](https://central.sonatype.
 
 ## Java and JUnit Compatibility
 
-TableTest requires Java version 17 or above and is compatible with JUnit 5.11 and above.
+TableTest requires Java 8 or above and is compatible with JUnit 5.11 and above.
 
-For projects on Java 8–16, separate Java 8 compatible artifacts are available as `org.tabletest:tabletest-junit-java8` from the [`java8` branch](https://github.com/nchaugen/tabletest/tree/java8).
+On Java 15+, use text blocks for table data (as shown in the examples above). On Java 8–14, pass table rows as a string array:
 
-Frameworks such as Quarkus and SpringBoot packages their own version of JUnit. TableTest is compatible with Quarkus version 3.21.2 and above and SpringBoot version 3.4.0 and above. Please see the [compatibility tests](compatibility-tests) for examples of how to use TableTest with these frameworks.
+```java
+@TableTest({
+    "a | b | sum",
+    "1 | 2 | 3",
+    "4 | 5 | 9"
+})
+void testAddition(int a, int b, int sum) {
+    assertEquals(sum, a + b);
+}
+```
+
+Frameworks such as Quarkus and SpringBoot package their own version of JUnit. TableTest is compatible with Quarkus version 3.21.2 and above and SpringBoot version 3.4.0 and above. Please see the [compatibility tests](compatibility-tests) for examples of how to use TableTest with these frameworks.
 
 ### Compatibility Notes
 
 Note that TableTest versions 0.5.4 - 0.5.7 needed JUnit 5.14 and above. JUnit 5.13.0 introduced breaking changes that broke compatibility with TableTest. This was fixed in JUnit 5.13.1.
+
+**Upgrading from 1.0.0**: A clean rebuild is required — run `mvn clean test` or `gradle clean test` after changing the version. Running tests without a clean rebuild will fail with `AnnotationTypeMismatchException`. Kotlin projects are unaffected.
 
 ### Maven (pom.xml)
 

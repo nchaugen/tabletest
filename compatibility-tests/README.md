@@ -7,6 +7,7 @@ This directory contains compatibility test projects that verify TableTest works 
 | Group | Projects | Purpose |
 |-------|----------|---------|
 | `basic` | maven-java, maven-kotlin, gradle-java, gradle-kotlin | Core JUnit integration; uses text blocks (Java 17 target) |
+| `basic-java8` | maven-java, gradle-java | Core JUnit integration; uses string array syntax (Java 8 target) |
 | `frameworks` | maven-quarkus-java, maven-springboot-java, gradle-quarkus-kotlin, gradle-springboot-kotlin | Framework-managed JUnit integration |
 
 ## Version Strategy
@@ -17,16 +18,11 @@ This directory contains compatibility test projects that verify TableTest works 
 
 CI runs both minimum and latest to catch regressions at both ends of the supported range.
 
-## Branch Differences
+## Runtime Testing
 
-| | `main` branch | `java8` branch |
-|-|--------------|----------------|
-| Runtime(s) | Java 17 | Java 8 + Java 15 |
-| JUnit | 5.x + 6.x | 5.x only (cap) |
-| Spring Boot | 3.x / 4.x | 2.x only |
-| Quarkus | 3.x | 2.x only |
+The `basic-java8` group runs on a Java 8 JVM to verify the compiled bytecode works on the minimum supported runtime. The `basic` and `frameworks` groups run on Java 17+ where text blocks and framework dependencies are available.
 
-JUnit 6, Spring Boot 3.x, and Quarkus 3.x all require Java 17+, so the `java8` branch caps below those.
+JUnit 6, Spring Boot 3.x, and Quarkus 3.x all require Java 17+, so the `basic-java8` group is capped at JUnit 5.x.
 
 ## Running Locally
 

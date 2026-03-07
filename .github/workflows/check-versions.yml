@@ -22,6 +22,11 @@ jobs:
             | grep -o '<version>[^<]*</version>' | grep -o '[0-9][^<]*' \
             | grep -v 'SNAPSHOT\|RC\|M[0-9]' | sort -V | tail -1)
 
+          # JUnit 5.x latest (for Java 8 compatibility tests)
+          JUNIT_5=$(curl -s https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter/maven-metadata.xml \
+            | grep -o '<version>[^<]*</version>' | grep -o '[0-9][^<]*' \
+            | grep '^5\.' | grep -v 'SNAPSHOT\|RC\|M[0-9]' | sort -V | tail -1)
+
           # Spring Boot latest (3.x/4.x)
           SPRINGBOOT=$(curl -s https://repo1.maven.org/maven2/org/springframework/boot/spring-boot/maven-metadata.xml \
             | grep -o '<version>[^<]*</version>' | grep -o '[0-9][^<]*' \
@@ -33,16 +38,18 @@ jobs:
             | grep -v 'SNAPSHOT\|CR\|Alpha\|Beta' | sort -V | tail -1)
 
           echo "junit_latest=${JUNIT_LATEST}" >> $GITHUB_OUTPUT
+          echo "junit_5_latest=${JUNIT_5}" >> $GITHUB_OUTPUT
           echo "springboot_latest=${SPRINGBOOT}" >> $GITHUB_OUTPUT
           echo "quarkus_latest=${QUARKUS}" >> $GITHUB_OUTPUT
 
-          echo "Queried versions: JUnit=${JUNIT_LATEST}, SpringBoot=${SPRINGBOOT}, Quarkus=${QUARKUS}"
+          echo "Queried versions: JUnit=${JUNIT_LATEST}, JUnit5=${JUNIT_5}, SpringBoot=${SPRINGBOOT}, Quarkus=${QUARKUS}"
 
       - name: Load current versions
         id: current
         run: |
           source compatibility-tests/latest-versions.env
           echo "junit_current=${JUNIT_LATEST}" >> $GITHUB_OUTPUT
+          echo "junit_5_current=${JUNIT_5_LATEST}" >> $GITHUB_OUTPUT
           echo "springboot_current=${SPRINGBOOT_LATEST}" >> $GITHUB_OUTPUT
           echo "quarkus_current=${QUARKUS_LATEST}" >> $GITHUB_OUTPUT
 
@@ -50,10 +57,12 @@ jobs:
         id: update
         run: |
           JUNIT_NEW="${{ steps.versions.outputs.junit_latest }}"
+          JUNIT_5_NEW="${{ steps.versions.outputs.junit_5_latest }}"
           SPRINGBOOT_NEW="${{ steps.versions.outputs.springboot_latest }}"
           QUARKUS_NEW="${{ steps.versions.outputs.quarkus_latest }}"
 
           JUNIT_OLD="${{ steps.current.outputs.junit_current }}"
+          JUNIT_5_OLD="${{ steps.current.outputs.junit_5_current }}"
           SPRINGBOOT_OLD="${{ steps.current.outputs.springboot_current }}"
           QUARKUS_OLD="${{ steps.current.outputs.quarkus_current }}"
 
@@ -65,6 +74,13 @@ jobs:
             UPDATED=true
           else
             JUNIT_NEW="$JUNIT_OLD"
+          fi
+
+          if [ -n "$JUNIT_5_NEW" ] && [ "$JUNIT_5_NEW" != "$JUNIT_5_OLD" ]; then
+            CHANGES="${CHANGES}- JUnit 5 ${JUNIT_5_OLD} → ${JUNIT_5_NEW}\n"
+            UPDATED=true
+          else
+            JUNIT_5_NEW="$JUNIT_5_OLD"
           fi
 
           if [ -n "$SPRINGBOOT_NEW" ] && [ "$SPRINGBOOT_NEW" != "$SPRINGBOOT_OLD" ]; then
@@ -87,8 +103,8 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
           if [ "$UPDATED" = "true" ]; then
-            printf 'JUNIT_LATEST=%s\nSPRINGBOOT_LATEST=%s\nQUARKUS_LATEST=%s\n' \
-              "$JUNIT_NEW" "$SPRINGBOOT_NEW" "$QUARKUS_NEW" \
+            printf 'JUNIT_LATEST=%s\nJUNIT_5_LATEST=%s\nSPRINGBOOT_LATEST=%s\nQUARKUS_LATEST=%s\n' \
+              "$JUNIT_NEW" "$JUNIT_5_NEW" "$SPRINGBOOT_NEW" "$QUARKUS_NEW" \
               > compatibility-tests/latest-versions.env
           fi
 
@@ -103,6 +119,6 @@ jobs:
 
             ${{ steps.update.outputs.changes }}
 
-            These versions will be tested in the `compat-latest` CI job.
+            These versions will be tested in the `compat-latest` and `java8-latest` CI jobs.
           commit-message: 'chore: update latest framework versions'
           labels: dependencies
