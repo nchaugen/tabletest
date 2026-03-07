@@ -2,7 +2,8 @@
 
 # Compatibility matrix runner for tabletest samples
 # Env vars (space-separated lists) to control matrices; defaults provided if unset:
-#   JUNIT_VERSIONS="5.13.4 5.13.2 5.12.2 5.11.0"
+#   JUNIT_VERSIONS="6.0.3 5.14.1 5.13.4 5.12.2 5.11.0"
+#   JUNIT5_VERSIONS="5.14.1 5.13.4 5.12.2 5.11.0"  # used for basic-java8 (JUnit 6+ requires JVM 17+)
 #   QUARKUS_VERSIONS="3.25.3 3.24.0 3.23.4 3.21.2"
 #   SPRINGBOOT_VERSIONS="3.5.4 3.4.8 3.4.0"
 #   TABLETEST_VERSION="1.0.1-SNAPSHOT"  # default TableTest version (can be overridden via env)
@@ -13,7 +14,7 @@
 #   QUARKUS_VERSIONS="3.25.3" SPRINGBOOT_VERSIONS="3.5.4" ./test-compatibility.sh
 #   TABLETEST_VERSION="1.0.1-SNAPSHOT" ./test-compatibility.sh
 #   TEST_GROUPS="basic" JUNIT_VERSIONS="5.11.0" QUARKUS_VERSIONS="" SPRINGBOOT_VERSIONS="" ./test-compatibility.sh
-#   TEST_GROUPS="basic-java8" JUNIT_VERSIONS="5.11.0" QUARKUS_VERSIONS="" SPRINGBOOT_VERSIONS="" ./test-compatibility.sh
+#   TEST_GROUPS="basic-java8" JUNIT5_VERSIONS="5.11.0" QUARKUS_VERSIONS="" SPRINGBOOT_VERSIONS="" ./test-compatibility.sh
 
 # Colors for output
 YELLOW='\033[1;33m'
@@ -21,6 +22,7 @@ NC='\033[0m' # No Color
 
 # Set defaults if env not provided
 if [ -z "$JUNIT_VERSIONS" ]; then JUNIT_VERSIONS="6.0.3 5.14.1 5.13.4 5.12.2 5.11.0"; fi
+if [ -z "$JUNIT5_VERSIONS" ]; then JUNIT5_VERSIONS="5.14.1 5.13.4 5.12.2 5.11.0"; fi
 if [ -z "$QUARKUS_VERSIONS" ]; then QUARKUS_VERSIONS="3.31.3 3.24.0 3.23.4 3.21.2"; fi
 if [ -z "$SPRINGBOOT_VERSIONS" ]; then SPRINGBOOT_VERSIONS="4.0.2 3.5.7 3.4.0"; fi
 if [ -z "$TABLETEST_VERSION" ]; then TABLETEST_VERSION="1.0.1-SNAPSHOT"; fi
@@ -122,8 +124,19 @@ for group_dir in compatibility-tests/*/; do
             if [ -d "$config_dir" ]; then
                 tool=$(get_build_tool "$config_dir")
                 case "$group_name" in
-                  basic|basic-java8)
+                  basic)
                     for v in $JUNIT_VERSIONS; do
+                      if [ "$tool" = "maven" ]; then
+                        run_tests "$config_dir" "-Djunit.version=$v" "[junit=$v]"
+                      elif [ "$tool" = "gradle" ]; then
+                        run_tests "$config_dir" "-Pjunit.version=$v" "[junit=$v]"
+                      else
+                        run_tests "$config_dir" "" "[junit=$v]"
+                      fi
+                    done
+                    ;;
+                  basic-java8)
+                    for v in $JUNIT5_VERSIONS; do
                       if [ "$tool" = "maven" ]; then
                         run_tests "$config_dir" "-Djunit.version=$v" "[junit=$v]"
                       elif [ "$tool" = "gradle" ]; then

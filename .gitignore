@@ -31,6 +31,7 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
+bin/
 
 ### VS Code ###
 .vscode/

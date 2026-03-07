@@ -114,7 +114,7 @@ jobs:
       - name: Run basic-java8 minimum tests
         run: |
           TEST_GROUPS="basic-java8" \
-          JUNIT_VERSIONS="5.11.0" \
+          JUNIT5_VERSIONS="5.11.0" \
           QUARKUS_VERSIONS="" \
           SPRINGBOOT_VERSIONS="" \
           ./test-compatibility.sh
@@ -142,7 +142,7 @@ jobs:
       - name: Run basic-java8 latest tests
         run: |
           TEST_GROUPS="basic-java8" \
-          JUNIT_VERSIONS="$JUNIT_5_LATEST" \
+          JUNIT5_VERSIONS="$JUNIT_5_LATEST" \
           QUARKUS_VERSIONS="" \
           SPRINGBOOT_VERSIONS="" \
           ./test-compatibility.sh
