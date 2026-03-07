@@ -2,9 +2,10 @@
 
 ## [Unreleased]
 ### Changed
-- Minimum Java version lowered from 21 to 17
+- Minimum Java version lowered from 21 to 8
+- `@TableTest` value parameter accepts a string array for Java 8–14 users without text blocks
 ### Added
-- Java 8 compatible artifacts available as `tabletest-junit-java8` on the `java8` branch
+- Java 8 compatibility tests in CI
 
 ## [1.0.0] - 2026-02-15
 ### Changed
