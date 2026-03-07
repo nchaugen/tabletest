@@ -309,6 +309,8 @@ Frameworks such as Quarkus and SpringBoot package their own version of JUnit. Ta
 
 Note that TableTest versions 0.5.4 - 0.5.7 needed JUnit 5.14 and above. JUnit 5.13.0 introduced breaking changes that broke compatibility with TableTest. This was fixed in JUnit 5.13.1.
 
+**Upgrading from 1.0.0**: A clean rebuild is required — run `mvn clean test` or `gradle clean test` after changing the version. Running tests without a clean rebuild will fail with `AnnotationTypeMismatchException`. Kotlin projects are unaffected.
+
 ### Maven (pom.xml)
 
 ```xml

@@ -3,9 +3,16 @@
 ## [Unreleased]
 ### Changed
 - Minimum Java version lowered from 21 to 8
-- `@TableTest` value parameter accepts a string array for Java 8–14 users without text blocks
+- `@TableTest` value parameter accepts a string array to support Java versions without text blocks
 ### Added
 - Java 8 compatibility tests in CI
+### Upgrading from 1.0.0
+This release is **source compatible** but **binary incompatible** with 1.0.0.
+
+- **A clean rebuild is required**: run `mvn clean test` or `gradle clean test` after upgrading
+- Upgrading without a clean rebuild (e.g. `mvn test` alone) will fail with `AnnotationTypeMismatchException`
+- Recompiling without cleaning (e.g. `mvn compile test`) is also insufficient — Maven's incremental compiler does not detect annotation return type changes
+- **Kotlin projects are not affected**: the Kotlin incremental compiler handles the annotation change automatically
 
 ## [1.0.0] - 2026-02-15
 ### Changed
