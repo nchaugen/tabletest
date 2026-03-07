@@ -55,7 +55,7 @@ public static boolean parseBoolean(String input) {
 
 ## Usage
 
-Annotate test methods with `@TableTest` and provide table data as a multi-line string or [external file](#table-in-external-file).
+Annotate test methods with `@TableTest` and provide table data as a text block (Java 15+), a string array (Java 8–14), a Kotlin raw string, or an [external file](#table-in-external-file).
 
 Tables use pipes (`|`) to separate columns. The first row contains headers, the following rows contain test data. Each data row invokes the test method with cell values as arguments.
 
