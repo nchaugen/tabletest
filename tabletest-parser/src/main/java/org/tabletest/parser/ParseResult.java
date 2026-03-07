@@ -15,13 +15,20 @@
  */
 package org.tabletest.parser;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
-import static java.util.Collections.*;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 
 /**
  * Represents the result of a parsing operation.
@@ -33,7 +40,7 @@ public interface ParseResult {
     }
 
     static Success success(String consumed, String rest) {
-        return success(consumed, rest, List.of());
+        return success(consumed, rest, emptyList());
     }
 
     static Failure failure(String rest) {
@@ -58,7 +65,7 @@ public interface ParseResult {
      * Determines if the parse operation is incomplete, that is, if there is more input to parse or if the parse failed.
      */
     default boolean isIncomplete() {
-        return !rest().isBlank() || isFailure();
+        return !rest().trim().isEmpty() || isFailure();
     }
 
     String rest();
@@ -73,8 +80,6 @@ public interface ParseResult {
      * Concatenates two parse results if both succeeded, joining the consumed strings and captures,
      * and keeping the rest of the appended. If this parse result is a failure, nothing is appended.
      * If the next parse result is a failure, the next parse result is returned.
-     * @param nextResult
-     * @return
      */
     default ParseResult append(Supplier<ParseResult> nextResult) {
         if (this instanceof Failure) return this;
@@ -84,11 +89,30 @@ public interface ParseResult {
         return success.append((Success) next);
     }
 
-    record Success(String consumed, String rest, List<Object> captures) implements ParseResult {
-        public Success {
-            captures = Collections.unmodifiableList(new ArrayList<>(captures));
+    class Success implements ParseResult {
+        private final String consumed;
+        private final String rest;
+        private final List<Object> captures;
+
+        public Success(String consumed, String rest, List<Object> captures) {
+            this.consumed = consumed;
+            this.rest = rest;
+            this.captures = unmodifiableList(new ArrayList<>(captures));
         }
 
+        public String consumed() {
+            return consumed;
+        }
+
+        @Override
+        public String rest() {
+            return rest;
+        }
+
+        @Override
+        public List<Object> captures() {
+            return captures;
+        }
 
         /**
          * Stores the parsed value as a capture. If nothing was consumed, an empty string is stored.
@@ -105,7 +129,7 @@ public interface ParseResult {
          */
         Success captureTrimmed() {
             ArrayList<Object> nextCaptures = new ArrayList<>(captures);
-            nextCaptures.add(consumed.isBlank() ? null : new StringValue(consumed.trim(), null));
+            nextCaptures.add(consumed.trim().isEmpty() ? null : new StringValue(consumed.trim(), null));
             return new Success(consumed, rest, nextCaptures);
         }
 
@@ -118,7 +142,7 @@ public interface ParseResult {
             if (captures.stream().anyMatch(Objects::isNull)) {
                 throw new TableTestParseException("Cannot collect null values to list: " + captures);
             }
-            return new Success(consumed, rest, List.of(List.copyOf(captures)));
+            return new Success(consumed, rest, singletonList(unmodifiableList(new ArrayList<>(captures))));
         }
 
         /**
@@ -131,7 +155,7 @@ public interface ParseResult {
                 throw new TableTestParseException("Cannot collect null values to set: " + captures);
             }
             Set<Object> set = new LinkedHashSet<>(captures);
-            return new Success(consumed, rest, List.of(Collections.unmodifiableSet(set)));
+            return new Success(consumed, rest, singletonList(unmodifiableSet(set)));
         }
 
         /**
@@ -148,33 +172,77 @@ public interface ParseResult {
             if (captures.stream().anyMatch(Objects::isNull)) {
                 throw new TableTestParseException("Cannot collect null values to map: " + captures);
             }
-            Map<Object, Object> captureGroup =
-                IntStream.range(0, captures.size())
-                    .filter(i -> i % 2 == 0)
-                    .mapToObj(i -> Map.entry(captures.get(i), captures.get(i + 1)))
-                    .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (a, b) -> b,
-                        LinkedHashMap::new
-                    ));
-
-            return new Success(consumed, rest, List.of(unmodifiableMap(captureGroup)));
+            Map<Object, Object> captureGroup = new LinkedHashMap<>();
+            for (int i = 0; i < captures.size(); i += 2) {
+                captureGroup.put(captures.get(i), captures.get(i + 1));
+            }
+            return new Success(consumed, rest, singletonList(unmodifiableMap(captureGroup)));
         }
 
         private Success append(Success nextResult) {
+            List<Object> combined = new ArrayList<>(captures);
+            combined.addAll(nextResult.captures);
             return new Success(
                 consumed + nextResult.consumed,
                 nextResult.rest,
-                Stream.concat(captures.stream(), nextResult.captures.stream()).toList()
+                combined
             );
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Success)) return false;
+            Success other = (Success) obj;
+            return Objects.equals(consumed, other.consumed)
+                && Objects.equals(rest, other.rest)
+                && Objects.equals(captures, other.captures);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(consumed, rest, captures);
+        }
+
+        @Override
+        public String toString() {
+            return "Success[consumed=" + consumed + ", rest=" + rest + ", captures=" + captures + "]";
         }
     }
 
-    record Failure(String rest) implements ParseResult {
+    class Failure implements ParseResult {
+        private final String rest;
+
+        public Failure(String rest) {
+            this.rest = rest;
+        }
+
+        @Override
+        public String rest() {
+            return rest;
+        }
+
         @Override
         public List<Object> captures() {
-            return List.of();
+            return emptyList();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Failure)) return false;
+            Failure other = (Failure) obj;
+            return Objects.equals(rest, other.rest);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(rest);
+        }
+
+        @Override
+        public String toString() {
+            return "Failure[rest=" + rest + "]";
         }
     }
 }

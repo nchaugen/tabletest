@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.tabletest.junit.TableTestException.*;
@@ -93,7 +94,7 @@ public class TypeConversion {
         return typeConverterSearchPath
             .map(it -> findMatchingConverterInClass(it, targetType))
             .filter(Optional::isPresent)
-            .flatMap(Optional::stream)
+            .flatMap(opt -> opt.map(Stream::of).orElse(Stream.empty()))
             .findFirst();
     }
 
@@ -203,7 +204,7 @@ public class TypeConversion {
         List<Method> matchingMethods = Arrays.stream(converterClass.getMethods())
             .filter(TypeConversion::isTypeConverter)
             .filter(it -> targetType.isAssignableFrom(it.getReturnType()))
-            .toList();
+            .collect(Collectors.toList());
 
         if (matchingMethods.size() > 1) {
             throw new TableTestException(multipleTypeConvertersFound(converterClass, targetType));
@@ -223,7 +224,8 @@ public class TypeConversion {
      */
     private static boolean isTypeConverter(Method method) {
         boolean isCandidate = Modifier.isStatic(method.getModifiers())
-            && method.canAccess(null)
+            && Modifier.isPublic(method.getModifiers())
+            && Modifier.isPublic(method.getDeclaringClass().getModifiers())
             && method.getParameterCount() == 1;
 
         if (isCandidate && !method.isAnnotationPresent(TypeConverter.class)) {

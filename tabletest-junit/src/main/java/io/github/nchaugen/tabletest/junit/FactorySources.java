@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Deprecated(since = "1.0.0")
+@Deprecated
 public @interface FactorySources {
     Class<?>[] value();
 }

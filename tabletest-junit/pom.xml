@@ -219,7 +219,7 @@
                             <goal>compile</goal>
                         </goals>
                         <configuration>
-                            <release>17</release>
+                            <release>8</release>
                         </configuration>
                     </execution>
                     <execution>

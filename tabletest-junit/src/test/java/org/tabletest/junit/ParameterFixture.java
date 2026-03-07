@@ -35,7 +35,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 public class ParameterFixture {
 
@@ -59,13 +60,13 @@ public class ParameterFixture {
         Arrays.stream(ParameterFixture.class.getDeclaredMethods())
             .filter(it -> it.getName().endsWith("ValueParams"))
             .flatMap((Method method) -> Arrays.stream(method.getParameters()))
-            .collect(Collectors.toMap(parameter -> parameter.getParameterizedType().getTypeName(), it -> it));
+            .collect(toMap(parameter -> parameter.getParameterizedType().getTypeName(), it -> it));
 
     private static final Map<Class<?>, Parameter> paramsByType =
         Arrays.stream(ParameterFixture.class.getDeclaredMethods())
             .filter(it -> it.getName().endsWith("NonParameterizedValueParams"))
             .flatMap((Method method) -> Arrays.stream(method.getParameters()))
-            .collect(Collectors.toMap(Parameter::getType, it -> it));
+            .collect(toMap(Parameter::getType, it -> it));
 
     @SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
     private void javaNonParameterizedValueParams(

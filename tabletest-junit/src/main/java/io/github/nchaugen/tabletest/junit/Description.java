@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Deprecated(since = "1.0.0")
+@Deprecated
 public @interface Description {
     String value();
 }

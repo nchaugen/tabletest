@@ -22,9 +22,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.util.stream.Collectors.joining;
 import static org.tabletest.junit.TableTestException.multipleScenarioAnnotations;
 import static org.tabletest.junit.ValueSetUtil.isFromValueSet;
 
@@ -101,7 +101,7 @@ public class ScenarioNameUtil {
         return IntStream.range(0, values.size())
             .mapToObj(index -> toValueFromValueSetDescription(values, index, parameterRow))
             .filter(Objects::nonNull)
-            .collect(Collectors.joining(", "));
+            .collect(joining(", "));
     }
 
     private static String toValueFromValueSetDescription(List<?> values, int index, Row parameterRow) {
@@ -158,7 +158,7 @@ public class ScenarioNameUtil {
      * @return true if not null and not blank, false otherwise
      */
     private static boolean isNotBlank(Object value) {
-        return value != null && !value.toString().isBlank();
+        return value != null && !value.toString().trim().isEmpty();
     }
 
 }

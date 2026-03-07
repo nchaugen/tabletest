@@ -15,13 +15,27 @@
  */
 package org.tabletest.parser;
 
+import java.util.Objects;
+
 /**
  * Represents a parsed string value with information about how it was quoted in the source.
- *
- * @param value the string value (without surrounding quotes)
- * @param quoteChar the character used for quoting, or null if unquoted
  */
-public record StringValue(String value, Character quoteChar) {
+public class StringValue {
+    private final String value;
+    private final Character quoteChar;
+
+    public StringValue(String value, Character quoteChar) {
+        this.value = value;
+        this.quoteChar = quoteChar;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    public Character quoteChar() {
+        return quoteChar;
+    }
 
     public static StringValue unquoted(String value) {
         return new StringValue(value, null);
@@ -42,5 +56,23 @@ public record StringValue(String value, Character quoteChar) {
      */
     public String withQuotes() {
         return quoteChar == null ? value : quoteChar + value + quoteChar;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StringValue)) return false;
+        StringValue other = (StringValue) obj;
+        return Objects.equals(value, other.value) && Objects.equals(quoteChar, other.quoteChar);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, quoteChar);
+    }
+
+    @Override
+    public String toString() {
+        return "StringValue[value=" + value + ", quoteChar=" + quoteChar + "]";
     }
 }
