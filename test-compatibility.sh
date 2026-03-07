@@ -13,6 +13,7 @@
 #   QUARKUS_VERSIONS="3.25.3" SPRINGBOOT_VERSIONS="3.5.4" ./test-compatibility.sh
 #   TABLETEST_VERSION="1.0.1-SNAPSHOT" ./test-compatibility.sh
 #   TEST_GROUPS="basic" JUNIT_VERSIONS="5.11.0" QUARKUS_VERSIONS="" SPRINGBOOT_VERSIONS="" ./test-compatibility.sh
+#   TEST_GROUPS="basic-java8" JUNIT_VERSIONS="5.11.0" QUARKUS_VERSIONS="" SPRINGBOOT_VERSIONS="" ./test-compatibility.sh
 
 # Colors for output
 YELLOW='\033[1;33m'
@@ -111,7 +112,7 @@ for group_dir in compatibility-tests/*/; do
         group_name=$(basename "$group_dir")
 
         # Skip groups not in TEST_GROUPS if that variable is set
-        if [ -n "$TEST_GROUPS" ] && ! echo "$TEST_GROUPS" | grep -qw "$group_name"; then
+        if [ -n "$TEST_GROUPS" ] && ! echo " $TEST_GROUPS " | grep -q " $group_name "; then
             continue
         fi
 
@@ -121,7 +122,7 @@ for group_dir in compatibility-tests/*/; do
             if [ -d "$config_dir" ]; then
                 tool=$(get_build_tool "$config_dir")
                 case "$group_name" in
-                  basic)
+                  basic|basic-java8)
                     for v in $JUNIT_VERSIONS; do
                       if [ "$tool" = "maven" ]; then
                         run_tests "$config_dir" "-Djunit.version=$v" "[junit=$v]"

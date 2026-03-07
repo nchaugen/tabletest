@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+// Allow overriding JUnit version via -Pjunit.version
+def junitVersion = project.findProperty('junit.version') ?: '5.11.0'
+// Allow overriding TableTest version via -Ptabletest.version
+def tabletestVersion = project.findProperty('tabletest.version') ?: '1.0.1-SNAPSHOT'
+
+dependencies {
+    testImplementation "org.tabletest:tabletest-junit:${tabletestVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
