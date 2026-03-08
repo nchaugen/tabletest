@@ -180,19 +180,24 @@ jobs:
 
           MODULES="${{ inputs.modules }}"
 
+          COMMIT=$(git rev-parse HEAD)
+
           if [[ "$MODULES" == "both" ]]; then
             BODY=$(extract_changelog CHANGELOG.md)
             gh release create "tabletest-junit-$VERSION" \
+              --target "$COMMIT" \
               --title "TableTest $VERSION" \
               --notes "$BODY"
           elif [[ "$MODULES" == "parser-only" ]]; then
             BODY=$(extract_changelog tabletest-parser/CHANGELOG.md)
             gh release create "tabletest-parser-$VERSION" \
+              --target "$COMMIT" \
               --title "TableTest Parser $VERSION" \
               --notes "$BODY"
           else
             BODY=$(extract_changelog CHANGELOG.md)
             gh release create "tabletest-junit-$VERSION" \
+              --target "$COMMIT" \
               --title "TableTest JUnit $VERSION" \
               --notes "$BODY"
           fi
