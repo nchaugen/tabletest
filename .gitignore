@@ -39,3 +39,10 @@ bin/
 ### Mac OS ###
 .DS_Store
 .planning/
+
+### jenv ###
+.java-version
+
+### Maven release plugin ###
+release.properties
+pom.xml.releaseBackup
