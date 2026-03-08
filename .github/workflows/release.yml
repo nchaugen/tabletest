@@ -173,40 +173,6 @@ jobs:
             git tag "tabletest-junit-$VERSION"
           fi
 
-      - name: Create GitHub release
-        if: ${{ !inputs.dry-run }}
-        run: |
-          extract_changelog() {
-            local file=$1
-            sed -n "/^## \[$VERSION\]/,/^## \[/{/^## \[/!p}" "$file"
-          }
-
-          MODULES="${{ inputs.modules }}"
-
-          COMMIT=$(git rev-parse HEAD)
-
-          if [[ "$MODULES" == "both" ]]; then
-            BODY=$(extract_changelog CHANGELOG.md)
-            gh release create "tabletest-junit-$VERSION" \
-              --target "$COMMIT" \
-              --title "TableTest $VERSION" \
-              --notes "$BODY"
-          elif [[ "$MODULES" == "parser-only" ]]; then
-            BODY=$(extract_changelog tabletest-parser/CHANGELOG.md)
-            gh release create "tabletest-parser-$VERSION" \
-              --target "$COMMIT" \
-              --title "TableTest Parser $VERSION" \
-              --notes "$BODY"
-          else
-            BODY=$(extract_changelog CHANGELOG.md)
-            gh release create "tabletest-junit-$VERSION" \
-              --target "$COMMIT" \
-              --title "TableTest JUnit $VERSION" \
-              --notes "$BODY"
-          fi
-        env:
-          GH_TOKEN: ${{ github.token }}
-
       - name: Set next SNAPSHOT versions
         run: |
           # Calculate next patch version
@@ -263,3 +229,32 @@ jobs:
         if: ${{ !inputs.dry-run }}
         run: |
           git push origin main --follow-tags
+
+      - name: Create GitHub release
+        if: ${{ !inputs.dry-run }}
+        run: |
+          extract_changelog() {
+            local file=$1
+            sed -n "/^## \[$VERSION\]/,/^## \[/{/^## \[/!p}" "$file"
+          }
+
+          MODULES="${{ inputs.modules }}"
+
+          if [[ "$MODULES" == "both" ]]; then
+            BODY=$(extract_changelog CHANGELOG.md)
+            gh release create "tabletest-junit-$VERSION" \
+              --title "TableTest $VERSION" \
+              --notes "$BODY"
+          elif [[ "$MODULES" == "parser-only" ]]; then
+            BODY=$(extract_changelog tabletest-parser/CHANGELOG.md)
+            gh release create "tabletest-parser-$VERSION" \
+              --title "TableTest Parser $VERSION" \
+              --notes "$BODY"
+          else
+            BODY=$(extract_changelog CHANGELOG.md)
+            gh release create "tabletest-junit-$VERSION" \
+              --title "TableTest JUnit $VERSION" \
+              --notes "$BODY"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
