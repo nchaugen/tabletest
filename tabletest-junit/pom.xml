@@ -4,7 +4,7 @@
 
     <groupId>org.tabletest</groupId>
     <artifactId>tabletest-junit</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2025</inceptionYear>
@@ -18,7 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <repository.url>git@github.com:nchaugen/tabletest.git</repository.url>
         <project.scm.id>github</project.scm.id>
-        <version.tabletest-parser>1.1.0</version.tabletest-parser>
+        <version.tabletest-parser>1.1.1-SNAPSHOT</version.tabletest-parser>
         <version.tabletest-reporter>0.3.0</version.tabletest-reporter>
         <version.junit>6.0.3</version.junit>
         <version.kotlin>2.2.0</version.kotlin>
