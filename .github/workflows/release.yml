@@ -98,26 +98,22 @@ jobs:
           if [[ "$MODULES" != "junit-only" ]]; then
             # Set parser project version
             mvn -f tabletest-parser/pom.xml versions:set -DnewVersion="$VERSION" -DgenerateBackupPoms=false -q
-
-            # Update parser's cross-reference to junit version (only when releasing both)
-            if [[ "$MODULES" == "both" ]]; then
-              sed -i "s|<version.tabletest-junit>[^<]*</version.tabletest-junit>|<version.tabletest-junit>$VERSION</version.tabletest-junit>|" tabletest-parser/pom.xml
-            fi
+            # parser's version.tabletest-junit stays unchanged (depends on previously released junit)
           fi
 
           if [[ "$MODULES" != "parser-only" ]]; then
             # Set junit project version
             mvn -f tabletest-junit/pom.xml versions:set -DnewVersion="$VERSION" -DgenerateBackupPoms=false -q
 
-            # Update junit's cross-reference to parser version (only when releasing both)
+            # Update junit's dependency on parser to release version (when releasing both)
             if [[ "$MODULES" == "both" ]]; then
               sed -i "s|<version.tabletest-parser>[^<]*</version.tabletest-parser>|<version.tabletest-parser>$VERSION</version.tabletest-parser>|" tabletest-junit/pom.xml
             fi
             # junit-only: version.tabletest-parser stays unchanged (at current released version)
           fi
 
-          # Update aggregator POM version
-          mvn -f pom.xml versions:set -DnewVersion="$VERSION" -DgenerateBackupPoms=false -q
+          # Update aggregator POM version (sed to avoid reactor cycle)
+          sed -i "s|<version>[^<]*-SNAPSHOT</version>|<version>$VERSION</version>|" pom.xml
 
       - name: Stamp changelogs
         run: |
@@ -214,8 +210,9 @@ jobs:
           if [[ "$MODULES" != "junit-only" ]]; then
             mvn -f tabletest-parser/pom.xml versions:set -DnewVersion="$NEXT_SNAPSHOT" -DgenerateBackupPoms=false -q
 
+            # Parser can now depend on the just-released junit version
             if [[ "$MODULES" == "both" ]]; then
-              sed -i "s|<version.tabletest-junit>[^<]*</version.tabletest-junit>|<version.tabletest-junit>$NEXT_SNAPSHOT</version.tabletest-junit>|" tabletest-parser/pom.xml
+              sed -i "s|<version.tabletest-junit>[^<]*</version.tabletest-junit>|<version.tabletest-junit>$VERSION</version.tabletest-junit>|" tabletest-parser/pom.xml
             fi
           fi
 
@@ -224,14 +221,12 @@ jobs:
 
             if [[ "$MODULES" == "both" ]]; then
               sed -i "s|<version.tabletest-parser>[^<]*</version.tabletest-parser>|<version.tabletest-parser>$NEXT_SNAPSHOT</version.tabletest-parser>|" tabletest-junit/pom.xml
-            elif [[ "$MODULES" == "junit-only" ]]; then
-              # Keep parser cross-reference at released version (don't revert to SNAPSHOT)
-              true
             fi
+            # junit-only: version.tabletest-parser stays unchanged
           fi
 
-          # Update aggregator POM
-          mvn -f pom.xml versions:set -DnewVersion="$NEXT_SNAPSHOT" -DgenerateBackupPoms=false -q
+          # Update aggregator POM (sed to avoid reactor cycle)
+          sed -i "s|<version>$VERSION</version>|<version>$NEXT_SNAPSHOT</version>|" pom.xml
 
           # Update test-compatibility.sh default
           sed -i "s|TABLETEST_VERSION=\"[^\"]*\"|TABLETEST_VERSION=\"$NEXT_SNAPSHOT\"|" test-compatibility.sh
