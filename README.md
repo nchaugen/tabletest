@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> TableTest has new Maven coordinate: `org.tabletest:tabletest-junit:1.1.0`
+>
+> Please update your dependencies to keep receiving updates.
+
 # TableTest
 
 TableTest extends JUnit for data-driven testing using a concise and readable table format. Express system behaviour through multiple examples, reducing test code while improving readability and maintainability.
