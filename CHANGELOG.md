@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [1.1.0] - 2026-03-08
 ### Changed
 - Minimum Java version lowered from 21 to 8
 - `@TableTest` value parameter accepts a string array to support Java versions without text blocks

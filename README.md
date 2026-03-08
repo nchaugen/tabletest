@@ -319,7 +319,7 @@ Note that TableTest versions 0.5.4 - 0.5.7 needed JUnit 5.14 and above. JUnit 5.
     <dependency>
         <groupId>org.tabletest</groupId>
         <artifactId>tabletest-junit</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -335,7 +335,7 @@ Note that TableTest versions 0.5.4 - 0.5.7 needed JUnit 5.14 and above. JUnit 5.
 
 ```kotlin
 dependencies {
-    testImplementation("org.tabletest:tabletest-junit:1.0.0")
+    testImplementation("org.tabletest:tabletest-junit:1.1.0")
     testImplementation("org.junit.jupiter:junit-jupiter:6.0.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
