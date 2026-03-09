@@ -99,7 +99,7 @@ jobs:
 
           echo "updated=${UPDATED}" >> $GITHUB_OUTPUT
           echo "changes<<EOF" >> $GITHUB_OUTPUT
-          printf "${CHANGES}" >> $GITHUB_OUTPUT
+          printf '%b' "${CHANGES}" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
           if [ "$UPDATED" = "true" ]; then
