@@ -27,7 +27,7 @@ jobs:
           name: tabletest-artifacts
           path: ~/.m2/repository/org/tabletest
 
-  compat:
+  java17-compatibility:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -54,7 +54,7 @@ jobs:
       - name: Run compatibility tests
         run: TEST_GROUPS="basic frameworks" ./test-compatibility.sh
 
-  java8:
+  java8-compatibility:
     needs: build
     runs-on: ubuntu-latest
     steps:
