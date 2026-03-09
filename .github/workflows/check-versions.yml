@@ -103,8 +103,10 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
           if [ "$UPDATED" = "true" ]; then
-            printf 'JUNIT_LATEST=%s\nJUNIT_5_LATEST=%s\nSPRINGBOOT_LATEST=%s\nQUARKUS_LATEST=%s\n' \
+            source compatibility-tests/latest-versions.env
+            printf 'JUNIT_LATEST=%s\nJUNIT_5_LATEST=%s\nSPRINGBOOT_LATEST=%s\nQUARKUS_LATEST=%s\nJUNIT_MIN=%s\nJUNIT_5_MIN=%s\nSPRINGBOOT_MIN=%s\nQUARKUS_MIN=%s\n' \
               "$JUNIT_NEW" "$JUNIT_5_NEW" "$SPRINGBOOT_NEW" "$QUARKUS_NEW" \
+              "$JUNIT_MIN" "$JUNIT_5_MIN" "$SPRINGBOOT_MIN" "$QUARKUS_MIN" \
               > compatibility-tests/latest-versions.env
           fi
 
