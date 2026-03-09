@@ -1,4 +1,4 @@
-name: Check Latest Versions
+name: Check Latest Framework Versions
 
 on:
   schedule:
@@ -115,12 +115,12 @@ jobs:
         uses: peter-evans/create-pull-request@v8
         with:
           branch: chore/update-latest-versions
-          title: 'chore: update latest framework versions'
+          title: 'chore: update latest framework versions for compatibility tests'
           body: |
-            Updated latest compatible framework versions:
+            Updated latest framework versions:
 
             ${{ steps.update.outputs.changes }}
 
-            These versions will be tested in the `compat-latest` and `java8-latest` CI jobs.
-          commit-message: 'chore: update latest framework versions'
+            These versions will be tested in the compatibility test steps of the CI job.
+          commit-message: 'chore: update latest framework versions for compatibility tests'
           labels: dependencies
