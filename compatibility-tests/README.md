@@ -12,9 +12,7 @@ This directory contains compatibility test projects that verify TableTest works 
 
 ## Version Strategy
 
-**Minimum versions** are hardcoded in each project's `pom.xml` or `build.gradle` properties. They represent the oldest supported release and are never auto-bumped.
-
-**Latest versions** are tracked in [`latest-versions.env`](latest-versions.env) and auto-bumped weekly by the `check-versions.yml` workflow. They represent the newest compatible release within the allowed range for each branch.
+**Minimum and latest versions** are both tracked in [`latest-versions.env`](latest-versions.env). Minimum versions represent the oldest supported release and are updated manually. Latest versions represent the newest compatible release and are auto-bumped weekly by the `check-versions.yml` workflow.
 
 CI runs both minimum and latest to catch regressions at both ends of the supported range.
 
@@ -26,10 +24,10 @@ JUnit 6, Spring Boot 3.x, and Quarkus 3.x all require Java 17+, so the `basic-ja
 
 ## Running Locally
 
-Run all groups with default versions:
+Build and install the TableTest artifacts first, then run all groups with default versions:
 
 ```bash
-./test-compatibility.sh
+mvn install -q && ./test-compatibility.sh
 ```
 
 Run with specific versions:

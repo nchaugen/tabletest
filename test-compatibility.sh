@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Compatibility matrix runner for tabletest samples
-# Env vars (space-separated lists) to control matrices; defaults provided if unset:
-#   JUNIT_VERSIONS="6.0.3 5.14.1 5.13.4 5.12.2 5.11.0"
-#   JUNIT5_VERSIONS="5.14.1 5.13.4 5.12.2 5.11.0"  # used for basic-java8 (JUnit 6+ requires JVM 17+)
-#   QUARKUS_VERSIONS="3.25.3 3.24.0 3.23.4 3.21.2"
-#   SPRINGBOOT_VERSIONS="3.5.4 3.4.8 3.4.0"
+# Env vars (space-separated lists) to control matrices; defaults from latest-versions.env if unset:
+#   JUNIT_VERSIONS="<JUNIT_LATEST> <JUNIT_MIN>"
+#   JUNIT5_VERSIONS="<JUNIT_5_LATEST> <JUNIT_5_MIN>"  # used for basic-java8 (JUnit 6+ requires JVM 17+)
+#   QUARKUS_VERSIONS="<QUARKUS_LATEST> <QUARKUS_MIN>"
+#   SPRINGBOOT_VERSIONS="<SPRINGBOOT_LATEST> <SPRINGBOOT_MIN>"
 #   TABLETEST_VERSION="1.1.1-SNAPSHOT"  # default TableTest version (can be overridden via env)
 #   TEST_GROUPS="basic frameworks"       # space-separated list of groups to run (all if unset)
 # Usage examples:
@@ -20,11 +20,16 @@
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Load version definitions (latest and minimum) if not already in env
+if [ -f "compatibility-tests/latest-versions.env" ]; then
+  source compatibility-tests/latest-versions.env
+fi
+
 # Set defaults if env not provided
-if [ -z "$JUNIT_VERSIONS" ]; then JUNIT_VERSIONS="6.0.3 5.14.1 5.13.4 5.12.2 5.11.0"; fi
-if [ -z "$JUNIT5_VERSIONS" ]; then JUNIT5_VERSIONS="5.14.1 5.13.4 5.12.2 5.11.0"; fi
-if [ -z "$QUARKUS_VERSIONS" ]; then QUARKUS_VERSIONS="3.31.3 3.24.0 3.23.4 3.21.2"; fi
-if [ -z "$SPRINGBOOT_VERSIONS" ]; then SPRINGBOOT_VERSIONS="4.0.2 3.5.7 3.4.0"; fi
+if [ -z "$JUNIT_VERSIONS" ]; then JUNIT_VERSIONS="${JUNIT_LATEST} ${JUNIT_MIN}"; fi
+if [ -z "$JUNIT5_VERSIONS" ]; then JUNIT5_VERSIONS="${JUNIT_5_LATEST} ${JUNIT_5_MIN}"; fi
+if [ -z "$QUARKUS_VERSIONS" ]; then QUARKUS_VERSIONS="${QUARKUS_LATEST} ${QUARKUS_MIN}"; fi
+if [ -z "$SPRINGBOOT_VERSIONS" ]; then SPRINGBOOT_VERSIONS="${SPRINGBOOT_LATEST} ${SPRINGBOOT_MIN}"; fi
 if [ -z "$TABLETEST_VERSION" ]; then TABLETEST_VERSION="1.1.1-SNAPSHOT"; fi
 
 # Test results tracking

@@ -51,12 +51,14 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
+      - name: Load versions
+        run: cat compatibility-tests/latest-versions.env >> $GITHUB_ENV
       - name: Run minimum compatibility tests
         run: |
           TEST_GROUPS="basic frameworks" \
-          JUNIT_VERSIONS="5.11.0" \
-          QUARKUS_VERSIONS="3.21.2" \
-          SPRINGBOOT_VERSIONS="3.4.0" \
+          JUNIT_VERSIONS="$JUNIT_MIN" \
+          QUARKUS_VERSIONS="$QUARKUS_MIN" \
+          SPRINGBOOT_VERSIONS="$SPRINGBOOT_MIN" \
           ./test-compatibility.sh
 
   compat-latest:
@@ -83,7 +85,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
-      - name: Load latest versions
+      - name: Load versions
         run: cat compatibility-tests/latest-versions.env >> $GITHUB_ENV
       - name: Run latest compatibility tests
         run: |
@@ -111,10 +113,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
+      - name: Load versions
+        run: cat compatibility-tests/latest-versions.env >> $GITHUB_ENV
       - name: Run basic-java8 minimum tests
         run: |
           TEST_GROUPS="basic-java8" \
-          JUNIT5_VERSIONS="5.11.0" \
+          JUNIT5_VERSIONS="$JUNIT_5_MIN" \
           QUARKUS_VERSIONS="" \
           SPRINGBOOT_VERSIONS="" \
           ./test-compatibility.sh
@@ -137,7 +141,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
-      - name: Load latest versions
+      - name: Load versions
         run: cat compatibility-tests/latest-versions.env >> $GITHUB_ENV
       - name: Run basic-java8 latest tests
         run: |
