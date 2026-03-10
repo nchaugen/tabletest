@@ -1,0 +1,150 @@
+name: Release tabletest-junit
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 1.0.1)'
+        required: true
+        type: string
+      dry-run:
+        description: 'Build and validate without deploying or pushing'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  VERSION: ${{ inputs.version }}
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          server-id: central
+          server-username: MAVEN_CENTRAL_USERNAME
+          server-password: MAVEN_CENTRAL_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: GPG_PASSPHRASE
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-release-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-release-
+
+      - name: Validate preconditions
+        run: |
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Version '$VERSION' does not match semver pattern (e.g. 1.0.1)"
+            exit 1
+          fi
+
+          UNRELEASED=$(sed -n '/^## \[Unreleased\]/,/^## \[/p' CHANGELOG.md | sed '1d;$d')
+          if [ -z "$UNRELEASED" ]; then
+            echo "::error::CHANGELOG.md has no content under [Unreleased]"
+            exit 1
+          fi
+
+          if git tag -l "tabletest-junit-$VERSION" | grep -q .; then
+            echo "::error::Tag tabletest-junit-$VERSION already exists"
+            exit 1
+          fi
+
+          PARSER_DEP=$(grep -oP '(?<=<version.tabletest-parser>)[^<]+' tabletest-junit/pom.xml)
+          if [[ "$PARSER_DEP" == *-SNAPSHOT ]]; then
+            echo "::error::tabletest-junit depends on parser $PARSER_DEP — release parser first or update the dependency"
+            exit 1
+          fi
+
+          echo "All preconditions passed"
+
+      - name: Set release version
+        run: mvn -f tabletest-junit/pom.xml versions:set -DnewVersion="$VERSION" -DgenerateBackupPoms=false -q
+
+      - name: Stamp changelog
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          sed -i "s|^## \[Unreleased\]|## [Unreleased]\n\n## [$VERSION] - $TODAY|" CHANGELOG.md
+
+      - name: Update README.md
+        run: |
+          sed -i '/<artifactId>tabletest-junit<\/artifactId>/{n;s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>'"$VERSION"'</version>|}' README.md
+          sed -i 's|org.tabletest:tabletest-junit:[0-9]\+\.[0-9]\+\.[0-9]\+|org.tabletest:tabletest-junit:'"$VERSION"'|' README.md
+
+      - name: Commit release
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "release: tabletest-junit $VERSION"
+
+      - name: Show release commit
+        if: inputs.dry-run
+        run: git show --stat HEAD && echo "---" && git show HEAD
+
+      - name: Deploy
+        if: ${{ !inputs.dry-run }}
+        run: mvn -f tabletest-junit/pom.xml clean deploy -Prelease -DskipTests --no-transfer-progress
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Create git tag
+        run: git tag "tabletest-junit-$VERSION"
+
+      - name: Set next development version
+        run: |
+          NEXT_PATCH=$(echo "$VERSION" | awk -F. '{print $1"."$2"."$3+1}')
+          NEXT_SNAPSHOT="${NEXT_PATCH}-SNAPSHOT"
+          mvn -f tabletest-junit/pom.xml versions:set -DnewVersion="$NEXT_SNAPSHOT" -DgenerateBackupPoms=false -q
+
+          # Update test-compatibility.sh default
+          sed -i "s|TABLETEST_VERSION=\"[^\"]*\"|TABLETEST_VERSION=\"$NEXT_SNAPSHOT\"|" test-compatibility.sh
+
+          # Update compatibility test build files
+          find compatibility-tests -name 'pom.xml' -exec \
+            sed -i "s|<tabletest.version>[^<]*</tabletest.version>|<tabletest.version>$NEXT_SNAPSHOT</tabletest.version>|" {} +
+          find compatibility-tests -name 'build.gradle' -exec \
+            sed -i "s|?: '[0-9]\+\.[0-9]\+\.[0-9]\+-SNAPSHOT'|?: '$NEXT_SNAPSHOT'|" {} +
+          find compatibility-tests -name 'build.gradle.kts' -exec \
+            sed -i "s|?: \"[0-9]\+\.[0-9]\+\.[0-9]\+-SNAPSHOT\"|?: \"$NEXT_SNAPSHOT\"|" {} +
+
+      - name: Commit next development version
+        run: |
+          NEXT_PATCH=$(echo "$VERSION" | awk -F. '{print $1"."$2"."$3+1}')
+          NEXT_SNAPSHOT="${NEXT_PATCH}-SNAPSHOT"
+          git add -A
+          git commit -m "chore: set tabletest-junit development version $NEXT_SNAPSHOT"
+
+      - name: Show next development version commit
+        if: inputs.dry-run
+        run: git show --stat HEAD && echo "---" && git show HEAD
+
+      - name: Push commits and tags
+        if: ${{ !inputs.dry-run }}
+        run: git push origin main --tags
+
+      - name: Create GitHub release
+        if: ${{ !inputs.dry-run }}
+        run: |
+          BODY=$(sed -n "/^## \[$VERSION\]/,/^## \[/{/^## \[/!p}" CHANGELOG.md)
+          gh release create "tabletest-junit-$VERSION" \
+            --title "TableTest JUnit $VERSION" \
+            --notes "$BODY"
+        env:
+          GH_TOKEN: ${{ github.token }}

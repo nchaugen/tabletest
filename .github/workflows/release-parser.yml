@@ -1,0 +1,134 @@
+name: Release tabletest-parser
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 1.0.1)'
+        required: true
+        type: string
+      dry-run:
+        description: 'Build and validate without deploying or pushing'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  VERSION: ${{ inputs.version }}
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          server-id: central
+          server-username: MAVEN_CENTRAL_USERNAME
+          server-password: MAVEN_CENTRAL_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: GPG_PASSPHRASE
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-release-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-release-
+
+      - name: Validate preconditions
+        run: |
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Version '$VERSION' does not match semver pattern (e.g. 1.0.1)"
+            exit 1
+          fi
+
+          UNRELEASED=$(sed -n '/^## \[Unreleased\]/,/^## \[/p' tabletest-parser/CHANGELOG.md | sed '1d;$d')
+          if [ -z "$UNRELEASED" ]; then
+            echo "::error::tabletest-parser/CHANGELOG.md has no content under [Unreleased]"
+            exit 1
+          fi
+
+          if git tag -l "tabletest-parser-$VERSION" | grep -q .; then
+            echo "::error::Tag tabletest-parser-$VERSION already exists"
+            exit 1
+          fi
+
+          JUNIT_DEP=$(grep -oP '(?<=<version.tabletest-junit>)[^<]+' tabletest-parser/pom.xml)
+          if [[ "$JUNIT_DEP" == *-SNAPSHOT ]]; then
+            echo "::error::tabletest-parser depends on junit $JUNIT_DEP — update to a released version first"
+            exit 1
+          fi
+
+          echo "All preconditions passed"
+
+      - name: Set release version
+        run: mvn -f tabletest-parser/pom.xml versions:set -DnewVersion="$VERSION" -DgenerateBackupPoms=false -q
+
+      - name: Stamp changelog
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          sed -i "s|^## \[Unreleased\]|## [Unreleased]\n\n## [$VERSION] - $TODAY|" tabletest-parser/CHANGELOG.md
+
+      - name: Commit release
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "release: tabletest-parser $VERSION"
+
+      - name: Show release commit
+        if: inputs.dry-run
+        run: git show --stat HEAD && echo "---" && git show HEAD
+
+      - name: Deploy
+        if: ${{ !inputs.dry-run }}
+        run: mvn -f tabletest-parser/pom.xml clean deploy -Prelease -DskipTests --no-transfer-progress
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Create git tag
+        run: git tag "tabletest-parser-$VERSION"
+
+      - name: Set next development version
+        run: |
+          NEXT_PATCH=$(echo "$VERSION" | awk -F. '{print $1"."$2"."$3+1}')
+          NEXT_SNAPSHOT="${NEXT_PATCH}-SNAPSHOT"
+          mvn -f tabletest-parser/pom.xml versions:set -DnewVersion="$NEXT_SNAPSHOT" -DgenerateBackupPoms=false -q
+
+      - name: Commit next development version
+        run: |
+          NEXT_PATCH=$(echo "$VERSION" | awk -F. '{print $1"."$2"."$3+1}')
+          NEXT_SNAPSHOT="${NEXT_PATCH}-SNAPSHOT"
+          git add -A
+          git commit -m "chore: set tabletest-parser development version $NEXT_SNAPSHOT"
+
+      - name: Show next development version commit
+        if: inputs.dry-run
+        run: git show --stat HEAD && echo "---" && git show HEAD
+
+      - name: Push commits and tags
+        if: ${{ !inputs.dry-run }}
+        run: git push origin main --tags
+
+      - name: Create GitHub release
+        if: ${{ !inputs.dry-run }}
+        run: |
+          BODY=$(sed -n "/^## \[$VERSION\]/,/^## \[/{/^## \[/!p}" tabletest-parser/CHANGELOG.md)
+          gh release create "tabletest-parser-$VERSION" \
+            --title "TableTest Parser $VERSION" \
+            --notes "$BODY"
+        env:
+          GH_TOKEN: ${{ github.token }}
