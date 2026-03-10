@@ -1,6 +1,7 @@
 package org.tabletest.junit;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.tabletest.junit.ParameterFixture.parameter;
 import static org.tabletest.junit.ParameterTypeAnalyzer.typeStackOf;
@@ -109,5 +110,20 @@ class ParameterTypeAnalyzerTest {
         """)
     void extractsNestedTypesWithBoundedWildcards(String typeName, List<Class<?>> expectedTypes) {
         assertEquals(expectedTypes, typeStackOf(parameter(typeName)));
+    }
+
+    @TableTest("""
+        type name                                            | types?
+        int[]                                                | ['int[]', int]
+        java.lang.Integer[]                                  | ['java.lang.Integer[]', java.lang.Integer]
+        java.util.List<java.lang.Integer>[]                  | ['java.util.List[]', java.util.List, java.lang.Integer]
+        java.util.List<java.util.List<java.lang.Long>>[]     | ['java.util.List[]', java.util.List, java.util.List, java.lang.Long]
+        java.util.Map<java.lang.String, java.lang.Integer>[] | ['java.util.Map[]', java.util.Map, java.lang.Integer]
+        """)
+    void extractsTypeStackOfArrayParameter(String typeName, List<String> expectedTypes) {
+        assertEquals(
+            expectedTypes,
+            typeStackOf(parameter(typeName)).stream().map(Class::getTypeName).collect(Collectors.toList())
+        );
     }
 }

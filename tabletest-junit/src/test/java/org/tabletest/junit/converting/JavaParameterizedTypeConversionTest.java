@@ -59,8 +59,8 @@ public class JavaParameterizedTypeConversionTest {
     }
 
     @TableTest("""
-        Empty | Byte    | Integer | Long    | Double  | String  | List      | Map
-        {}    | {1}     | {2}     | {3}     | {4}     | {5}     | {[6]}     | {[1: 7]}
+        Empty | Byte | Integer | Long | Double | String | List  | Map
+        {}    | {1}  | {2}     | {3}  | {4}    | {5}    | {[6]} | {[1: 7]}
         """)
     void converts_to_parameterized_set_types(
         Set<?> emptySet,
@@ -80,6 +80,22 @@ public class JavaParameterizedTypeConversionTest {
         assertEquals(Set.of("5"), stringSet);
         assertEquals(Set.of(List.of((short) 6)), listSet);
         assertEquals(Set.of(Map.of("1", 7L)), mapSet);
+    }
+
+    @TableTest("""
+        Integer | Long | List  | Map
+        [2]     | [3]  | [[6]] | [[1: 7]]
+        """)
+    void converts_to_parameterized_array_types(
+        Integer[] integerArray,
+        Long[] longArray,
+        List<Short>[] listArray,
+        Map<?, Long>[] mapArray
+    ) {
+        assertEquals(List.of(2), List.of(integerArray));
+        assertEquals(List.of(3L), List.of(longArray));
+        assertEquals(List.of(List.of((short) 6)), List.of(listArray));
+        assertEquals(List.of(Map.of("1", 7L)), List.of(mapArray));
     }
 
 }

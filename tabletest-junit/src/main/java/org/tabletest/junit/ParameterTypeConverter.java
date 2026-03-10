@@ -17,6 +17,7 @@ package org.tabletest.junit;
 
 import org.junit.jupiter.params.converter.ConvertWith;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Parameter;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -107,6 +108,10 @@ public class ParameterTypeConverter {
         ParameterType targetType,
         Class<?> testClass
     ) {
+        if (targetType.isArray() && value instanceof List<?>) {
+            return convertArray((List<?>) value, targetType, testClass);
+        }
+
         if (targetType.isMatching(value.getClass())) {
             if (value instanceof List<?>) return convertList((List<?>) value, targetType, testClass);
             if (value instanceof Set<?>) return convertSet((Set<?>) value, targetType, testClass);
@@ -120,6 +125,34 @@ public class ParameterTypeConverter {
             testClass,
             (Parameter parameter) -> convert(value, parameter, testClass)
         );
+    }
+
+    /**
+     * Converts a list to an array of the appropriate component type, recursively converting
+     * each element.
+     *
+     * @param list          The parsed list containing values to convert
+     * @param parameterType Information about the target array type
+     * @param testClass     The test class to search for factory methods
+     * @return A new array with converted elements
+     */
+    private static Object convertArray(
+        List<?> list,
+        ParameterType parameterType,
+        Class<?> testClass
+    ) {
+        ParameterType elementType = parameterType.elementType();
+        Class<?> arrayType = parameterType.toClass();
+        if (arrayType == null) {
+            return list.toArray();
+        }
+
+        Class<?> componentType = arrayType.getComponentType();
+        Object result = Array.newInstance(componentType, list.size());
+        for (int i = 0; i < list.size(); i++) {
+            Array.set(result, i, convert(list.get(i), elementType, testClass));
+        }
+        return result;
     }
 
     /**

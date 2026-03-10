@@ -20,6 +20,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -49,14 +50,23 @@ public class ParameterTypeAnalyzer {
      * @return A list of Class objects representing the types in the parameter
      */
     public static List<? extends Class<?>> typeStackOf(Parameter parameter) {
-        return collectTypes(parameter.getParameterizedType()).collect(toList());
+        List<Class<?>> types = new ArrayList<>(collectTypes(parameter.getParameterizedType()).collect(toList()));
+        if (parameter.getType().isArray() && (types.isEmpty() || !types.get(0).equals(parameter.getType()))) {
+            types.add(0, parameter.getType());
+        }
+        return types;
     }
 
     /**
      * Recursively collects all Class types from a Type, excluding Map key types.
      */
     private static Stream<Class<?>> collectTypes(Type type) {
-        if (type instanceof Class<?>) return Stream.of((Class<?>) type);
+        if (type instanceof Class<?>) {
+            Class<?> typeClass = (Class<?>) type;
+            return typeClass.isArray()
+                ? Stream.concat(Stream.of(typeClass), collectTypes(typeClass.getComponentType()))
+                : Stream.of(typeClass);
+        }
         if (type instanceof ParameterizedType) {
             ParameterizedType paramType = (ParameterizedType) type;
             if (paramType.getRawType() instanceof Class<?>) {
@@ -68,6 +78,9 @@ public class ParameterTypeAnalyzer {
                         : collectAllTypeArguments(paramType)
                 );
             }
+        }
+        if (type instanceof java.lang.reflect.GenericArrayType) {
+            return collectTypes(((java.lang.reflect.GenericArrayType) type).getGenericComponentType());
         }
         if (type instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) type;

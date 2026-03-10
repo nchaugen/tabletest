@@ -11,6 +11,7 @@ TableTest allows you to express how the system is expected to behave through mul
   - [Nested Values](#nested-values)
 - [Value Conversion](#value-conversion)
   - [Built-In Conversion](#built-in-conversion)
+  - [Array Parameters](#array-parameters)
   - [Custom Converters](#custom-converters)
   - [Customer Converter Sources](#custom-converter-sources)
   - [Custom Converters in Kotlin](#custom-converters-in-kotlin)
@@ -93,7 +94,7 @@ void testString(String value, int expectedLength) {
 ```
 
 ### List Values
-Lists are enclosed in square brackets with comma-separated elements. Lists can contain single values or compound values (nested lists/sets/maps). Empty lists are represented by `[]`.
+Lists are enclosed in square brackets with comma-separated elements. Lists can contain single values or compound values (nested lists/sets/maps). Empty lists are represented by `[]`. Lists also convert to array parameter types — see [Array Parameters](#array-parameters).
 
 ```java
 @TableTest("""
@@ -192,6 +193,49 @@ void testParameterizedTypes(Map<String, List<Integer>> grades, int expectedHighe
 }
 ```
 
+
+### Array Parameters
+
+List syntax also converts to array parameter types. This works for object arrays, primitive arrays, nested arrays, and arrays of generic types:
+
+```java
+@TableTest("""
+    Scenario   | Numbers   | Sum?
+    Single     | [5]       | 5
+    Multiple   | [1, 2, 3] | 6
+    Empty      | []        | 0
+    """)
+void testIntArray(int[] numbers, int sum) {
+    assertEquals(sum, Arrays.stream(numbers).sum());
+}
+```
+
+Nested arrays and arrays of parameterized types are also supported:
+
+```java
+@TableTest("""
+    Scenario | Grid             | Rows?
+    2x2      | [[a, b], [c, d]] | 2
+    1x3      | [[x, y, z]]      | 1
+    """)
+void testNestedArray(String[][] grid, int rows) {
+    assertEquals(rows, grid.length);
+}
+```
+
+In Kotlin, array types use `Array<T>` for object arrays and `IntArray`, `LongArray`, `DoubleArray` for primitives:
+
+```kotlin
+@TableTest("""
+    Scenario | Numbers   | Sum?
+    Single   | [5]       | 5
+    Multiple | [1, 2, 3] | 6
+    Empty    | []        | 0
+    """)
+fun testIntArray(numbers: IntArray, sum: Int) {
+    assertEquals(sum, numbers.sum())
+}
+```
 
 ### Custom Conversion
 Before falling back to built-in conversion, TableTest will look for a custom converter method present in either the test class, or in a class listed by a `@TypeConverterSources` annotation. Custom converter methods are tagged with the `@TypeConverter` annotation. If found, TableTest will use this method to convert the parsed value to the required test parameter type.

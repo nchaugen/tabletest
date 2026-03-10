@@ -95,6 +95,10 @@ public class ParameterType {
         return !typeStack.isEmpty() && Set.class.isAssignableFrom(typeStack.get(0));
     }
 
+    public boolean isArray() {
+        return !typeStack.isEmpty() && typeStack.get(0).isArray();
+    }
+
     public boolean isAssignableFrom(Class<?> type) {
         if (typeStack.isEmpty() || type == null) return false;
 

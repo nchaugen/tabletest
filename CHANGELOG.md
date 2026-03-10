@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Added
+- Array parameter support: list syntax `[a, b, c]` now converts to array types (`String[]`, `int[]`, `Map<K,V>[]`, nested arrays, etc.)
 
 ## [1.1.0] - 2026-03-08
 ### Changed

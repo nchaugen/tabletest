@@ -156,7 +156,7 @@ void singleValues(short number, String text, LocalDate date, Class<?> type) {
 
 ### Parameterized Types
 
-TableTest will convert elements in compound values like List, Set, and Map to match parameterized types. Nested values are also traversed and converted. Map keys remain String type and are not converted. Both custom and build-in converters will be considered for conversion. 
+TableTest will convert elements in compound values like List, Set, and Map to match parameterized types. Nested values are also traversed and converted. Map keys remain String type and are not converted. Both custom and build-in converters will be considered for conversion.
 
 In the example below, the list of grades inside the map is converted to `List<Integer>`:
 
@@ -169,6 +169,23 @@ In the example below, the list of grades inside the map is converted to `List<In
     """)
 void testParameterizedTypes(Map<String, List<Integer>> grades, int expectedHighestGrade) {
     // test implementation
+}
+```
+
+### Array Parameters
+
+List values also convert to array parameter types, including primitive arrays, nested arrays, and arrays of generic types:
+
+```java
+
+@TableTest("""
+    Scenario   | Numbers   | Sum?
+    Single     | [5]       | 5
+    Multiple   | [1, 2, 3] | 6
+    Empty      | []        | 0
+    """)
+void testIntArray(int[] numbers, int sum) {
+    assertEquals(sum, Arrays.stream(numbers).sum());
 }
 ```
 

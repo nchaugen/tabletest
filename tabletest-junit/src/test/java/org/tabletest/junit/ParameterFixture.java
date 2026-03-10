@@ -241,6 +241,17 @@ public class ParameterFixture {
         // This method is only used to get the parameter types
     }
 
+    @SuppressWarnings("unused")
+    private void arrayValueParams(
+        int[] primitiveIntArray,
+        Integer[] integerArray,
+        List<Integer>[] listIntegerArray,
+        List<List<Long>>[] listListLongArray,
+        Map<String, Integer>[] mapStringIntegerArray
+    ) {
+        // This method is only used to get the parameter types
+    }
+
     // Type converters for ParameterFixture parameters - intentionally multiple to test error handling
     @TypeConverter
     public static Age parseAge(int age) {
