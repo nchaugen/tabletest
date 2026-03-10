@@ -19,7 +19,7 @@
         <repository.url>git@github.com:nchaugen/tabletest.git</repository.url>
         <project.scm.id>github</project.scm.id>
         <version.tabletest-parser>1.1.0</version.tabletest-parser>
-        <version.tabletest-reporter>0.3.0</version.tabletest-reporter>
+        <version.tabletest-reporter>1.0.1</version.tabletest-reporter>
         <version.junit>6.0.3</version.junit>
         <version.kotlin>2.2.0</version.kotlin>
         <version.plugin.license>3.0</version.plugin.license>
@@ -103,7 +103,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.github.nchaugen</groupId>
+            <groupId>org.tabletest</groupId>
             <artifactId>tabletest-reporter-junit</artifactId>
             <version>${version.tabletest-reporter}</version>
             <scope>test</scope>
