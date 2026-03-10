@@ -148,6 +148,10 @@ jobs:
           git add -A
           git commit -m "release: prepare $VERSION"
 
+      - name: Show release commit
+        if: inputs.dry-run
+        run: git show --stat HEAD && echo "---" && git show HEAD
+
       - name: Deploy parser
         if: inputs.modules != 'junit-only' && !inputs.dry-run
         run: mvn -f tabletest-parser/pom.xml clean deploy -Prelease -DskipTests
@@ -224,6 +228,10 @@ jobs:
           NEXT_SNAPSHOT="${NEXT_PATCH}-SNAPSHOT"
           git add -A
           git commit -m "chore: set next development version $NEXT_SNAPSHOT"
+
+      - name: Show next development version commit
+        if: inputs.dry-run
+        run: git show --stat HEAD && echo "---" && git show HEAD
 
       - name: Push commits and tags
         if: ${{ !inputs.dry-run }}
