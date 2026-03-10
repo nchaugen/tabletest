@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 ### Added
-- Array parameter support: list syntax `[a, b, c]` now converts to array types (`String[]`, `int[]`, `Map<K,V>[]`, nested arrays, etc.)
+- Array parameter support: list syntax `[a, b, c]` now converts to array types, e.g. `String[]`, `int[]`, `Map<K,V>[]`, nested arrays. Thanks to @AlexeyKuznetsov-DD for the contribution!
 
 ## [1.1.0] - 2026-03-08
 ### Changed
