@@ -1,6 +1,8 @@
 # TableTest Parser Changelog
 
 ## [Unreleased]
+
+## [1.2.0] - 2026-03-12
 ### Added
 - Quoted map keys: map keys can now be single or double quoted, enabling keys containing whitespace, colons, commas, brackets, and other special characters (e.g. `["key with spaces": value]`)
 
