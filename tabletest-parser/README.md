@@ -63,12 +63,14 @@ Set              | Size?
 
 ### Map Value Format
 
-Maps use square brackets with comma-separated key-value pairs. Colons separate keys and values. Keys must be unquoted strings, while values can be any value type. Empty maps are represented by `[:]`.
+Maps use square brackets with comma-separated key-value pairs. Colons separate keys and values. Keys can be unquoted or quoted (single or double quotes). Unquoted keys cannot contain `,`, `:`, `|`, `[`, `]`, `{`, `}`, `'`, or `"`. To use keys with these characters or whitespace, wrap them in quotes. Values can be any value type. Empty maps are represented by `[:]`.
 
 ```tabletest
 Map                                      | Size?
 [1: Hello, 2: World]                     | 2
 [string: abc, list: [1, 2], map: [a: 4]] | 3
+["key with spaces": value]               | 1
+['key:colon': value, plain: other]       | 2
 [:]                                      | 0
 
 ```

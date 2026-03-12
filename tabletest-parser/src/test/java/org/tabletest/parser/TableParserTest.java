@@ -197,6 +197,10 @@ public class TableParserTest {
         Map with quoted value | '[q:"a,b", u:c]'               | [q: "a,b", u: c]
         Same value keys       | '[a:b, a:[b], a:{b}, a:[b:c]]' | [a: [b: c]]
         Extra whitespace      | '  [   a   :  a   ]  '         | [a: a]
+        Double quoted key     | '["key with spaces": value]'   | ["key with spaces": value]
+        Single quoted key     | "['key:colon': value]"         | ['key:colon': value]
+        Mixed quoted keys     | '["a,b": value, plain: other]' | ["a,b": value, plain: other]
+        Empty quoted key      | '["": value]'                  | ["": value]
         """)
     void shouldCaptureMaps(String input, Map<String, Object> expectedCaptures) {
         assertEquals(
@@ -270,6 +274,8 @@ public class TableParserTest {
         Map with single quoted string     | "[a: 'a']"        | [a: a]          | java.util.Map
         Nested with double quoted strings | '[double: ["a"]]' | [double: [a]]   | java.util.Map
         Nested with single quoted strings | "[single: ['a']]" | [single: [a]]   | java.util.Map
+        Map with double quoted key        | '["k": v]'        | [k: v]          | java.util.Map
+        Map with single quoted key        | "['k': v]"        | [k: v]          | java.util.Map
         """)
     void shouldCaptureStringsDiscardingQuotes(String input, Object expectedValue, Class expectedType) {
         Object actualValue = TableParser.parse("Scenario | Input\nString value | " + input).row(0).value(1);
@@ -311,6 +317,8 @@ public class TableParserTest {
         Map with single quoted string     | "[a: 'a']"        | [a: "'a'"]        | java.util.Map
         Nested with double quoted strings | '[double: ["a"]]' | [double: ['"a"']] | java.util.Map
         Nested with single quoted strings | "[single: ['a']]" | [single: ["'a'"]] | java.util.Map
+        Map with double quoted key        | '["k": v]'        | ['"k"': v]        | java.util.Map
+        Map with single quoted key        | "['k': v]"        | ["'k'": v]        | java.util.Map
         """)
     void shouldCaptureStringsKeepingQuotes(String input, Object expectedValue, Class expectedType) {
         Object actualValue = TableParser.parse("Scenario | Input\nString value | " + input, true).row(0).value(1);

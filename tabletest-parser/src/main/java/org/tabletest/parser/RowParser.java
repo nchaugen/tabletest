@@ -117,12 +117,20 @@ public class RowParser {
     private static Parser mapKey() {
         return sequence(
             anyWhitespace(),
-            captureUnquoted(sequence(
-                characterExcept(',', ':', '|', '[', ']', '{', '}', '\'', '"'),
-                atLeast(0, characterExcept(',', ':', '|', '[', ']'))
-            )),
+            either(
+                singleQuotedValue(),
+                doubleQuotedValue(),
+                unquotedMapKey()
+            ),
             anyWhitespace()
         );
+    }
+
+    private static Parser unquotedMapKey() {
+        return captureUnquoted(sequence(
+                characterExcept(',', ':', '|', '[', ']', '{', '}', '\'', '"'),
+                atLeast(0, characterExcept(',', ':', '|', '[', ']'))
+            ));
     }
 
     /**
