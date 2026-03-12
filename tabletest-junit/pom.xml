@@ -4,7 +4,7 @@
 
     <groupId>org.tabletest</groupId>
     <artifactId>tabletest-junit</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
+    <version>1.2.1</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2025</inceptionYear>
