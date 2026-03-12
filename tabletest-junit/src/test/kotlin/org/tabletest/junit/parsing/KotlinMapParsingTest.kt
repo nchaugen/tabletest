@@ -16,7 +16,7 @@ class KotlinMapParsingTest {
         }
     }
 
-    @TableTest("""    
+    @TableTest("""
         Scenario               | Input Map Value          | Size? | First Key?  | First Value?
         Basic alphanumeric key | [abc123: value]          | 1     | abc123      | value
         Key with underscore    | [key_name: value]        | 1     | key_name    | value
@@ -30,7 +30,7 @@ class KotlinMapParsingTest {
         assertEquals(firstValue, map[firstKey])
     }
 
-    @TableTest("""    
+    @TableTest("""
         Scenario                         | Input Map Value              | Size? | First Key? | First Value?
         Value with quotes                | [key: "quoted value"]        | 1     | key        | quoted value
         Value with single quotes         | [key: 'single quoted']       | 1     | key        | single quoted
@@ -43,7 +43,21 @@ class KotlinMapParsingTest {
         assertEquals(firstValue, map[firstKey])
     }
 
-    @TableTest("""    
+    @TableTest("""
+        Scenario               | Input Map Value                 | Size? | First Key?      | First Value?
+        Double quoted key      | ["key with spaces": value]      | 1     | key with spaces | value
+        Single quoted key      | ['key:colon': value]            | 1     | key:colon       | value
+        Key with commas        | ["a,b": value]                  | 1     | a,b             | value
+        Key with brackets      | ["a[b]": value]                 | 1     | a[b]            | value
+        Empty quoted key       | ["": value]                     | 1     | ''              | value
+        Mixed quoted and plain | ["quoted key": one, plain: two] | 2     | quoted key      | one
+        """)
+    fun testQuotedMapKeys(map: Map<String, String>, expectedSize: Int, firstKey: String, firstValue: String) {
+        assertEquals(expectedSize, map.size)
+        assertEquals(firstValue, map[firstKey])
+    }
+
+    @TableTest("""
         Scenario              | Input                                  | Size? | Value Type?
         Map with list values  | [items: [a, b], tags: [x, y]]          | 2     | java.util.List
         Map with set values   | [active: {true}, ids: {1, 2, 3}]       | 2     | java.util.Set

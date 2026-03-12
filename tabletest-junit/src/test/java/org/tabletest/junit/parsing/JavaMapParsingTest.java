@@ -47,6 +47,20 @@ public class JavaMapParsingTest {
     }
 
     @TableTest("""
+        Scenario               | Input Map Value                 | Size? | First Key?      | First Value?
+        Double quoted key      | ["key with spaces": value]      | 1     | key with spaces | value
+        Single quoted key      | ['key:colon': value]            | 1     | key:colon       | value
+        Key with commas        | ["a,b": value]                  | 1     | a,b             | value
+        Key with brackets      | ["a[b]": value]                 | 1     | a[b]            | value
+        Empty quoted key       | ["": value]                     | 1     | ''              | value
+        Mixed quoted and plain | ["quoted key": one, plain: two] | 2     | quoted key      | one
+        """)
+    void testQuotedMapKeys(Map<String, String> map, int expectedSize, String firstKey, String firstValue) {
+        assertEquals(expectedSize, map.size());
+        assertEquals(firstValue, map.get(firstKey));
+    }
+
+    @TableTest("""
         Scenario              | Input                                  | Size? | Value Type?
         Map with list values  | [items: [a, b], tags: [x, y]]          | 2     | java.util.List
         Map with set values   | [active: {true}, ids: {1, 2, 3}]       | 2     | java.util.Set

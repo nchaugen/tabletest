@@ -94,7 +94,7 @@ The TableTest format supports four types of values:
 - **Single values** specified with or without quotes (`abc`, `"a|b"`, `' '`)
 - **Lists** of elements enclosed in brackets (`[1, 2, 3]`)
 - **Sets** of elements enclosed in curly braces (`{a, b, c}`)
-- **Maps** of key:value pairs enclosed in brackets (`[a: 1, b: 2]`).
+- **Maps** of key:value pairs enclosed in brackets (`[a: 1, b: 2]`). Keys can be quoted for special characters (`["key with spaces": value]`).
 
 Lists, sets, and maps can be nested (`[a: [1, 2, 3], b: [4, 5, 6]]`).
 

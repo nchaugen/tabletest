@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Added
+- Quoted map keys: map keys can now be single or double quoted, enabling keys containing whitespace, colons, commas, brackets, and other special characters (e.g. `["key with spaces": value]`)
 
 ## [1.2.0] - 2026-03-10
 ### Added
