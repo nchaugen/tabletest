@@ -6,13 +6,13 @@
 #   JUNIT5_VERSIONS="<JUNIT_5_LATEST> <JUNIT_5_MIN>"  # used for basic-java8 (JUnit 6+ requires JVM 17+)
 #   QUARKUS_VERSIONS="<QUARKUS_LATEST> <QUARKUS_MIN>"
 #   SPRINGBOOT_VERSIONS="<SPRINGBOOT_LATEST> <SPRINGBOOT_MIN>"
-#   TABLETEST_VERSION="1.2.1-SNAPSHOT"  # default TableTest version (can be overridden via env)
+#   TABLETEST_VERSION="1.2.2-SNAPSHOT"  # default TableTest version (can be overridden via env)
 #   TEST_GROUPS="basic frameworks"       # space-separated list of groups to run (all if unset)
 # Usage examples:
 #   ./test-compatibility.sh                    # run all with defaults
 #   JUNIT_VERSIONS="5.13.4 5.11.0" ./test-compatibility.sh
 #   QUARKUS_VERSIONS="3.25.3" SPRINGBOOT_VERSIONS="3.5.4" ./test-compatibility.sh
-#   TABLETEST_VERSION="1.2.1-SNAPSHOT" ./test-compatibility.sh
+#   TABLETEST_VERSION="1.2.2-SNAPSHOT" ./test-compatibility.sh
 #   TEST_GROUPS="basic" JUNIT_VERSIONS="5.11.0" QUARKUS_VERSIONS="" SPRINGBOOT_VERSIONS="" ./test-compatibility.sh
 #   TEST_GROUPS="basic-java8" JUNIT5_VERSIONS="5.11.0" QUARKUS_VERSIONS="" SPRINGBOOT_VERSIONS="" ./test-compatibility.sh
 
@@ -30,7 +30,7 @@ if [ -z "$JUNIT_VERSIONS" ]; then JUNIT_VERSIONS="${JUNIT_LATEST} ${JUNIT_MIN}";
 if [ -z "$JUNIT5_VERSIONS" ]; then JUNIT5_VERSIONS="${JUNIT_5_LATEST} ${JUNIT_5_MIN}"; fi
 if [ -z "$QUARKUS_VERSIONS" ]; then QUARKUS_VERSIONS="${QUARKUS_LATEST} ${QUARKUS_MIN}"; fi
 if [ -z "$SPRINGBOOT_VERSIONS" ]; then SPRINGBOOT_VERSIONS="${SPRINGBOOT_LATEST} ${SPRINGBOOT_MIN}"; fi
-if [ -z "$TABLETEST_VERSION" ]; then TABLETEST_VERSION="1.2.1-SNAPSHOT"; fi
+if [ -z "$TABLETEST_VERSION" ]; then TABLETEST_VERSION="1.2.2-SNAPSHOT"; fi
 
 # Test results tracking
 PASSED=0
