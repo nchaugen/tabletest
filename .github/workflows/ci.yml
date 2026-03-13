@@ -22,7 +22,7 @@ jobs:
       - name: Build and test
         run: mvn install -q
       - name: Upload tabletest artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tabletest-artifacts
           path: ~/.m2/repository/org/tabletest
