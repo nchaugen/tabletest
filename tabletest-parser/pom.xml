@@ -20,19 +20,19 @@
         <project.scm.id>github</project.scm.id>
         <version.junit>6.0.3</version.junit>
         <version.tabletest-junit>1.1.0</version.tabletest-junit>
-        <version.plugin.license>3.0</version.plugin.license>
-        <version.plugin.clean>3.2.0</version.plugin.clean>
-        <version.plugin.resources>3.2.0</version.plugin.resources>
-        <version.plugin.compiler>3.10.1</version.plugin.compiler>
-        <version.plugin.surefire>3.1.2</version.plugin.surefire>
-        <version.plugin.jar>3.2.2</version.plugin.jar>
-        <version.plugin.install>3.0.1</version.plugin.install>
-        <version.plugin.deploy>3.0.0</version.plugin.deploy>
-        <version.plugin.javadoc>3.11.2</version.plugin.javadoc>
-        <version.plugin.source>3.3.1</version.plugin.source>
-        <version.plugin.gpg>3.2.7</version.plugin.gpg>
-        <version.plugin.publishing>0.7.0</version.plugin.publishing>
-        <version.plugin.release>3.1.1</version.plugin.release>
+        <version.plugin.license>5.0.0</version.plugin.license>
+        <version.plugin.clean>3.5.0</version.plugin.clean>
+        <version.plugin.resources>3.5.0</version.plugin.resources>
+        <version.plugin.compiler>3.15.0</version.plugin.compiler>
+        <version.plugin.surefire>3.5.5</version.plugin.surefire>
+        <version.plugin.jar>3.5.0</version.plugin.jar>
+        <version.plugin.install>3.1.4</version.plugin.install>
+        <version.plugin.deploy>3.1.4</version.plugin.deploy>
+        <version.plugin.javadoc>3.12.0</version.plugin.javadoc>
+        <version.plugin.source>3.4.0</version.plugin.source>
+        <version.plugin.gpg>3.2.8</version.plugin.gpg>
+        <version.plugin.publishing>0.10.0</version.plugin.publishing>
+        <version.plugin.release>3.3.1</version.plugin.release>
         <surefire.arguments />
     </properties>
 
