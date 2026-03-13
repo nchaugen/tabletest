@@ -22,7 +22,7 @@ jobs:
       - name: Build and test
         run: mvn install -q
       - name: Upload tabletest artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tabletest-artifacts
           path: ~/.m2/repository/org/tabletest
@@ -48,7 +48,7 @@ jobs:
           name: tabletest-artifacts
           path: ~/.m2/repository/org/tabletest
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: '8.13'
       - name: Run compatibility tests
@@ -75,7 +75,7 @@ jobs:
           name: tabletest-artifacts
           path: ~/.m2/repository/org/tabletest
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: '8.13'
       - name: Run basic-java8 compatibility tests
