@@ -19,7 +19,7 @@
         <repository.url>git@github.com:nchaugen/tabletest.git</repository.url>
         <project.scm.id>github</project.scm.id>
         <version.junit>6.0.3</version.junit>
-        <version.tabletest-junit>1.1.0</version.tabletest-junit>
+        <version.tabletest-junit>1.2.1</version.tabletest-junit>
         <version.plugin.license>5.0.0</version.plugin.license>
         <version.plugin.clean>3.5.0</version.plugin.clean>
         <version.plugin.resources>3.5.0</version.plugin.resources>
