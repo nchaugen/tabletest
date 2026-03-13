@@ -40,6 +40,9 @@ updates:
     directory: /compatibility-tests/basic/gradle-java
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: "org.junit.jupiter:*"
+      - dependency-name: "org.junit.platform:*"
     groups:
       gradle-dependencies:
         patterns:
@@ -49,6 +52,9 @@ updates:
     directory: /compatibility-tests/basic/gradle-kotlin
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: "org.junit.jupiter:*"
+      - dependency-name: "org.junit.platform:*"
     groups:
       gradle-dependencies:
         patterns:
@@ -58,6 +64,9 @@ updates:
     directory: /compatibility-tests/basic-java8/gradle-java
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: "org.junit.jupiter:*"
+      - dependency-name: "org.junit.platform:*"
     groups:
       gradle-dependencies:
         patterns:
@@ -67,6 +76,8 @@ updates:
     directory: /compatibility-tests/frameworks/gradle-quarkus-kotlin
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: "io.quarkus:*"
     groups:
       gradle-dependencies:
         patterns:
@@ -76,6 +87,8 @@ updates:
     directory: /compatibility-tests/frameworks/gradle-springboot-kotlin
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: "org.springframework.boot:*"
     groups:
       gradle-dependencies:
         patterns:
