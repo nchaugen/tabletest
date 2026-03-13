@@ -4,3 +4,79 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      maven-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: maven
+    directory: /tabletest-parser
+    schedule:
+      interval: weekly
+    groups:
+      maven-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: maven
+    directory: /tabletest-junit
+    schedule:
+      interval: weekly
+    groups:
+      maven-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: gradle
+    directory: /compatibility-tests/basic/gradle-java
+    schedule:
+      interval: weekly
+    groups:
+      gradle-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: gradle
+    directory: /compatibility-tests/basic/gradle-kotlin
+    schedule:
+      interval: weekly
+    groups:
+      gradle-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: gradle
+    directory: /compatibility-tests/basic-java8/gradle-java
+    schedule:
+      interval: weekly
+    groups:
+      gradle-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: gradle
+    directory: /compatibility-tests/frameworks/gradle-quarkus-kotlin
+    schedule:
+      interval: weekly
+    groups:
+      gradle-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: gradle
+    directory: /compatibility-tests/frameworks/gradle-springboot-kotlin
+    schedule:
+      interval: weekly
+    groups:
+      gradle-dependencies:
+        patterns:
+          - "*"
