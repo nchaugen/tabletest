@@ -4,79 +4,59 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    groups:
-      github-actions:
-        patterns:
-          - "*"
 
   - package-ecosystem: maven
-    directory: /
+    directories:
+      - /tabletest-parser
+      - /tabletest-junit
     schedule:
       interval: weekly
     groups:
-      maven-dependencies:
+      kotlin:
         patterns:
-          - "*"
+          - "org.jetbrains.kotlin*"
+      junit:
+        patterns:
+          - "org.junit*"
 
   - package-ecosystem: maven
-    directory: /tabletest-parser
+    directories:
+      - /compatibility-tests/basic/maven-java
+      - /compatibility-tests/basic/maven-kotlin
+      - /compatibility-tests/basic-java8/maven-java
+      - /compatibility-tests/frameworks/maven-quarkus-java
+      - /compatibility-tests/frameworks/maven-springboot-java
     schedule:
       interval: weekly
     groups:
-      maven-dependencies:
+      kotlin:
         patterns:
-          - "*"
-
-  - package-ecosystem: maven
-    directory: /tabletest-junit
-    schedule:
-      interval: weekly
-    groups:
-      maven-dependencies:
-        patterns:
-          - "*"
-
-  - package-ecosystem: gradle
-    directory: /compatibility-tests/basic/gradle-java
-    schedule:
-      interval: weekly
-    groups:
-      gradle-dependencies:
-        patterns:
-          - "*"
+          - "org.jetbrains.kotlin*"
+    ignore:
+      - dependency-name: "org.junit.jupiter:*"
+      - dependency-name: "org.junit:*"
+      - dependency-name: "org.junit.platform:*"
+      - dependency-name: "io.quarkus:*"
+      - dependency-name: "io.quarkus.platform:*"
+      - dependency-name: "org.springframework.boot:*"
 
   - package-ecosystem: gradle
-    directory: /compatibility-tests/basic/gradle-kotlin
+    directories:
+      - /compatibility-tests/basic/gradle-java
+      - /compatibility-tests/basic/gradle-kotlin
+      - /compatibility-tests/basic-java8/gradle-java
+      - /compatibility-tests/frameworks/gradle-quarkus-kotlin
+      - /compatibility-tests/frameworks/gradle-springboot-kotlin
     schedule:
       interval: weekly
     groups:
-      gradle-dependencies:
+      kotlin:
         patterns:
-          - "*"
-
-  - package-ecosystem: gradle
-    directory: /compatibility-tests/basic-java8/gradle-java
-    schedule:
-      interval: weekly
-    groups:
-      gradle-dependencies:
-        patterns:
-          - "*"
-
-  - package-ecosystem: gradle
-    directory: /compatibility-tests/frameworks/gradle-quarkus-kotlin
-    schedule:
-      interval: weekly
-    groups:
-      gradle-dependencies:
-        patterns:
-          - "*"
-
-  - package-ecosystem: gradle
-    directory: /compatibility-tests/frameworks/gradle-springboot-kotlin
-    schedule:
-      interval: weekly
-    groups:
-      gradle-dependencies:
-        patterns:
-          - "*"
+          - "org.jetbrains.kotlin*"
+    ignore:
+      - dependency-name: "org.junit.jupiter:*"
+      - dependency-name: "org.junit:*"
+      - dependency-name: "org.junit.platform:*"
+      - dependency-name: "io.quarkus:*"
+      - dependency-name: "io.quarkus.platform:*"
+      - dependency-name: "org.springframework.boot:*"
