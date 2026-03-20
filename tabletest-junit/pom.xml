@@ -21,7 +21,7 @@
         <version.tabletest-parser>1.2.0</version.tabletest-parser>
         <version.tabletest-reporter>1.0.1</version.tabletest-reporter>
         <version.junit>6.0.3</version.junit>
-        <version.kotlin>2.3.10</version.kotlin>
+        <version.kotlin>2.3.20</version.kotlin>
         <version.plugin.license>5.0.0</version.plugin.license>
         <version.plugin.clean>3.5.0</version.plugin.clean>
         <version.plugin.resources>3.5.0</version.plugin.resources>
