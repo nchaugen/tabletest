@@ -63,6 +63,20 @@ public class TableParserTest {
     }
 
     @Test
+    void shouldParseLongCellValuesWithoutStackOverflow() {
+        String longValue = "x".repeat(20_000);
+        Table result = TableParser.parse("Input\n" + longValue);
+        assertEquals(longValue, result.row(0).value(0));
+    }
+
+    @Test
+    void shouldIgnoreLongCommentsWithoutStackOverflow() {
+        String longComment = "// " + "x".repeat(20_000);
+        Table result = TableParser.parse("a | b\n" + longComment + "\n1 | 2\n");
+        assertEquals(List.of("1", "2"), result.row(0).values());
+    }
+
+    @Test
     void shouldIgnoreBlankLines() {
         //language=TableTest
         String input = """

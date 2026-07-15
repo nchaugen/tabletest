@@ -124,6 +124,20 @@ class CombinationParserTest {
     }
 
     @Test
+    void shouldMatchLongRepetitionWithoutStackOverflow() {
+        String longInput = "x".repeat(50_000);
+        Parser untilPipe = atLeast(0, characterExcept('|'));
+        assertEquals(success(longInput, ""), untilPipe.parse(longInput));
+    }
+
+    @Test
+    void shouldStopRepeatingWhenNothingIsConsumed() {
+        Parser zeroWidth = zeroOrMore(optional(character('a')));
+        assertEquals(success("", "bc"), zeroWidth.parse("bc"));
+        assertEquals(success("a", "bc"), zeroWidth.parse("abc"));
+    }
+
+    @Test
     void shouldMatchZeroOrMore() {
         // Basic repeated pattern
         Parser digits = zeroOrMore(characters("0123456789"));

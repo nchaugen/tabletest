@@ -18,7 +18,9 @@ package org.tabletest.parser;
 import org.tabletest.parser.ParseResult.Failure;
 import org.tabletest.parser.ParseResult.Success;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.tabletest.parser.ParseResult.failure;
 import static org.tabletest.parser.ParseResult.success;
@@ -73,20 +75,35 @@ public class CombinationParser {
 
     /**
      * Creates a parser that applies the provided parser at least n times.
+     * Repetition is iterative to support long inputs without exhausting the stack.
+     * Repetition stops when the component parser succeeds without consuming input,
+     * as it could otherwise repeat indefinitely.
      *
      * @param n minimum number of repetitions required
      * @param parser parser to repeat
      * @return a parser that applies the component parser repeatedly
      */
     public static Parser atLeast(int n, Parser parser) {
-        return input -> atLeast(n, parser, success("", input));
-    }
-
-    private static ParseResult atLeast(int n, Parser parser, ParseResult result) {
-        ParseResult next = parser.parse(result.rest());
-        if (next instanceof Failure) return n < 1 ? result : (Failure) next;
-        Success success = (Success) next;
-        return atLeast(n - 1, parser, result.append(() -> success));
+        return input -> {
+            StringBuilder consumed = new StringBuilder();
+            List<Object> captures = new ArrayList<>();
+            String rest = input;
+            int repetitions = 0;
+            while (true) {
+                ParseResult next = parser.parse(rest);
+                if (next instanceof Failure) {
+                    return repetitions < n ? next : success(consumed.toString(), rest, captures);
+                }
+                Success success = (Success) next;
+                consumed.append(success.consumed());
+                captures.addAll(success.captures());
+                if (success.consumed().isEmpty()) {
+                    return success(consumed.toString(), rest, captures);
+                }
+                rest = success.rest();
+                repetitions++;
+            }
+        };
     }
 
     private static ParseResult unsupportedCombine(ParseResult a, ParseResult b) {
