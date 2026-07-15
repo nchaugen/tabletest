@@ -1,6 +1,12 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Fixed
+- Table rows with missing or extra cells now fail with an error naming the offending row, instead of silently shifting values to the wrong parameters or misreading the first cell as a scenario name
+- Type converter cycles (e.g. a public static method in the test class taking and returning the same type) now fail with a clear error instead of crashing the test with `StackOverflowError`
+- The `@TypeConverter` deprecation warning is only emitted for methods actually selected as converters, once per method, instead of for every public static single-parameter method (including `main`) on every conversion
+- Cyclic meta-annotations on a parameter no longer crash `@ConvertWith` detection with `StackOverflowError`
+- Conversion failure messages now separate the searched converter locations with commas; also fixed a typo in the parameter-count error message
 
 ## [1.2.1] - 2026-03-12
 ### Added
