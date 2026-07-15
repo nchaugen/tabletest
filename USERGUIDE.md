@@ -251,6 +251,8 @@ A custom converter method will be used when it:
 
 There is no specific naming pattern for custom converter methods, any method fulfilling the requirements above will be considered.
 
+For backwards compatibility, a method fulfilling requirements 2–4 but missing the `@TypeConverter` annotation can still be selected as a converter, with a deprecation warning. When both an annotated and one or more non-annotated methods match, the annotated method is selected. Non-annotated converter methods will not be supported in a future version.
+
 Having selected a custom converter method with a return type matching the test parameter type, TableTest will consider if the value matches the parameter type of the converter method. If it doesn't, TableTest will recursively attempt to convert the value to match the parameter type using the same mechanism.
 
 In the example below, the map with student grades is being passed to the test as a `StudentGrades` domain value using the `toStudentGrades` custom converter method:

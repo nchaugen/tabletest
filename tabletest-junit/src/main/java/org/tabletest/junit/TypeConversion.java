@@ -220,7 +220,13 @@ public class TypeConversion {
     }
 
     /**
-     * Find applicable type converter in class if any
+     * Finds the applicable type converter in a class, if any.
+     * <p>
+     * When several candidate methods return the target type, the one annotated with
+     * {@link TypeConverter} is selected, so annotated converters are not blocked by
+     * plain helper methods that happen to qualify as candidates.
+     *
+     * @throws TableTestException if the candidates cannot be narrowed down to one
      */
     private static Optional<Method> findMatchingConverterInClass(
         Class<?> converterClass,
@@ -232,10 +238,24 @@ public class TypeConversion {
             .collect(Collectors.toList());
 
         if (matchingMethods.size() > 1) {
-            throw new TableTestException(multipleTypeConvertersFound(converterClass, targetType));
+            return Optional.of(soleAnnotatedConverter(matchingMethods)
+                .orElseThrow(() ->
+                    new TableTestException(multipleTypeConvertersFound(converterClass, targetType))
+                ));
         }
 
         return matchingMethods.stream().findFirst();
+    }
+
+    /**
+     * Returns the single {@link TypeConverter}-annotated method among the candidates,
+     * or empty if none or several are annotated.
+     */
+    private static Optional<Method> soleAnnotatedConverter(List<Method> candidates) {
+        List<Method> annotated = candidates.stream()
+            .filter(it -> it.isAnnotationPresent(TypeConverter.class))
+            .collect(Collectors.toList());
+        return annotated.size() == 1 ? Optional.of(annotated.get(0)) : Optional.empty();
     }
 
     /**

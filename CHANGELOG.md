@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Changed
+- When both a `@TypeConverter`-annotated method and non-annotated candidates match a target type, the annotated method is now selected instead of failing with "multiple type converters found"
 ### Fixed
 - Table rows with missing or extra cells now fail with an error naming the offending row, instead of silently shifting values to the wrong parameters or misreading the first cell as a scenario name
 - Type converter cycles (e.g. a public static method in the test class taking and returning the same type) now fail with a clear error instead of crashing the test with `StackOverflowError`
