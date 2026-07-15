@@ -91,7 +91,8 @@ class TableTestArgumentsProviderTest {
                 """
         );
         assertTrue(
-            exception.getMessage().contains("fewer parameters"),
+            exception.getMessage().contains("fewer parameters")
+                && exception.getMessage().contains("must have a corresponding test method parameter"),
             "Unexpected message: " + exception.getMessage()
         );
     }

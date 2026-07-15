@@ -1,10 +1,17 @@
 package org.tabletest.junit.converting;
 
 import org.tabletest.junit.TableTest;
+import org.tabletest.junit.TableTestException;
 import org.tabletest.junit.TypeConverter;
 import org.tabletest.junit.javadomain.Age;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Parameter;
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.tabletest.junit.ParameterTypeConverter.convertValue;
 import static org.tabletest.junit.TableTestExceptionAssertions.*;
 
 public class JavaConversionFailureTest {
@@ -42,6 +49,35 @@ public class JavaConversionFailureTest {
     @Test
     void failing_primitive_conversion() {
         assertThrowsWhenNullSpecifiedForPrimitiveType(null, boolean.class);
+    }
+
+    @Test
+    void failing_conversion_lists_searched_locations_separated_by_commas() {
+        TableTestException exception = assertThrows(
+            TableTestException.class,
+            () -> convertValue("invalid", localDateParameterOf(NestedFixture.class))
+        );
+        String expectedLocations =
+            NestedFixture.class.getTypeName() + ", " + JavaConversionFailureTest.class.getTypeName();
+        assertTrue(
+            exception.getMessage().contains(expectedLocations),
+            "Message does not list searched locations `" + expectedLocations + "`: " + exception.getMessage()
+        );
+    }
+
+    public static class NestedFixture {
+
+        @SuppressWarnings("unused")
+        private void params(LocalDate date) {
+        }
+    }
+
+    private static Parameter localDateParameterOf(Class<?> fixtureClass) {
+        try {
+            return fixtureClass.getDeclaredMethod("params", LocalDate.class).getParameters()[0];
+        } catch (NoSuchMethodException cause) {
+            throw new IllegalStateException(cause);
+        }
     }
 
 }

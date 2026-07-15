@@ -85,7 +85,7 @@ public class TableTestException extends ParameterResolutionException {
                 "Locations searched for type converters: %s",
             parsedValue,
             targetType.name(),
-            typeConverterSearchPath.map(Class::getTypeName).collect(Collectors.joining())
+            typeConverterSearchPath.map(Class::getTypeName).collect(Collectors.joining(", "))
         );
     }
 
@@ -104,7 +104,7 @@ public class TableTestException extends ParameterResolutionException {
     static String notEnoughTestParameters(int parameterCount, int columnCount) {
         return String.format(
             "There are fewer parameters in test method (%d) than columns in table (%d). " +
-                "All columns except scenario name must hava a corresponding test method parameter.",
+                "All columns except scenario name must have a corresponding test method parameter.",
             parameterCount,
             columnCount
         );
