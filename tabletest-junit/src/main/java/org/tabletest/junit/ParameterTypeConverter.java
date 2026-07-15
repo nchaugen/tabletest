@@ -33,6 +33,7 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static org.tabletest.junit.ExplicitConverterDetector.hasExplicitConverter;
 import static org.tabletest.junit.TableTestException.primitiveTypeDoesNotAllowNull;
+import static org.tabletest.junit.TableTestException.unsupportedCollectionType;
 
 /**
  * A utility class that handles conversion of parsed table values to the appropriate parameter types
@@ -177,6 +178,7 @@ public class ParameterTypeConverter {
         Class<?> testClass,
         Set<Class<?>> convertingTargets
     ) {
+        requireAssignableFrom(List.class, parameterType);
         ParameterType elementType = parameterType.elementType();
         return unmodifiableList(
             list.stream()
@@ -201,6 +203,9 @@ public class ParameterTypeConverter {
         Set<Class<?>> convertingTargets
     ) {
         // if this is a value set, the parameter type will be the element type
+        if (parameterType.isSet()) {
+            requireAssignableFrom(Set.class, parameterType);
+        }
         ParameterType elementType = parameterType.isSet() ? parameterType.elementType() : parameterType;
 
         LinkedHashSet<Object> convertedSet = set.stream()
@@ -208,6 +213,23 @@ public class ParameterTypeConverter {
             .collect(toCollection(LinkedHashSet::new));
 
         return unmodifiableSet(convertedSet);
+    }
+
+    /**
+     * Validates that the declared parameter type can hold the collection produced by
+     * conversion. Converted collections implement only the List, Set, or Map interface,
+     * so concrete parameter types like TreeSet or ArrayList cannot be satisfied and
+     * would otherwise fail confusingly at test invocation.
+     *
+     * @param producedType  The interface type of the collection conversion produces
+     * @param parameterType The declared parameter type
+     * @throws TableTestException if the parameter type cannot hold the produced collection
+     */
+    private static void requireAssignableFrom(Class<?> producedType, ParameterType parameterType) {
+        Class<?> targetClass = parameterType.toClass();
+        if (targetClass != null && !targetClass.isAssignableFrom(producedType)) {
+            throw new TableTestException(unsupportedCollectionType(parameterType));
+        }
     }
 
     /**
@@ -225,6 +247,7 @@ public class ParameterTypeConverter {
         Class<?> testClass,
         Set<Class<?>> convertingTargets
     ) {
+        requireAssignableFrom(Map.class, parameterType);
         ParameterType elementType = parameterType.elementType();
         LinkedHashMap<Object, Object> result = new LinkedHashMap<>();
         for (Map.Entry<?, ?> entry : map.entrySet()) {

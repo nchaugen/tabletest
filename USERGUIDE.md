@@ -182,6 +182,8 @@ void singleValues(short number, String text, LocalDate date, Class<?> type) {
 
 TableTest will also use this automatic conversion for single values appearing as elements in lists and sets, and for values in a map when the test method parameter is a parameterized type. Map keys remain String type and are not converted.
 
+Collection parameters must be declared using the interface types `List`, `Set`, or `Map` (or a supertype like `Collection`). Concrete collection types such as `TreeSet`, `ArrayList`, or `LinkedHashMap` are rejected with an error, as converted collections implement only the interface. To receive a specific collection implementation, declare a [custom converter](#custom-conversion) producing it.
+
 Automatic conversion for parameterized types works even for nested values:
 
 ```java

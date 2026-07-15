@@ -56,6 +56,15 @@ public class TableTestException extends ParameterResolutionException {
         );
     }
 
+    static String unsupportedCollectionType(ParameterType parameterType) {
+        return String.format(
+            "Parameter type %s is not supported for collection values. " +
+                "Declare collection parameters using the interface types List, Set, or Map. " +
+                "A @TypeConverter method can be used to produce a specific collection implementation.",
+            parameterType.name()
+        );
+    }
+
     static String typeConverterCycle(Object value, ParameterType targetType) {
         return String.format(
             "Type converter cycle detected while converting value \"%s\" to type %s: " +
