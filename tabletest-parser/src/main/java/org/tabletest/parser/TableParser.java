@@ -53,16 +53,20 @@ public class TableParser {
      * @param input      string to parse
      * @param keepQuotes if true, preserves original quotes in string values; if false, unwraps quotes
      * @return Table with parsed rows (first valid row as header)
-     * @throws NullPointerException if input is null
+     * @throws NullPointerException    if input is null
+     * @throws TableTestParseException if input contains no table rows
      */
     public static Table parse(String input, boolean keepQuotes) {
-        return new Table(
-            Arrays.stream(input.split(ROW_SEPARATOR))
-                .filter(it -> !it.trim().isEmpty())
-                .map(line -> parseRow(line, keepQuotes))
-                .filter(Objects::nonNull)
-                .collect(toList())
-        ).withHeadersInRows();
+        List<Row> rows = Arrays.stream(input.split(ROW_SEPARATOR))
+            .filter(it -> !it.trim().isEmpty())
+            .map(line -> parseRow(line, keepQuotes))
+            .filter(Objects::nonNull)
+            .collect(toList());
+        if (rows.isEmpty()) {
+            throw new TableTestParseException(
+                "Table has no rows: input was empty or contained only blank lines and comments");
+        }
+        return new Table(rows).withHeadersInRows();
     }
 
     private static Row parseRow(String line, boolean keepQuotes) {

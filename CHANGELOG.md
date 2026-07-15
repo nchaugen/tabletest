@@ -9,6 +9,7 @@
 - An empty value set (`{}`) for an expandable parameter now fails with an error naming the column, instead of silently generating zero test invocations for the row
 - Very long cell values and comment lines (roughly 15k characters and up) no longer crash parsing with `StackOverflowError`
 - A blank header cell now fails with a parse error naming the column, instead of a `NullPointerException`
+- A table input that is empty or holds only blank lines and comments now fails with `TableTestParseException` instead of `IllegalArgumentException`
 - Table rows with missing or extra cells now fail with an error naming the offending row, instead of silently shifting values to the wrong parameters or misreading the first cell as a scenario name
 - Type converter cycles (e.g. a public static method in the test class taking and returning the same type) now fail with a clear error instead of crashing the test with `StackOverflowError`
 - The `@TypeConverter` deprecation warning is only emitted for methods actually selected as converters, once per method, instead of for every public static single-parameter method (including `main`) on every conversion

@@ -63,6 +63,21 @@ public class TableParserTest {
     }
 
     @TableTest("""
+        Scenario            | Input
+        Empty input         | ''
+        Blank input         | '   '
+        Comment only        | '// just a comment'
+        Comments and blanks | '// one\\n   \\n// two'
+        """)
+    void shouldRejectInputWithoutTableRows(String input) {
+        TableTestParseException actualException = assertThrows(
+            TableTestParseException.class,
+            () -> TableParser.parse(input.replace("\\n", "\n"))
+        );
+        assertTrue(actualException.getMessage().startsWith("Table has no rows"), actualException.getMessage());
+    }
+
+    @TableTest("""
         Scenario            | Header Row  | Error Message?
         Blank first header  | " | b | c"  | Header cell in column 1 is blank
         Blank middle header | "a |  | c"  | Header cell in column 2 is blank
