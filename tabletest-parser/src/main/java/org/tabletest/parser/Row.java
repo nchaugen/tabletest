@@ -52,10 +52,10 @@ public class Row {
     /**
      * Returns the number of values in this row.
      *
-     * @return value count (0 if row is empty)
+     * @return value count
      */
     public int valueCount() {
-        return !values.isEmpty() ? values.size() : 0;
+        return values.size();
     }
 
     /**
