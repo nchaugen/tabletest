@@ -190,5 +190,24 @@ class ParseResultTest {
                     .collectCapturesToMap()
             );
         }
+
+        @Test
+        void collectingDuplicateKeysToMapIsNotPossible() {
+            TableTestParseException exception = assertThrows(
+                TableTestParseException.class,
+                () -> success("a: 1, a: 2", "", List.of(unquoted("a"), unquoted("1"), unquoted("a"), unquoted("2")))
+                    .collectCapturesToMap()
+            );
+            assertTrue(exception.getMessage().contains("Duplicate key `a`"), exception.getMessage());
+        }
+
+        @Test
+        void collectingSameKeyInDifferentQuotingToMapIsNotPossible() {
+            assertThrows(
+                TableTestParseException.class,
+                () -> success("a: 1, \"a\": 2", "", List.of(unquoted("a"), unquoted("1"), doubleQuoted("a"), unquoted("2")))
+                    .collectCapturesToMap()
+            );
+        }
     }
 }

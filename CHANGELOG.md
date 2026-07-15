@@ -4,6 +4,7 @@
 ### Changed
 - When both a `@TypeConverter`-annotated method and non-annotated candidates match a target type, the annotated method is now selected instead of failing with "multiple type converters found"
 - Collection parameters must be declared using the interface types `List`, `Set`, or `Map`; concrete types like `TreeSet` or `ArrayList` now fail with a clear error instead of expanding value sets into scalars or failing obscurely at test invocation (custom converters can still produce concrete collection types)
+- Duplicate map keys (e.g. `[a: 1, a: 2]`) now fail with a parse error naming the key, instead of silently keeping the last value; quoted and unquoted spellings of the same key count as duplicates
 ### Fixed
 - Very long cell values and comment lines (roughly 15k characters and up) no longer crash parsing with `StackOverflowError`
 - A blank header cell now fails with a parse error naming the column, instead of a `NullPointerException`

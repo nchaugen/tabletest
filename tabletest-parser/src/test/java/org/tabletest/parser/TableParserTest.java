@@ -223,7 +223,6 @@ public class TableParserTest {
         Map with set          | '[s:{a,b}, t:{c}]'             | [s: {a, b}, t: {c}]
         Map with list         | '[l:[a,b], i:[c]]'             | [l: [a, b], i: [c]]
         Map with quoted value | '[q:"a,b", u:c]'               | [q: "a,b", u: c]
-        Same value keys       | '[a:b, a:[b], a:{b}, a:[b:c]]' | [a: [b: c]]
         Extra whitespace      | '  [   a   :  a   ]  '         | [a: a]
         Double quoted key     | '["key with spaces": value]'   | ["key with spaces": value]
         Single quoted key     | "['key:colon': value]"         | ['key:colon': value]
@@ -249,6 +248,9 @@ public class TableParserTest {
         Unexpected leading character   | 'a[:]'   | true     | java.lang.String |
         Unexpected trailing character  | '[:]a'   | false    |                  | Failed to parse `a`
         Missing element                | '[a:b,]' | false    |                  | Failed to parse `[a:b,]`
+        Duplicate keys                 | '[a:b, a:c]' | false |                 | Duplicate key `a`
+        Duplicate quoted key           | '[a:b, "a":c]' | false |               | Duplicate key `a`
+        Same key different value types | '[a:b, a:[b], a:{b}, a:[b:c]]' | false | | Duplicate key `a`
         """)
     void shouldHandleInvalidMapSyntax(
         String input,

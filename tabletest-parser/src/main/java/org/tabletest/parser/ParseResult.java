@@ -16,6 +16,7 @@
 package org.tabletest.parser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -162,8 +163,10 @@ public interface ParseResult {
          * Collects captured values into a map, pairwise transforming them into key-value pairs.
          * Capture order is retained, so first two captures becomes the first element of the map,
          * the next two become the second, etc. Null values are not allowed.
+         * Keys must be unique; quoted and unquoted spellings of the same key count as duplicates.
          *
-         * @throws TableTestParseException if there is an uneven number of captures or any of the values are null
+         * @throws TableTestParseException if there is an uneven number of captures, any of the values are null,
+         *                                 or a key occurs more than once
          */
         Success collectCapturesToMap() {
             if (captures.size() % 2 != 0) {
@@ -173,10 +176,20 @@ public interface ParseResult {
                 throw new TableTestParseException("Cannot collect null values to map: " + captures);
             }
             Map<Object, Object> captureGroup = new LinkedHashMap<>();
+            Set<Object> seenKeys = new HashSet<>();
             for (int i = 0; i < captures.size(); i += 2) {
-                captureGroup.put(captures.get(i), captures.get(i + 1));
+                Object key = captures.get(i);
+                if (!seenKeys.add(keyIdentity(key))) {
+                    throw new TableTestParseException(
+                        "Duplicate key `" + keyIdentity(key) + "` in map `[" + consumed.trim() + "]`");
+                }
+                captureGroup.put(key, captures.get(i + 1));
             }
             return new Success(consumed, rest, singletonList(unmodifiableMap(captureGroup)));
+        }
+
+        private static Object keyIdentity(Object key) {
+            return key instanceof StringValue ? ((StringValue) key).value() : key;
         }
 
         private Success append(Success nextResult) {
