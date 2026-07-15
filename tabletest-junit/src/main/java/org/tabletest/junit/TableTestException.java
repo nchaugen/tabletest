@@ -16,6 +16,7 @@
 package org.tabletest.junit;
 
 import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.tabletest.parser.Row;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
@@ -74,6 +75,18 @@ public class TableTestException extends ParameterResolutionException {
             parsedValue,
             targetType.name(),
             typeConverterSearchPath.map(Class::getTypeName).collect(Collectors.joining())
+        );
+    }
+
+    static String rowWidthMismatch(int rowNumber, Row row, int columnCount) {
+        return String.format(
+            "Data row %d has %d cells but the header row has %d columns. " +
+                "All rows must have the same number of cells as the header row. " +
+                "Offending row: `%s`",
+            rowNumber,
+            row.valueCount(),
+            columnCount,
+            row.values().stream().map(String::valueOf).collect(Collectors.joining(" | "))
         );
     }
 

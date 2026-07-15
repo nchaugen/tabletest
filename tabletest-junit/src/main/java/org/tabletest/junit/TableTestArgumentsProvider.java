@@ -21,8 +21,10 @@ import org.tabletest.parser.Row;
 import org.tabletest.parser.Table;
 import org.tabletest.parser.TableParser;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -31,6 +33,7 @@ import static org.tabletest.junit.ScenarioNameUtil.hasScenarioName;
 import static org.tabletest.junit.ScenarioNameUtil.hasUndeclaredColumn;
 import static org.tabletest.junit.ScenarioNameUtil.toDisplayName;
 import static org.tabletest.junit.TableTestException.notEnoughTestParameters;
+import static org.tabletest.junit.TableTestException.rowWidthMismatch;
 import static org.tabletest.junit.ValueSetUtil.generateValueCombinations;
 
 /**
@@ -62,10 +65,46 @@ public class TableTestArgumentsProvider {
      * @throws TableTestException if unable to provide an argument
      */
     public static Stream<? extends Arguments> provideArgumentsForInput(ExtensionContext context, String input) {
+        return provideArgumentsForInput(context.getRequiredTestMethod(), input);
+    }
+
+    /**
+     * Provides a stream of arguments for the given test method from tabular data.
+     * <p>
+     * See {@link #provideArgumentsForInput(ExtensionContext, String)} for the table semantics.
+     *
+     * @param testMethod The test method the arguments are provided for
+     * @param input      The string containing the table data
+     * @return A stream of Arguments objects, one for each data row in the table
+     * @throws TableTestException if unable to provide an argument
+     */
+    public static Stream<? extends Arguments> provideArgumentsForInput(Method testMethod, String input) {
         Table table = TableParser.parse(input);
-        Parameter[] parameters = resolveParameters(context, table.columnCount());
+        Parameter[] parameters = resolveParameters(testMethod, table.columnCount());
+        validateRowWidths(table);
 
         return table.map(row -> toArguments(row, parameters));
+    }
+
+    /**
+     * Validates that every data row has the same number of cells as the header row.
+     * <p>
+     * Without this guarantee, rows with missing or extra cells would silently shift
+     * values to the wrong parameters or be misread as having a scenario name column.
+     *
+     * @param table The parsed table
+     * @throws TableTestException if a data row's width differs from the header's
+     */
+    private static void validateRowWidths(Table table) {
+        List<Row> rows = table.rows();
+        IntStream.range(0, rows.size())
+            .filter(index -> rows.get(index).valueCount() != table.columnCount())
+            .findFirst()
+            .ifPresent(index -> {
+                throw new TableTestException(
+                    rowWidthMismatch(index + 1, rows.get(index), table.columnCount())
+                );
+            });
     }
 
     /**
@@ -74,13 +113,13 @@ public class TableTestArgumentsProvider {
      * Verifies that there are enough method parameters to represent the table columns.
      * One extra column is allowed, which will be interpreted as the name of the argument set.
      *
-     * @param context     The test extension context
+     * @param testMethod  The test method
      * @param columnCount The number of columns in the table
      * @return Array of method parameters
      * @throws TableTestException if there are fewer parameters than columns
      */
-    private static Parameter[] resolveParameters(ExtensionContext context, int columnCount) {
-        Parameter[] parameters = context.getRequiredTestMethod().getParameters();
+    private static Parameter[] resolveParameters(Method testMethod, int columnCount) {
+        Parameter[] parameters = testMethod.getParameters();
         if (parameters.length < columnCount - 1) {
             throw new TableTestException(notEnoughTestParameters(parameters.length, columnCount));
         }
