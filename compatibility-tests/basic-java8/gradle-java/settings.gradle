@@ -1,0 +1,5 @@
+// Lets Gradle download a Java 8 toolchain when none is installed locally
+// (e.g. macOS aarch64, where CI-style preinstalled JDK 8 is unavailable).
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
