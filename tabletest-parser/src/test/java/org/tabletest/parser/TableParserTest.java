@@ -299,6 +299,8 @@ public class TableParserTest {
         Empty double quoted               | '""'              | ''              | java.lang.String
         Unmatched single quote            | "'"               | "'"             | java.lang.String
         Unmatched double quote            | '"'               | '"'             | java.lang.String
+        Unterminated quote is literal     | "'abc"            | "'abc"          | java.lang.String
+        Quotes inside unquoted value      | a'b"c             | a'b"c           | java.lang.String
         Single quoted pipe                | "'|'"             | '|'             | java.lang.String
         Double quoted pipe                | '"|"'             | '|'             | java.lang.String
         Single quoted opening bracket     | "'['"             | '['             | java.lang.String

@@ -79,6 +79,8 @@ Single values can appear with or without quotes. Surrounding single (`'`) or dou
 
 Whitespace around unquoted values is trimmed. To preserve leading or trailing whitespace, use quotes. Empty values are represented by adjacent quote pairs (`""` or `''`). [Null values](#null-values) are represented by a blank cell.
 
+Quote characters cannot be escaped inside quoted values. To include single quotes in a value, use double quotes around it, and vice versa. Quotes only have special meaning at the start of a value, so a value containing both kinds of quotes can be left unquoted when it doesn't otherwise require quoting (e.g. `a'b"c`). An opening quote without a matching closing quote is not an error: the value parses as a literal including the quote character (e.g. `'abc` is the value `'abc`).
+
 ```java
 
 @TableTest("""
