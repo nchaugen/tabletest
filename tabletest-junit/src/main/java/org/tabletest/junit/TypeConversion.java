@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -78,15 +79,17 @@ public class TypeConversion {
             throw new TableTestException(typeConverterCycle(value, targetType));
         }
         return findTypeConverter(targetType, typeConverterSearchPath(testClass))
-            .map(converter ->
-                invokeTypeConverter(
+            .map(converter -> {
+                warnIfMissingAnnotation(converter);
+                return invokeTypeConverter(
                     converter,
                     convertedValueSupplier.apply(
                         converter.getParameters()[0],
                         including(convertingTargets, targetType.toClass())
                     ),
                     targetType
-                ))
+                );
+            })
             .orElseGet(() -> fallbackToJUnitConversion(value, targetType, testClass));
     }
 
@@ -240,26 +243,34 @@ public class TypeConversion {
      * <p>
      * A method qualifies as a type converter if it is public, static, and takes a single parameter.
      * Methods should be annotated with {@link TypeConverter} to indicate they are type converters.
-     * Non-annotated methods are still accepted for backwards compatibility but will generate a warning.
+     * Non-annotated methods are still accepted for backwards compatibility but generate a warning
+     * when selected.
      *
      * @return true if public, static, and takes a single parameter; false otherwise
      */
     private static boolean isTypeConverter(Method method) {
-        boolean isCandidate = Modifier.isStatic(method.getModifiers())
+        return Modifier.isStatic(method.getModifiers())
             && Modifier.isPublic(method.getModifiers())
             && Modifier.isPublic(method.getDeclaringClass().getModifiers())
             && method.getParameterCount() == 1;
+    }
 
-        if (isCandidate && !method.isAnnotationPresent(TypeConverter.class)) {
+    private static final Set<Method> WARNED_CONVERTERS = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Warns, once per method, when a selected type converter lacks the {@link TypeConverter}
+     * annotation. Non-annotated converters are deprecated and will not be supported in a
+     * future version.
+     */
+    private static void warnIfMissingAnnotation(Method converter) {
+        if (!converter.isAnnotationPresent(TypeConverter.class) && WARNED_CONVERTERS.add(converter)) {
             System.err.printf(
                 "[TableTest] Warning: Method %s.%s() is used as a type converter but is not annotated with @TypeConverter. " +
                     "Please add @TypeConverter annotation. Non-annotated converters will not be supported in a future version.%n",
-                method.getDeclaringClass().getName(),
-                method.getName()
+                converter.getDeclaringClass().getName(),
+                converter.getName()
             );
         }
-
-        return isCandidate;
     }
 
     /**
