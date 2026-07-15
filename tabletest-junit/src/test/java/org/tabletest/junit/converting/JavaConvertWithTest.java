@@ -35,6 +35,42 @@ public class JavaConvertWithTest {
         assertEquals(expectedAgeCategory, person.ageCategory());
     }
 
+    @TableTest("""
+        Number | Doubled?
+        2      | 4
+        """)
+    void testCyclicMetaAnnotatedParameterWithoutConverter(@CyclicA Integer number, Integer doubled) {
+        assertEquals(doubled, number * 2);
+    }
+
+    @TableTest("""
+        Person                 | AgeCategory?
+        [name: Fred, age: 22]  | ADULT
+        [name: Wilma, age: 19] | TEEN
+        """)
+    void testComposedConvertWithInMetaAnnotationCycle(@CyclicPersonType Person person, AgeCategory expectedAgeCategory) {
+        assertEquals(expectedAgeCategory, person.ageCategory());
+    }
+
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.PARAMETER})
+    @Retention(RetentionPolicy.RUNTIME)
+    @CyclicB
+    public @interface CyclicA {
+    }
+
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.PARAMETER})
+    @Retention(RetentionPolicy.RUNTIME)
+    @CyclicA
+    public @interface CyclicB {
+    }
+
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.PARAMETER})
+    @Retention(RetentionPolicy.RUNTIME)
+    @CyclicA
+    @ConvertWith(PersonConverter.class)
+    public @interface CyclicPersonType {
+    }
+
     record Person(String firstName, String lastName, int age) {
         AgeCategory ageCategory() {
             return AgeCategory.of(age);

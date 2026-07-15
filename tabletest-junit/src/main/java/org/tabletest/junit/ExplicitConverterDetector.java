@@ -20,36 +20,52 @@ import org.junit.jupiter.params.converter.ConvertWith;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
-import java.util.function.Predicate;
+import java.util.HashSet;
+import java.util.Set;
 
+/**
+ * Detects whether a parameter carries an explicit JUnit converter, either as a direct
+ * {@link ConvertWith} annotation or composed into a meta-annotation at any depth.
+ */
 public class ExplicitConverterDetector {
     private ExplicitConverterDetector() {
     }
 
     public static boolean hasExplicitConverter(Parameter parameter) {
-        return hasExplicitConverter(parameter.getAnnotations());
+        return hasExplicitConverter(parameter.getAnnotations(), new HashSet<>());
     }
 
-    private static boolean hasExplicitConverter(Annotation[] annotations) {
+    /**
+     * Searches annotations and their meta-annotations for {@link ConvertWith}.
+     * Each annotation type is visited at most once, so cyclic meta-annotations
+     * cannot cause infinite recursion.
+     */
+    private static boolean hasExplicitConverter(
+        Annotation[] annotations,
+        Set<Class<? extends Annotation>> visited
+    ) {
         return Arrays.stream(annotations)
             .filter(ExplicitConverterDetector::isNotLanguageMetaAnnotation)
-            .anyMatch(ExplicitConverterDetector::isOrHasExplicitConverter);
+            .filter(it -> visited.add(it.annotationType()))
+            .anyMatch(it -> isOrHasExplicitConverter(it, visited));
     }
 
+    private static boolean isOrHasExplicitConverter(
+        Annotation it,
+        Set<Class<? extends Annotation>> visited
+    ) {
+        return ConvertWith.class.equals(it.annotationType())
+            || hasExplicitConverter(it.annotationType().getAnnotations(), visited);
+    }
+
+    /**
+     * Language-provided meta-annotations (Retention, Target, etc.) cannot compose a
+     * converter and are skipped. Matches on the type name rather than
+     * {@code Class.getPackage()}, which can return null.
+     */
     private static boolean isNotLanguageMetaAnnotation(Annotation it) {
-        return !it.annotationType().getPackage().getName().startsWith("java.lang.annotation")
-            && !it.annotationType().getPackage().getName().startsWith("kotlin.annotation");
-    }
-
-    private static boolean isOrHasExplicitConverter(Annotation it) {
-        return isExplicitConverter().or(hasExplicitConverter()).test(it);
-    }
-
-    private static Predicate<Annotation> isExplicitConverter() {
-        return it -> ConvertWith.class.equals(it.annotationType());
-    }
-
-    private static Predicate<Annotation> hasExplicitConverter() {
-        return it -> hasExplicitConverter(it.annotationType().getAnnotations());
+        String typeName = it.annotationType().getName();
+        return !typeName.startsWith("java.lang.annotation.")
+            && !typeName.startsWith("kotlin.annotation.");
     }
 }
