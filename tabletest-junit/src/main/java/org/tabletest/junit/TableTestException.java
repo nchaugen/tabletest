@@ -56,6 +56,17 @@ public class TableTestException extends ParameterResolutionException {
         );
     }
 
+    static String typeConverterCycle(Object value, ParameterType targetType) {
+        return String.format(
+            "Type converter cycle detected while converting value \"%s\" to type %s: " +
+                "resolving the converter's parameter requires converting to %s again. " +
+                "A type converter must not take the type it returns, directly or via other converters.",
+            value,
+            targetType.name(),
+            targetType.name()
+        );
+    }
+
     static String primitiveTypeDoesNotAllowNull(ParameterType parameterType) {
         return String.format(
             "Blank cell translates to null, but null cannot be assigned to primitive type %s",

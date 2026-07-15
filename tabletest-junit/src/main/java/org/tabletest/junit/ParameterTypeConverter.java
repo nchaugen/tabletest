@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
@@ -80,7 +81,7 @@ public class ParameterTypeConverter {
             return null;
         }
 
-        return convert(value, parameterType, testClass);
+        return convert(value, parameterType, testClass, emptySet());
     }
 
     /**
@@ -92,30 +93,33 @@ public class ParameterTypeConverter {
      * @return The converted value
      */
     public static Object convert(Object value, Parameter parameter, Class<?> testClass) {
-        return convert(value, ParameterType.of(parameter), testClass);
+        return convert(value, ParameterType.of(parameter), testClass, emptySet());
     }
 
     /**
      * Recursively converts values based on their parsed type and the expected parameter type.
      *
-     * @param value      The parsed value to convert
-     * @param targetType Information about the target parameter type
-     * @param testClass  The test class to search for factory methods
+     * @param value             The parsed value to convert
+     * @param targetType        Information about the target parameter type
+     * @param testClass         The test class to search for factory methods
+     * @param convertingTargets Target types whose converter input is currently being resolved,
+     *                          used to detect converter cycles
      * @return The converted value
      */
     private static Object convert(
         Object value,
         ParameterType targetType,
-        Class<?> testClass
+        Class<?> testClass,
+        Set<Class<?>> convertingTargets
     ) {
         if (targetType.isArray() && value instanceof List<?>) {
-            return convertArray((List<?>) value, targetType, testClass);
+            return convertArray((List<?>) value, targetType, testClass, convertingTargets);
         }
 
         if (targetType.isMatching(value.getClass())) {
-            if (value instanceof List<?>) return convertList((List<?>) value, targetType, testClass);
-            if (value instanceof Set<?>) return convertSet((Set<?>) value, targetType, testClass);
-            if (value instanceof Map<?, ?>) return convertMap((Map<?, ?>) value, targetType, testClass);
+            if (value instanceof List<?>) return convertList((List<?>) value, targetType, testClass, convertingTargets);
+            if (value instanceof Set<?>) return convertSet((Set<?>) value, targetType, testClass, convertingTargets);
+            if (value instanceof Map<?, ?>) return convertMap((Map<?, ?>) value, targetType, testClass, convertingTargets);
             return value;
         }
 
@@ -123,7 +127,9 @@ public class ParameterTypeConverter {
             value,
             targetType,
             testClass,
-            (Parameter parameter) -> convert(value, parameter, testClass)
+            convertingTargets,
+            (Parameter parameter, Set<Class<?>> nowConverting) ->
+                convert(value, ParameterType.of(parameter), testClass, nowConverting)
         );
     }
 
@@ -139,7 +145,8 @@ public class ParameterTypeConverter {
     private static Object convertArray(
         List<?> list,
         ParameterType parameterType,
-        Class<?> testClass
+        Class<?> testClass,
+        Set<Class<?>> convertingTargets
     ) {
         ParameterType elementType = parameterType.elementType();
         Class<?> arrayType = parameterType.toClass();
@@ -150,7 +157,7 @@ public class ParameterTypeConverter {
         Class<?> componentType = arrayType.getComponentType();
         Object result = Array.newInstance(componentType, list.size());
         for (int i = 0; i < list.size(); i++) {
-            Array.set(result, i, convert(list.get(i), elementType, testClass));
+            Array.set(result, i, convert(list.get(i), elementType, testClass, convertingTargets));
         }
         return result;
     }
@@ -167,12 +174,13 @@ public class ParameterTypeConverter {
     private static List<?> convertList(
         List<?> list,
         ParameterType parameterType,
-        Class<?> testClass
+        Class<?> testClass,
+        Set<Class<?>> convertingTargets
     ) {
         ParameterType elementType = parameterType.elementType();
         return unmodifiableList(
             list.stream()
-                .map(it -> convert(it, elementType, testClass))
+                .map(it -> convert(it, elementType, testClass, convertingTargets))
                 .collect(toList())
         );
     }
@@ -189,13 +197,14 @@ public class ParameterTypeConverter {
     private static Set<?> convertSet(
         Set<?> set,
         ParameterType parameterType,
-        Class<?> testClass
+        Class<?> testClass,
+        Set<Class<?>> convertingTargets
     ) {
         // if this is a value set, the parameter type will be the element type
         ParameterType elementType = parameterType.isSet() ? parameterType.elementType() : parameterType;
 
         LinkedHashSet<Object> convertedSet = set.stream()
-            .map(it -> convert(it, elementType, testClass))
+            .map(it -> convert(it, elementType, testClass, convertingTargets))
             .collect(toCollection(LinkedHashSet::new));
 
         return unmodifiableSet(convertedSet);
@@ -213,12 +222,13 @@ public class ParameterTypeConverter {
     private static Map<?, ?> convertMap(
         Map<?, ?> map,
         ParameterType parameterType,
-        Class<?> testClass
+        Class<?> testClass,
+        Set<Class<?>> convertingTargets
     ) {
         ParameterType elementType = parameterType.elementType();
         LinkedHashMap<Object, Object> result = new LinkedHashMap<>();
         for (Map.Entry<?, ?> entry : map.entrySet()) {
-            result.put(entry.getKey(), convert(entry.getValue(), elementType, testClass));
+            result.put(entry.getKey(), convert(entry.getValue(), elementType, testClass, convertingTargets));
         }
         return unmodifiableMap(result);
     }

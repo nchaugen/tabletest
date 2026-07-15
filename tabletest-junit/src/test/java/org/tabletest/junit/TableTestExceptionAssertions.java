@@ -2,6 +2,7 @@ package org.tabletest.junit;
 
 import org.junit.jupiter.api.function.Executable;
 
+import java.lang.reflect.Parameter;
 import java.util.stream.Stream;
 
 import static org.tabletest.junit.ParameterFixture.parameter;
@@ -24,6 +25,13 @@ public class TableTestExceptionAssertions {
         assertThrowsTableTestException(
             () -> convertValue(parsedValue, parameter(type)),
             "Multiple type converters found for type " + type.getTypeName() + " in class .+"
+        );
+    }
+
+    public static void assertThrowsWhenTypeConverterCycleDetected(Object parsedValue, Parameter parameter) {
+        assertThrowsTableTestException(
+            () -> convertValue(parsedValue, parameter),
+            "Type converter cycle detected .+"
         );
     }
 

@@ -25,10 +25,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,25 +59,44 @@ public class TypeConversion {
      * @param value                  The parsed value to convert
      * @param targetType             The target type of the conversion
      * @param testClass              The test class to search for type converters
+     * @param convertingTargets      Target types whose converter input is currently being resolved,
+     *                               used to detect converter cycles
      * @param convertedValueSupplier A function that supplies the parsed value converted to match
-     *                               the type converter's parameter type
+     *                               the type converter's parameter type, given the extended set of
+     *                               in-progress target types
      * @return the converted value
-     * @throws TableTestException if the conversion fails
+     * @throws TableTestException if the conversion fails or a converter cycle is detected
      */
     public static Object convert(
         Object value,
         ParameterType targetType,
         Class<?> testClass,
-        Function<Parameter, Object> convertedValueSupplier
+        Set<Class<?>> convertingTargets,
+        BiFunction<Parameter, Set<Class<?>>, Object> convertedValueSupplier
     ) {
+        if (convertingTargets.contains(targetType.toClass())) {
+            throw new TableTestException(typeConverterCycle(value, targetType));
+        }
         return findTypeConverter(targetType, typeConverterSearchPath(testClass))
             .map(converter ->
                 invokeTypeConverter(
                     converter,
-                    convertedValueSupplier.apply(converter.getParameters()[0]),
+                    convertedValueSupplier.apply(
+                        converter.getParameters()[0],
+                        including(convertingTargets, targetType.toClass())
+                    ),
                     targetType
                 ))
             .orElseGet(() -> fallbackToJUnitConversion(value, targetType, testClass));
+    }
+
+    /**
+     * Returns a new unmodifiable set extending the given set with the given target type.
+     */
+    private static Set<Class<?>> including(Set<Class<?>> convertingTargets, Class<?> target) {
+        Set<Class<?>> extended = new HashSet<>(convertingTargets);
+        extended.add(target);
+        return Collections.unmodifiableSet(extended);
     }
 
     /**
