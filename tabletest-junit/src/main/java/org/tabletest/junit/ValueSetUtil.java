@@ -15,13 +15,37 @@
  */
 package org.tabletest.junit;
 
+import org.tabletest.parser.Row;
+
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static org.tabletest.junit.TableTestException.emptyValueSet;
+
 public class ValueSetUtil {
+
+    /**
+     * Validates that every value set due for expansion holds at least one value.
+     * An empty value set would expand to zero combinations, silently erasing the row.
+     *
+     * @param arguments  converted values from the row
+     * @param parameters test method parameters
+     * @param row        the data row, used to name the column in the error message
+     * @throws TableTestException if a value set to be expanded is empty
+     */
+    static void validateValueSetsNotEmpty(List<?> arguments, Parameter[] parameters, Row row) {
+        IntStream.range(0, arguments.size())
+            .filter(position -> isToBeExpanded(arguments.get(position), parameters[position].getType()))
+            .filter(position -> ((Set<?>) arguments.get(position)).isEmpty())
+            .findFirst()
+            .ifPresent(position -> {
+                throw new TableTestException(emptyValueSet(row.header(position), row));
+            });
+    }
 
     /**
      * Recursively generates all combinations of values by expanding sets that are not

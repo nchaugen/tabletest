@@ -8,19 +8,17 @@ class KotlinValueSetTest {
 
     @TableTest(
         """    
-        Scenario                  | adding any of | to set    | makes size? | is set null? | contains null?
-        Adding existing values    | {1, 2, 3}     | {1, 2, 3} | 3           | false        | false
-        Adding other values       | {4, 5, 6}     | {1, 2, 3} | 4           | false        | false
-        Adding no values          | {}            | {1, 2, 3} | 4           | false        | true
-        Adding nothing to nothing |               |           |             | true         | false
+        Scenario                  | adding any of | to set    | makes size? | is set null?
+        Adding existing values    | {1, 2, 3}     | {1, 2, 3} | 3           | false
+        Adding other values       | {4, 5, 6}     | {1, 2, 3} | 4           | false
+        Adding nothing to nothing |               |           |             | true
         """
     )
     fun value_sets(
         a: Int?,
         b: Set<Int?>?,
         expectedSize: Int?,
-        expectedNull: Boolean,
-        containsNull: Boolean
+        expectedNull: Boolean
     ) {
         if (expectedNull) {
             assertNull(b)
@@ -28,7 +26,6 @@ class KotlinValueSetTest {
             val result = b!!.toMutableSet()
             result.add(a)
             assertEquals(expectedSize, result.size)
-            assertEquals(containsNull, result.contains(null))
         }
     }
 

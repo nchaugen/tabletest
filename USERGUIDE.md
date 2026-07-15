@@ -422,7 +422,7 @@ void blankConvertsToNull(String string, Integer integer, List<?> list, Map<Strin
 ### Value Sets
 TableTest supports using the set format to specify multiple examples of values that are applicable for the current scenario. This is a powerful feature that can be used to contract multiple rows that have identical expectations. 
 
-When a value is a set (enclosed in curly braces) and the corresponding parameter isn't declared as a `Set` type, TableTest will create multiple test invocations for this row, one for each value in the set. 
+When a value is a set (enclosed in curly braces) and the corresponding parameter isn't declared as a `Set` type, TableTest will create multiple test invocations for this row, one for each value in the set. A value set must hold at least one value — an empty set (`{}`) would generate no invocations for the row, so it fails with an error naming the column. Use a blank cell to pass null. 
 
 In the example below, the test method will be invoked 12 times, three times for each row, once for each value in the set in column `Example years`.
 

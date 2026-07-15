@@ -35,6 +35,7 @@ import static org.tabletest.junit.ScenarioNameUtil.toDisplayName;
 import static org.tabletest.junit.TableTestException.notEnoughTestParameters;
 import static org.tabletest.junit.TableTestException.rowWidthMismatch;
 import static org.tabletest.junit.ValueSetUtil.generateValueCombinations;
+import static org.tabletest.junit.ValueSetUtil.validateValueSetsNotEmpty;
 
 /**
  * Provides arguments for parameterized tests from tabular data in TableTest format.
@@ -142,10 +143,11 @@ public class TableTestArgumentsProvider {
      */
     private static Stream<? extends Arguments> toArguments(Row row, Parameter[] parameters) {
 
-        List<Object> convertedValues = row
-            .skipFirstIf(hasUndeclaredColumn(row, parameters)) // first column is scenario name by convention
+        Row dataRow = row.skipFirstIf(hasUndeclaredColumn(row, parameters)); // first column is scenario name by convention
+        List<Object> convertedValues = dataRow
             .mapIndexed((index, cell) -> convertValue(cell, parameters[index]))
             .collect(toList());
+        validateValueSetsNotEmpty(convertedValues, parameters, dataRow);
 
         return generateValueCombinations(convertedValues, parameters, 0)
             .map(values ->

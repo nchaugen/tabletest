@@ -98,6 +98,16 @@ public class TableTestException extends ParameterResolutionException {
         );
     }
 
+    static String emptyValueSet(String columnName, Row row) {
+        return String.format(
+            "Empty value set in column \"%s\". " +
+                "A value set must hold at least one value, otherwise the row generates no test invocations. " +
+                "Use a blank cell for null. Offending row: `%s`",
+            columnName,
+            row.values().stream().map(String::valueOf).collect(Collectors.joining(" | "))
+        );
+    }
+
     static String rowWidthMismatch(int rowNumber, Row row, int columnCount) {
         return String.format(
             "Data row %d has %d cells but the header row has %d columns. " +

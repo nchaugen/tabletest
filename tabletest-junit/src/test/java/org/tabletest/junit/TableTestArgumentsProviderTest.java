@@ -5,6 +5,7 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -97,6 +98,34 @@ class TableTestArgumentsProviderTest {
         );
     }
 
+    @Test
+    void fails_when_value_set_to_be_expanded_is_empty() {
+        TableTestException exception = assertThrowsWhileProviding(
+            twoIntParameters(),
+            """
+                a  | b
+                {} | 2
+                """
+        );
+        assertTrue(
+            exception.getMessage().contains("Empty value set")
+                && exception.getMessage().contains("column \"a\""),
+            "Message does not describe the empty value set: " + exception.getMessage()
+        );
+    }
+
+    @Test
+    void allows_empty_set_for_set_typed_parameter() {
+        Stream<? extends Arguments> arguments = provideArgumentsForInput(
+            intAndSetParameters(),
+            """
+                a | b
+                1 | {}
+                """
+        );
+        assertEquals(1, arguments.count());
+    }
+
     private static TableTestException assertThrowsWhileProviding(Method testMethod, String input) {
         return assertThrows(
             TableTestException.class,
@@ -125,9 +154,21 @@ class TableTestArgumentsProviderTest {
     private void twoInts(int a, int b) {
     }
 
+    @SuppressWarnings("unused")
+    private void intAndSet(int a, Set<Integer> b) {
+    }
+
     private static Method twoIntParameters() {
+        return testMethod("twoInts");
+    }
+
+    private static Method intAndSetParameters() {
+        return testMethod("intAndSet");
+    }
+
+    private static Method testMethod(String name) {
         return Arrays.stream(TableTestArgumentsProviderTest.class.getDeclaredMethods())
-            .filter(method -> method.getName().equals("twoInts"))
+            .filter(method -> method.getName().equals(name))
             .findFirst()
             .orElseThrow();
     }
