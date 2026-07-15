@@ -62,7 +62,7 @@ public void leapYearCalculation(Year year, boolean expectedResult) {
 
 Each array element represents one row. Empty string elements and comment lines (`//`) are ignored.
 
-Tables use the pipe character (`|`) to separate columns and newline to separate rows. The first row is the header containing column names. The following lines are data rows.
+Tables use the pipe character (`|`) to separate columns and newline to separate rows. The first row is the header containing column names. Header cells cannot be blank. The following lines are data rows.
 
 Column values can be [single values](#single-values), [lists](#list-values), [sets](#set-values), or [maps](#map-values). Values are automatically converted to the type of the corresponding test parameter.
 

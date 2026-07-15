@@ -112,11 +112,17 @@ public class Table {
      * Returns the header row as a list of trimmed strings.
      *
      * @return list of header values
+     * @throws TableTestParseException if a header cell is blank
      */
     public List<String> headers() {
-        return header.values().stream()
-            .map(Object::toString)
-            .collect(toList());
+        return header.mapIndexed(Table::requireHeaderValue).collect(toList());
+    }
+
+    private static String requireHeaderValue(Integer index, Object value) {
+        if (value == null) {
+            throw new TableTestParseException("Header cell in column " + (index + 1) + " is blank");
+        }
+        return value.toString();
     }
 
     /**

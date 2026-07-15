@@ -62,6 +62,20 @@ public class TableParserTest {
         assertEquals(List.of("8", "9 //"), result.row(3).values());
     }
 
+    @TableTest("""
+        Scenario            | Header Row  | Error Message?
+        Blank first header  | " | b | c"  | Header cell in column 1 is blank
+        Blank middle header | "a |  | c"  | Header cell in column 2 is blank
+        Blank last header   | "a | b | "  | Header cell in column 3 is blank
+        """)
+    void shouldRejectBlankHeaderCells(String headerRow, String expectedErrorMessage) {
+        TableTestParseException actualException = assertThrows(
+            TableTestParseException.class,
+            () -> TableParser.parse(headerRow + "\n1 | 2 | 3")
+        );
+        assertTrue(actualException.getMessage().startsWith(expectedErrorMessage), actualException.getMessage());
+    }
+
     @Test
     void shouldParseLongCellValuesWithoutStackOverflow() {
         String longValue = "x".repeat(20_000);
