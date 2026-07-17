@@ -60,3 +60,6 @@ updates:
       - dependency-name: "io.quarkus:*"
       - dependency-name: "io.quarkus.platform:*"
       - dependency-name: "org.springframework.boot:*"
+      # Pinned to 0.10.0 in basic-java8: the last version that runs
+      # on a Java 8 JVM (1.0.0 needs 17+)
+      - dependency-name: "org.gradle.toolchains.foojay-resolver-convention"
