@@ -1,5 +1,7 @@
 // Lets Gradle download a Java 8 toolchain when none is installed locally
 // (e.g. macOS aarch64, where CI-style preinstalled JDK 8 is unavailable).
+// Pinned to 0.10.0: it is the last version that runs on a Java 8 JVM,
+// which CI uses to run Gradle itself (1.0.0 requires JVM 17+).
 plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.10.0'
 }
