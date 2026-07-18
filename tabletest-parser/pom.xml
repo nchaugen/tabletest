@@ -20,6 +20,7 @@
         <project.scm.id>github</project.scm.id>
         <version.junit>6.1.2</version.junit>
         <version.tabletest-junit>1.2.2</version.tabletest-junit>
+        <version.tabletest-reporter>1.2.0</version.tabletest-reporter>
         <version.plugin.license>5.0.0</version.plugin.license>
         <version.plugin.clean>3.5.0</version.plugin.clean>
         <version.plugin.resources>3.5.0</version.plugin.resources>
@@ -87,6 +88,12 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${version.junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.tabletest</groupId>
+            <artifactId>tabletest-reporter-junit</artifactId>
+            <version>${version.tabletest-reporter}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -208,6 +215,37 @@
     </build>
 
     <profiles>
+        <!-- Living documentation: runs only the spec-tagged tests with the reporter
+             extension and generates the HTML report with
+             `mvn -Preport -pl tabletest-parser test org.tabletest:tabletest-reporter-maven-plugin:report`. -->
+        <profile>
+            <id>report</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <groups>spec &amp; !unpublished</groups>
+                            <properties>
+                                <configurationParameters>
+                                    junit.jupiter.extensions.autodetection.enabled=true
+                                </configurationParameters>
+                            </properties>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.tabletest</groupId>
+                        <artifactId>tabletest-reporter-maven-plugin</artifactId>
+                        <version>${version.tabletest-reporter}</version>
+                        <configuration>
+                            <format>html</format>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <!-- Creates additional artefacts that are required for deployment. -->
         <profile>
             <id>release</id>
