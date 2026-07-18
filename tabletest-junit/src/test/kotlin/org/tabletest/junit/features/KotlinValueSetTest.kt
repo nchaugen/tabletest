@@ -30,14 +30,14 @@ class KotlinValueSetTest {
     }
 
     @TableTest(
-        """    
-        Scenario                      | a                | b | c | d         | e
-        Anything multiplied by 0 is 0 | {-1, 0, 1, 1000} | 0 | 0 | {1, 2, 3} | 3
+        """
+        Scenario       | x         | y       | is sum even?
+        Even plus even | {2, 4, 6} | {8, 10} | true
+        Odd plus even  | {1, 3, 5} | {6, 8}  | false
         """
     )
-    fun testValueSet(a: Int, b: Int, c: Int, d: Set<Int>, e: Int) {
-        kotlin.test.assertEquals(c, a * b)
-        kotlin.test.assertEquals(e, d.size)
+    fun value_set_combinations(x: Int, y: Int, expectedEvenSum: Boolean) {
+        assertEquals(expectedEvenSum, (x + y) % 2 == 0)
     }
 
 }
