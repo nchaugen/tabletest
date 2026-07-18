@@ -18,7 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <repository.url>git@github.com:nchaugen/tabletest.git</repository.url>
         <project.scm.id>github</project.scm.id>
-        <version.tabletest-parser>1.2.0</version.tabletest-parser>
+        <version.tabletest-parser>1.2.1</version.tabletest-parser>
         <version.tabletest-reporter>1.1.0</version.tabletest-reporter>
         <version.junit>6.1.2</version.junit>
         <version.kotlin>2.4.10</version.kotlin>
