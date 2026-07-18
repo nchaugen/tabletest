@@ -3,14 +3,14 @@ package org.tabletest.junit.features
 import org.tabletest.junit.TableTest
 import org.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenFallbackFails
 import org.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenNullSpecifiedForPrimitiveType
-import kotlin.test.assertNull
+import kotlin.test.assertEquals
 
 class KotlinNullValueTest {
 
     @TableTest(
-        """    
-        String | Integer | List | Map | Set
-               |         |      |     |
+        """
+        String | Integer | List | Map | Set | all null?
+               |         |      |     |     | true
         """
     )
     fun blank_converts_to_null(
@@ -18,13 +18,13 @@ class KotlinNullValueTest {
         integer: Int?,
         list: List<*>?,
         map: Map<String, *>?,
-        set: Set<*>?
+        set: Set<*>?,
+        expectedAllNull: Boolean
     ) {
-        assertNull(string)
-        assertNull(integer)
-        assertNull(list)
-        assertNull(map)
-        assertNull(set)
+        assertEquals(
+            expectedAllNull,
+            string == null && integer == null && list == null && map == null && set == null
+        )
     }
 
     @TableTest(
