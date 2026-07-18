@@ -4,6 +4,7 @@ import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
 import org.tabletest.junit.TypeConverter;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.time.Year;
@@ -12,8 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("Leap Year Rules")
-@Description("The following describes the rules for leap years.")
+@Tag("spec")
+@DisplayName("Leap year rules")
+@Description("""
+        The classic introductory example: the Gregorian leap year rules, first as one
+        example per rule, then with value sets showing each rule holds across eras.
+        """)
 public class LeapYearExampleTest {
 
     @Test
@@ -36,6 +41,8 @@ public class LeapYearExampleTest {
         assertTrue(Year.isLeap(2000));
     }
 
+    @DisplayName("The four rules, one example year each")
+    @Description("Yes/No in the expectation column is read by a custom type converter.")
     @TableTest("""
         Scenario                        | Year | Is Leap Year?
         Not divisible by 4              | 2001 | No
@@ -53,7 +60,7 @@ public class LeapYearExampleTest {
         return input.equalsIgnoreCase("yes");
     }
 
-    @DisplayName("Leap Year Calculation")
+    @DisplayName("Each rule holds across eras")
     @Description("""
         A leap year is a year with an extra day added to the calendar — February 29 — to keep the calendar
         year aligned with Earth’s orbit around the Sun.
