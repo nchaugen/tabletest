@@ -19,7 +19,7 @@
         <repository.url>git@github.com:nchaugen/tabletest.git</repository.url>
         <project.scm.id>github</project.scm.id>
         <version.tabletest-parser>1.2.1</version.tabletest-parser>
-        <version.tabletest-reporter>1.1.0</version.tabletest-reporter>
+        <version.tabletest-reporter>1.2.0</version.tabletest-reporter>
         <version.junit>6.1.2</version.junit>
         <version.kotlin>2.4.10</version.kotlin>
         <version.plugin.license>5.0.0</version.plugin.license>
@@ -295,6 +295,37 @@
     </build>
 
     <profiles>
+        <!-- Living documentation: runs only the spec-tagged example tests with the reporter
+             extension and generates the HTML report with
+             `mvn -Preport -pl tabletest-junit test org.tabletest:tabletest-reporter-maven-plugin:report`. -->
+        <profile>
+            <id>report</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <groups>spec &amp; !unpublished</groups>
+                            <properties>
+                                <configurationParameters>
+                                    junit.jupiter.extensions.autodetection.enabled=true
+                                </configurationParameters>
+                            </properties>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.tabletest</groupId>
+                        <artifactId>tabletest-reporter-maven-plugin</artifactId>
+                        <version>${version.tabletest-reporter}</version>
+                        <configuration>
+                            <format>html</format>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <!-- Creates additional artefacts that are required for deployment. -->
         <profile>
             <id>release</id>
