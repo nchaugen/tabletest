@@ -63,7 +63,7 @@ public class BasicExamplesTest {
     @TableTest("""
         Map                                      | Size?
         [1: Hello, 2: World]                     | 2
-        // ["|": 1, ',': 2, abc: 3]                 | 3
+        [pipe: "|", comma: ',']                  | 2
         [string: abc, list: [1, 2], map: [a: 4]] | 3
         [:]                                      | 0
         """)

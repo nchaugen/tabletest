@@ -9,8 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenFallbackFails;
-import static org.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenNullSpecifiedForPrimitiveType;
+import static org.tabletest.junit.TableTestExceptionAssertions.assertConversionFails;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Tag("spec")
@@ -43,17 +42,16 @@ class JavaNullValueTest {
     @DisplayName("A blank cell for a primitive parameter fails the row")
     @Description("""
             Primitives cannot hold null — declare the boxed type instead if the
-            column can be blank. The error explains that the blank cell
-            translates to null, which cannot be assigned to the primitive type.
+            column can be blank.
             """)
     @TableTest("""
-        table value | parameter type
-                    | boolean
-                    | short
-                    | char
+        blank cell | parameter type | Error?
+                   | boolean        | null cannot be assigned to primitive type boolean
+                   | short          | null cannot be assigned to primitive type short
+                   | char           | null cannot be assigned to primitive type char
         """)
-    void blank_fails_for_primitive_parameter_type(String value, Class<?> type) {
-        assertThrowsWhenNullSpecifiedForPrimitiveType(value, type);
+    void blank_fails_for_primitive_parameter_type(String value, Class<?> type, String expectedError) {
+        assertConversionFails(value, type, expectedError);
     }
 
     @DisplayName("An empty string is a value, not null, and non-String types cannot convert it")
@@ -63,16 +61,17 @@ class JavaNullValueTest {
             custom type converter the row fails.
             """)
     @TableTest("""
-        Scenario            | table value | Type
-        Empty single quoted | ''          | java.util.List
-        Empty double quoted | ""          | java.lang.Integer
-        Empty primitive     | ""          | boolean
+        Scenario            | table value | parameter type    | Error?
+        Empty single quoted | ''          | java.util.List    | 'conversion of value "" to type java.util.List failed'
+        Empty double quoted | ""          | java.lang.Integer | 'conversion of value "" to type java.lang.Integer failed'
+        Empty primitive     | ""          | boolean           | 'conversion of value "" to type boolean failed'
         """)
     void empty_string_for_non_string_types_requires_factory_method(
         String value,
-        Class<?> type
+        Class<?> type,
+        String expectedError
     ) {
-        assertThrowsWhenFallbackFails(value, type);
+        assertConversionFails(value, type, expectedError);
     }
 
 }

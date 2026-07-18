@@ -23,7 +23,7 @@ public class JavaPrimitiveConversionTest {
             and boxed parameters both use it.
             """)
     @TableTest("""
-        A   | B   | A and B
+        A   | B   | A and B?
         Yes | Yes | Yes
         No  | Yes | No
         """)
@@ -43,7 +43,7 @@ public class JavaPrimitiveConversionTest {
             is written as a word too.
             """)
     @TableTest("""
-        A   | B     | A + B
+        A   | B     | A + B?
         one | three | four
         two | two   | four
         """)

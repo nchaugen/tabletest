@@ -9,8 +9,20 @@ import static org.tabletest.junit.ParameterFixture.parameter;
 import static org.tabletest.junit.ParameterTypeConverter.convertValue;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TableTestExceptionAssertions {
+
+    public static void assertConversionFails(Object parsedValue, Class<?> type, String expectedMessagePart) {
+        Exception exception = assertThrows(
+            TableTestException.class,
+            () -> convertValue(parsedValue, parameter(type))
+        );
+        assertTrue(
+            exception.getMessage().contains(expectedMessagePart),
+            String.format("Message `%s` did not contain `%s`", exception.getMessage(), expectedMessagePart)
+        );
+    }
 
     public static void assertThrowsWhenFallbackFails(Object parsedValue, Class<?> type) {
         assertThrowsTableTestException(

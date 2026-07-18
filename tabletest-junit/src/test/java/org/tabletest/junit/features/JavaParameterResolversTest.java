@@ -9,8 +9,11 @@ import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,28 +29,29 @@ public class JavaParameterResolversTest {
 
     @DisplayName("Resolver-supplied parameters follow the table-bound parameters")
     @Description("""
-            Each invocation receives its scenario name and data column from the
-            table, while JUnit supplies TestInfo, TestReporter, and a temporary
-            directory.
+            Each invocation takes its file content from the table, writes it to
+            a JUnit-supplied temporary directory, and verifies the size of the
+            written file. TestInfo and TestReporter are resolved alongside.
             """)
     @TableTest("""
-        Scenario | a
-                 | 0
-        One      | 1
+        Scenario     | File content | File size in bytes?
+        Single word  | hello        | 5
+        Two words    | hello world  | 11
+        Empty file   | ''           | 0
         """)
     void parameter_resolvers_with_declared_scenario(
         @Scenario String scenario,
-        String a,
+        String content,
+        long expectedFileSize,
         TestInfo info,
         TestReporter reporter,
         @TempDir Path tempDir
-    ) {
-        assertNotNull(info, "TestInfo is null");
+    ) throws IOException {
+        Path file = Files.writeString(tempDir.resolve("content.txt"), content);
+        assertEquals(expectedFileSize, Files.size(file));
         assertNotNull(reporter, "TestReporter is null");
-        assertNotNull(tempDir, "TempDir is null");
-        assertTrue(a.matches("\\d"), "Data column is not digit: " + a);
         assertTrue(
-            info.getDisplayName().contains(scenario == null ? "null" : scenario),
+            info.getDisplayName().contains(scenario),
             "Scenario name is not in display name: " + info.getDisplayName()
         );
     }

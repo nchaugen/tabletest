@@ -20,26 +20,31 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class JavaScenarioNameTest {
 
     @DisplayName("An extra first column names the row without binding to a parameter")
-    @Description("The name may be empty or blank; the row runs regardless.")
+    @Description("""
+            The method takes two parameters, the table has three columns — the
+            first column is the scenario name. The name may be empty or blank;
+            the row runs regardless.
+            """)
     @TableTest("""
-        Scenario | a | b
-        Zero     | 0 | 0
-        ""       | 1 | 2
-                 | 2 | 4
+        Scenario   | Number | Doubled?
+        Zero       | 0      | 0
+        ""         | 1      | 2
+                   | 2      | 4
         """)
-    void scenario_column_can_be_undeclared(int a, int b) {
-        assertEquals(b, 2 * a);
+    void scenario_column_can_be_undeclared(int number, int doubled) {
+        assertEquals(doubled, 2 * number);
     }
 
     @DisplayName("A @Scenario parameter receives the scenario name as an argument")
+    @Description("A blank scenario cell arrives as null, an empty one as the empty string.")
     @TableTest("""
-        Scenario | Expected Scenario
+        Scenario | Received name?
                  |
         ""       | ""
         Example  | Example
         """)
-    void scenario_column_can_be_declared(@Scenario String scenario, String expectedScenario) {
-        assertEquals(expectedScenario, scenario);
+    void scenario_column_can_be_declared(@Scenario String scenario, String expectedName) {
+        assertEquals(expectedName, scenario);
     }
 
     // Not published: asserts JUnit's internal `[n]`-prefixed display names —
