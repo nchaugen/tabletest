@@ -1,6 +1,12 @@
 # TableTest Parser Changelog
 
 ## [Unreleased]
+### Changed
+- Duplicate map keys (e.g. `[a: 1, a: 2]`) now fail with a parse error naming the key, instead of silently keeping the last value; quoted and unquoted spellings of the same key count as duplicates
+### Fixed
+- Very long cell values and comment lines (roughly 15k characters and up) no longer crash parsing with `StackOverflowError`
+- A blank header cell now fails with a parse error naming the column, instead of a `NullPointerException`
+- A table input that is empty or holds only blank lines and comments now fails with `TableTestParseException` instead of `IllegalArgumentException`
 
 ## [1.2.0] - 2026-03-12
 ### Added
