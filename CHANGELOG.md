@@ -1,6 +1,8 @@
 # TableTest Changelog
 
 ## [Unreleased]
+
+## [1.2.2] - 2026-07-18
 ### Changed
 - When both a `@TypeConverter`-annotated method and non-annotated candidates match a target type, the annotated method is now selected instead of failing with "multiple type converters found"
 - Collection parameters must be declared using the interface types `List`, `Set`, or `Map`; concrete types like `TreeSet` or `ArrayList` now fail with a clear error instead of expanding value sets into scalars or failing obscurely at test invocation (custom converters can still produce concrete collection types)
