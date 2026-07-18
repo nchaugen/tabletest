@@ -1,7 +1,10 @@
 package org.tabletest.parser;
 
+import org.tabletest.junit.Description;
 import org.tabletest.junit.Scenario;
 import org.tabletest.junit.TableTest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,6 +17,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Tag("spec")
+@DisplayName("Table parsing")
+@Description("""
+        How TableParser turns TableTest source text into a table of captured
+        values: the structural rules a table must satisfy, and the grammar of
+        cell values — strings, quoting, lists, sets, and maps.
+        """)
 public class TableParserTest {
 
     @Test
@@ -62,6 +72,11 @@ public class TableParserTest {
         assertEquals(List.of("8", "9 //"), result.row(3).values());
     }
 
+    @DisplayName("Input without any data rows is rejected")
+    @Description("""
+            A table needs a header row and at least one data row. \\n in the
+            Input column stands for a line break in the parsed source.
+            """)
     @TableTest("""
         Scenario            | Input
         Empty input         | ''
@@ -77,6 +92,7 @@ public class TableParserTest {
         assertTrue(actualException.getMessage().startsWith("Table has no rows"), actualException.getMessage());
     }
 
+    @DisplayName("Blank header cells are rejected, naming the column")
     @TableTest("""
         Scenario            | Header Row  | Error Message?
         Blank first header  | " | b | c"  | Header cell in column 1 is blank
@@ -128,13 +144,15 @@ public class TableParserTest {
 
     }
 
+    @DisplayName("Lists in [square brackets] hold values, nested collections, and quoted strings")
+    @Description("A blank cell captures null; unquoted elements are trimmed.")
     @TableTest("""
         Scenario               | Input               | Captured?
         Null list              | ''                  |
         Empty list             | '[]'                | []
         Basic list             | '[a, b, c]'         | [a, b, c]
         Nested list            | '[[a], [b], [c]]'   | [[a], [b], [c]]
-        Mixted content list    | '[[],a]'            | [[], a]
+        Mixed content list     | '[[],a]'            | [[], a]
         List with set          | '[{a,b}, c]'        | [{a, b}, c]
         List with map          | '[[a:b], c]'        | [[a: b], c]
         List with quoted value | '["a,b", c]'        | ["a,b", c]
@@ -147,6 +165,11 @@ public class TableParserTest {
         );
     }
 
+    @DisplayName("A value starting with [ must be a well-formed list")
+    @Description("""
+            Values that do not open a list — quoted brackets, a stray closing
+            bracket, a letter before the bracket — capture as plain strings.
+            """)
     @TableTest("""
         Scenario                       | Input    | Success? | Parsed Type?     | Error Message?
         Quoted brackets                | '"[]"'   | true     | java.lang.String |
@@ -178,13 +201,14 @@ public class TableParserTest {
         }
     }
 
+    @DisplayName("Sets in {curly braces} keep each distinct value once")
     @TableTest("""
         Scenario              | Input               | Captured?
         Null set              | ''                  |
         Empty set             | '{}'                | {}
         Basic set             | '{a, b, a, a, c}'   | {a, b, c}
         Nested set            | '{{a}, {b}, {b}}'   | {{a}, {b}}
-        Mixted content set    | '{{},a,a,{}}'       | {{}, a}
+        Mixed content set     | '{{},a,a,{}}'       | {{}, a}
         Set with list         | '{[a],[b],[b]}'     | {[a], [b]}
         Set with map          | '{[a:b], [a:b]}'    | {[a: b]}
         Set with quoted value | '{"a,b", c, "a,b"}' | {"a,b", c}
@@ -197,6 +221,8 @@ public class TableParserTest {
         );
     }
 
+    @DisplayName("A value starting with { must be a well-formed set")
+    @Description("Values that do not open a set capture as plain strings.")
     @TableTest("""
         Scenario                       | Input    | Success? | Parsed Type?     | Error Message?
         Quoted braces                  | '"{}"'   | true     | java.lang.String |
@@ -228,13 +254,14 @@ public class TableParserTest {
         }
     }
 
+    @DisplayName("Maps in [key: value] form support nesting and quoted keys")
     @TableTest("""
         Scenario              | Input                          | Captured?
         Null map              | ''                             |
         Empty map             | '[:]'                          | [:]
         Basic map             | '[a:b, c:d]'                   | [a: b, c: d]
         Nested map            | '[A:[a:1], B:[b:2], C:[c:3]]'  | [A: [a: 1], B: [b: 2], C: [c: 3]]
-        Mixted content map    | '[m:[:], s:a]'                 | [m: [:], s: a]
+        Mixed content map     | '[m:[:], s:a]'                 | [m: [:], s: a]
         Map with set          | '[s:{a,b}, t:{c}]'             | [s: {a, b}, t: {c}]
         Map with list         | '[l:[a,b], i:[c]]'             | [l: [a, b], i: [c]]
         Map with quoted value | '[q:"a,b", u:c]'               | [q: "a,b", u: c]
@@ -251,6 +278,8 @@ public class TableParserTest {
         );
     }
 
+    @DisplayName("A malformed map or a duplicate key fails parsing")
+    @Description("Values that do not open a map capture as plain strings.")
     @TableTest("""
         Scenario                       | Input    | Success? | Parsed Type?     | Error Message?
         Quoted empty map               | '"[:]"'  | true     | java.lang.String |
@@ -285,6 +314,12 @@ public class TableParserTest {
         }
     }
 
+    @DisplayName("Quotes delimit values and are discarded from the captured value")
+    @Description("""
+            Unquoted values are trimmed; quoted values keep their whitespace.
+            Either quote style protects pipes, brackets, and braces. A blank
+            cell captures null.
+            """)
     @TableTest("""
         Scenario                          | Input             | Captured Value? | Captured Type?
         Unquoted                          | 'abc'             | abc             | java.lang.String
@@ -330,6 +365,11 @@ public class TableParserTest {
         assertEquals(expectedValue, actualValue);
     }
 
+    @DisplayName("In quote-preserving mode values capture with their quotes intact")
+    @Description("""
+            The mode used by tools that rewrite tables, such as the formatter,
+            so the original quoting survives a round trip.
+            """)
     @TableTest("""
         Scenario                          | Input             | Captured?         | Captured Type?
         Unquoted                          | 'abc'             | abc               | java.lang.String
@@ -401,10 +441,12 @@ public class TableParserTest {
         assertTrue(exception.getMessage().startsWith("Failed to parse `[2025-08-01T00:00:00] | 0` in row `Purchase too old"), exception.getMessage());
     }
 
+    @DisplayName("Stray quotes and unbalanced brackets fail with a parse error")
+    @Description("The error names the offending fragment and the row it is in.")
     @TableTest("""
         Scenario                   | Input  | Error Message?
-        Tripple single quotes      | "'''"  | Failed to parse `'`
-        Tripple double quotes      | '\"""' | Failed to parse `"`
+        Triple single quotes       | "'''"  | Failed to parse `'`
+        Triple double quotes       | '\"""' | Failed to parse `"`
         Standalone opening bracket | '['    | Failed to parse `[`
         Standalone opening brace   | '{'    | Failed to parse `{`
         Additional opening bracket | '[[]'  | Failed to parse `[[]`
