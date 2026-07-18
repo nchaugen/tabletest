@@ -1,5 +1,8 @@
 package org.tabletest.junit.converting;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
 import org.tabletest.junit.javadomain.ConstructorDate;
 import org.tabletest.junit.javadomain.TypeFactoryDate;
@@ -26,8 +29,17 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@Tag("spec")
+@DisplayName("Built-in conversion")
+@Description("""
+        Cell text converts automatically to the declared parameter type. Each
+        column shows accepted input formats for the type named in its header —
+        a passing row means every cell converted.
+        """)
 public class JavaFallbackConversionTest {
 
+    @DisplayName("Integer types accept decimal, hex, and octal formats")
+    @Description("Applies to byte, short, int, and long — primitive or boxed.")
     @TableTest("""
         Format  | Byte | Short | Integer | Long | Expected
         Decimal | 15   | 15    | 15      | 15   | 15
@@ -47,6 +59,8 @@ public class JavaFallbackConversionTest {
         assertEquals(expected, String.valueOf(longValue));
     }
 
+    // Not published: boxed twin of the table above — renders identically.
+    @Tag("unpublished")
     @TableTest("""
         Format  | Byte | Short | Integer | Long | Expected
         Decimal | 15   | 15    | 15      | 15   | 15
@@ -66,6 +80,8 @@ public class JavaFallbackConversionTest {
         assertEquals(expected, String.valueOf(longValue));
     }
 
+    @DisplayName("Decimal types accept plain and scientific notation")
+    @Description("float and double, primitive or boxed, plus BigDecimal and BigInteger.")
     @TableTest("""
         Float Primitive | Double Primitive | Float   | Double      | BigDecimal  | BigInteger
         3.14159         | 2.718281828      | 3.14159 | 2.718281828 | 123.456e789 | 1234567890123456789
@@ -88,6 +104,7 @@ public class JavaFallbackConversionTest {
         assertNotNull(bigIntVal);
     }
 
+    @DisplayName("Numeric literals widen to larger primitive types")
     @TableTest("""
         byte | widened byte? | float | widened float? | double | widened double?
         123  | 123           | 123   | 123.0          | 123    | 123.0
@@ -105,6 +122,8 @@ public class JavaFallbackConversionTest {
         assertEquals(doubleVal, widenedDouble);
     }
 
+    @DisplayName("Chars, strings, enums, and booleans convert directly")
+    @Description("Enum values are matched by constant name — TimeUnit in this table.")
     @TableTest("""
         char | Character | String   | TimeUnit | boolean | Boolean
         a    | a         | abc      | SECONDS  | true    | true
@@ -127,6 +146,7 @@ public class JavaFallbackConversionTest {
         assertEquals(boolPrimitive, boolVal);
     }
 
+    @DisplayName("Files, paths, URIs, URLs, and class names convert")
     @TableTest("""
         File            | Path            | URI                 | URL                 | Class Name
         /path/to/file   | /path/to/file   | https://junit.org/  | https://junit.org/  | java.lang.Integer
@@ -147,6 +167,7 @@ public class JavaFallbackConversionTest {
         assertNotNull(classVal);
     }
 
+    @DisplayName("Charsets, currencies, locales, and UUIDs convert")
     @TableTest("""
         Charset    | Currency | Locale | UUID
         UTF-8      | NOK      | en     | d043e930-7b3b-48e3-bdbe-5a3ccfb833db
@@ -165,6 +186,7 @@ public class JavaFallbackConversionTest {
         assertNotNull(uuidVal);
     }
 
+    @DisplayName("Durations, periods, years, and month-days use ISO-8601 formats")
     @TableTest("""
         Duration | Period  | Year | YearMonth | MonthDay
         PT3S     | P2M6D   | 2017 | 2017-03   | --03-14
@@ -185,6 +207,7 @@ public class JavaFallbackConversionTest {
         assertNotNull(monthDayVal);
     }
 
+    @DisplayName("Local dates and times use ISO-8601 formats")
     @TableTest("""
         LocalDate  | LocalTime    | LocalDateTime           | ZoneId
         2017-03-14 | 12:34:56.789 | 2017-03-14T12:34:56.789 | Europe/Berlin
@@ -203,6 +226,7 @@ public class JavaFallbackConversionTest {
         assertNotNull(zoneIdVal);
     }
 
+    @DisplayName("Zoned and offset date-times use ISO-8601 formats")
     @TableTest("""
         Instant                  | OffsetDateTime            | OffsetTime     | ZonedDateTime             | ZoneOffset
         1977-08-17T18:19:20Z     | 2017-03-14T12:34:56.789Z  | 12:34:56.789Z  | 2017-03-14T12:34:56.789Z  | +02:30
@@ -223,6 +247,12 @@ public class JavaFallbackConversionTest {
         assertNotNull(zoneOffsetVal);
     }
 
+    @DisplayName("A type with a String constructor or factory method converts automatically")
+    @Description("""
+            When no built-in conversion exists, TableTest falls back to a
+            single-argument constructor or a static factory method on the
+            target type — inside collections too.
+            """)
     @TableTest("""
         String     | Constructor | Factory method in type | List with fallback
         2025-05-27 | 2025-05-27  | 2025-05-27             | [2025-05-27]
