@@ -1,6 +1,8 @@
 # TableTest Parser Changelog
 
 ## [Unreleased]
+
+## [1.2.1] - 2026-07-18
 ### Changed
 - Duplicate map keys (e.g. `[a: 1, a: 2]`) now fail with a parse error naming the key, instead of silently keeping the last value; quoted and unquoted spellings of the same key count as duplicates
 ### Fixed
