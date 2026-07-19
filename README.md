@@ -1,8 +1,3 @@
-> [!IMPORTANT]
-> TableTest has new Maven coordinate: `org.tabletest:tabletest-junit:1.2.2`
->
-> Please update your dependencies to keep receiving updates.
-
 # TableTest
 
 TableTest extends JUnit for data-driven testing using a concise and readable table format. Express system behaviour through multiple examples, reducing test code while improving readability and maintainability.
@@ -302,7 +297,7 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 
 ### Publishing TableTest results
 
-Functionality for publishing TableTest results to AsciiDoc and Markdown format is available as the [Reporter](#reporter) tool.
+Functionality for publishing TableTest results to HTML, AsciiDoc, Markdown, or custom formats is available as the [Reporter](#reporter) tool.
 
 ## Installation
 
@@ -347,7 +342,7 @@ Note that TableTest versions 0.5.4 - 0.5.7 needed JUnit 5.14 and above. JUnit 5.
     <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>6.0.3</version>
+        <version>6.1.2</version>
         <scope>test</scope>
     </dependency>
 </dependencies>
@@ -358,7 +353,7 @@ Note that TableTest versions 0.5.4 - 0.5.7 needed JUnit 5.14 and above. JUnit 5.
 ```kotlin
 dependencies {
     testImplementation("org.tabletest:tabletest-junit:1.2.2")
-    testImplementation("org.junit.jupiter:junit-jupiter:6.0.3")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 ```
@@ -393,7 +388,7 @@ The formatter returns input unchanged on parse errors, so it never breaks your b
 
 ## Reporter
 
-The [TableTest Reporter](https://github.com/nchaugen/tabletest-reporter) generates documentation from your TableTest tests. Run your tests, then run the reporter to turn test tables into readable AsciiDoc or Markdown output.
+The [TableTest Reporter](https://github.com/nchaugen/tabletest-reporter) generates documentation from your TableTest tests. Run your tests, then run the reporter to turn test tables into readable HTML, AsciiDoc or Markdown output.
 
 - **Gradle and Maven plugins** — integrates into your build
 - **Pass/fail indicators** — rows are marked with test results in the generated output
