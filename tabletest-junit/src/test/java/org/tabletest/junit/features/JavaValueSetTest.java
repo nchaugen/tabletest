@@ -48,4 +48,20 @@ class JavaValueSetTest {
         assertEquals(expectedEvenSum, (x + y) % 2 == 0);
     }
 
+    @DisplayName("A value set groups values that share one expectation; fixed columns repeat")
+    @Description("""
+            A value set is a claim that the outcome is the same whichever value is
+            chosen, so every value in the set must lead to the same result. Columns
+            that are not sets — here the pass mark — keep their single value across
+            the whole expansion.
+            """)
+    @TableTest("""
+        Scenario          | Score (any of) | Pass mark | Passes?
+        Scores above mark | {60, 75, 100}  | 50        | true
+        Scores below mark | {10, 30, 49}   | 50        | false
+        """)
+    void value_set_shares_one_expectation(int score, int passMark, boolean passes) {
+        assertEquals(passes, score >= passMark);
+    }
+
 }
