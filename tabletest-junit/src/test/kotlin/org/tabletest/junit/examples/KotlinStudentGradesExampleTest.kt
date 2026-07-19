@@ -6,7 +6,10 @@ import org.tabletest.junit.javadomain.Grades
 import org.tabletest.junit.javadomain.Student
 import org.tabletest.junit.javadomain.Students
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Tag
 
+// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
+@Tag("unpublished")
 class KotlinStudentGradesExampleTest {
 
     @TableTest(

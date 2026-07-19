@@ -1,6 +1,8 @@
 package org.tabletest.junit.converting;
 
+import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
+import org.junit.jupiter.api.DisplayName;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,8 +13,15 @@ import java.util.stream.LongStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@DisplayName("Array parameters")
+@Description("""
+        A [bracketed] list converts to an array parameter for any element type —
+        object, primitive, nested, or map — and arrays nest inside other
+        collection parameters.
+        """)
 public class JavaArrayParameterConversionTest {
 
+    @DisplayName("A list converts to a String array (a blank cell is a null array)")
     @TableTest("""
         Scenario       | Values    | Expected?
         single element | [hello]   | [hello]
@@ -24,6 +33,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(expected, values == null ? null : Arrays.asList(values));
     }
 
+    @DisplayName("A list converts to a boxed Integer array")
     @TableTest("""
         Scenario       | Values    | Expected?
         single element | [1]       | [1]
@@ -34,6 +44,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(expected, Arrays.asList(values));
     }
 
+    @DisplayName("A list converts to a primitive int array")
     @TableTest("""
         Scenario       | Values    | Expected?
         single element | [1]       | [1]
@@ -44,6 +55,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(expected, IntStream.of(values).boxed().toList());
     }
 
+    @DisplayName("A list converts to a primitive long array")
     @TableTest("""
         Scenario       | Values    | Expected?
         single element | [1]       | [1]
@@ -53,6 +65,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(expected, LongStream.of(values).boxed().toList());
     }
 
+    @DisplayName("A list converts to a primitive double array")
     @TableTest("""
         Scenario       | Values          | Expected?
         single element | [1.5]           | [1.5]
@@ -62,6 +75,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(expected, DoubleStream.of(values).boxed().toList());
     }
 
+    @DisplayName("Nested lists convert to a two-dimensional array")
     @TableTest("""
         Scenario     | Values           | Expected?
         nested lists | [[a, b], [c, d]] | [[a, b], [c, d]]
@@ -74,6 +88,7 @@ public class JavaArrayParameterConversionTest {
         }
     }
 
+    @DisplayName("A list of maps converts to an array of maps")
     @TableTest("""
         Scenario   | Values           | Expected?
         single map | [[a: b]]         | [[a: b]]
@@ -83,6 +98,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(expected, Arrays.asList(values));
     }
 
+    @DisplayName("Arrays nest as elements of a list")
     @TableTest("""
         Scenario      | Values        | Expected?
         string arrays | [[a, b], [c]] | [[a, b], [c]]

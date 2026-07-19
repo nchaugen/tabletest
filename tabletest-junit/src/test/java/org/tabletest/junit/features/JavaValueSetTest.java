@@ -1,7 +1,6 @@
 package org.tabletest.junit.features;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
 
@@ -10,7 +9,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Tag("spec")
 @DisplayName("Value sets")
 @Description("""
         A cell in {curly braces} lists several example values that share one

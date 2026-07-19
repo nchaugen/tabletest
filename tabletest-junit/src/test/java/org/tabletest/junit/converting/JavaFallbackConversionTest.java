@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Tag("spec")
 @DisplayName("Built-in conversion")
 @Description("""
         Cell text converts automatically to the declared parameter type. Each

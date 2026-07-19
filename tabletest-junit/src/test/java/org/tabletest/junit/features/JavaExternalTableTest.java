@@ -7,7 +7,6 @@ import org.tabletest.junit.TableTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Tag("spec")
 @DisplayName("External table files")
 @Description("""
         A table can live in a classpath resource file instead of the annotation:

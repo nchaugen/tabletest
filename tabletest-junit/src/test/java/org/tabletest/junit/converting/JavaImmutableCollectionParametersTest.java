@@ -1,6 +1,8 @@
 package org.tabletest.junit.converting;
 
+import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
+import org.junit.jupiter.api.DisplayName;
 
 import java.util.List;
 import java.util.Map;
@@ -8,8 +10,16 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+@DisplayName("Immutable collection parameters")
+@Description("""
+        Collections passed from a table — and every collection nested inside them —
+        are immutable. Any attempt to add, put, or otherwise modify one throws. Each
+        row lists the collection shapes exercised; the rule is that none of them can
+        be mutated.
+        """)
 class JavaImmutableCollectionParametersTest {
 
+    @DisplayName("A List parameter and its nested collections reject modification")
     @TableTest("""
         list | nested list | nested set | nested map
         []   | [[]]        | [{}]       | [[:]]
@@ -46,6 +56,7 @@ class JavaImmutableCollectionParametersTest {
         }
     }
 
+    @DisplayName("A Map parameter and its nested collections reject modification")
     @TableTest("""
         map | nested list | nested set  | nested map
         [:] | [empty: []] | [empty: {}] | [empty: [:]]
@@ -83,6 +94,7 @@ class JavaImmutableCollectionParametersTest {
     }
 
 
+    @DisplayName("A Set parameter and its nested collections reject modification")
     @TableTest("""
         set | nested list | nested set | nested map
         {}  | {[]}        | {{}}       | {[:]}

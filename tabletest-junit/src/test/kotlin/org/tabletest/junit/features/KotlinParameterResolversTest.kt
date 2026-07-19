@@ -8,7 +8,10 @@ import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Tag
 
+// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
+@Tag("unpublished")
 class KotlinParameterResolversTest {
 
     @TableTest(

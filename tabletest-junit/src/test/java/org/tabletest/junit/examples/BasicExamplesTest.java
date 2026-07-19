@@ -10,7 +10,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Tag("spec")
 @DisplayName("Value formats")
 @Description("""
         The basic value formats a table cell can hold: plain values converted to the

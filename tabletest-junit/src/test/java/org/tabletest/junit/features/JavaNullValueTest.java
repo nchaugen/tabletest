@@ -1,7 +1,6 @@
 package org.tabletest.junit.features;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
 
@@ -12,7 +11,6 @@ import java.util.Set;
 import static org.tabletest.junit.TableTestExceptionAssertions.assertConversionFails;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Tag("spec")
 @DisplayName("Null values")
 @Description("""
         A blank cell converts to null for any nullable parameter type. Null is

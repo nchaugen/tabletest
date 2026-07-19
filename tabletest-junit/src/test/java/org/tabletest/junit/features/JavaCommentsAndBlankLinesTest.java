@@ -1,11 +1,14 @@
 package org.tabletest.junit.features;
 
 import org.tabletest.junit.TableTest;
+import org.junit.jupiter.api.Tag;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+// Unpublished: temporary — reporter drops comment/blank rows from the YAML; flips back with reporter enabler E3.
+@Tag("unpublished")
 public class JavaCommentsAndBlankLinesTest {
 
     @TableTest("""

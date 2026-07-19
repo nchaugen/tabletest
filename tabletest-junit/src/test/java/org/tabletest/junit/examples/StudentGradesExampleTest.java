@@ -1,7 +1,6 @@
 package org.tabletest.junit.examples;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
 import org.tabletest.junit.TypeConverter;
@@ -14,7 +13,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Tag("spec")
 @DisplayName("Student grades")
 @Description("""
         A richer domain example: each cell holds a whole class register — a map of

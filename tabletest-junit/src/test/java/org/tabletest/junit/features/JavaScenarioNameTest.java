@@ -10,7 +10,6 @@ import org.junit.jupiter.api.TestInfo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Tag("spec")
 @DisplayName("Scenario names")
 @Description("""
         A table can carry one more column than the method has table-bound

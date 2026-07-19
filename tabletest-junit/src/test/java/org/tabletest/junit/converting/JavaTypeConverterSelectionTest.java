@@ -1,6 +1,7 @@
 package org.tabletest.junit.converting;
 
 import org.tabletest.junit.TableTest;
+import org.junit.jupiter.api.Tag;
 import org.tabletest.junit.TypeConverter;
 import org.tabletest.junit.javadomain.Age;
 
@@ -10,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests that converter selection prefers the {@link TypeConverter}-annotated method
  * when non-annotated candidates with the same return type are also present.
  */
+// Unpublished: converter-mechanism rule whose meaning lives in converter code the report cannot show; stays conformance.
+@Tag("unpublished")
 public class JavaTypeConverterSelectionTest {
 
     @TableTest("""

@@ -1,6 +1,8 @@
 package org.tabletest.junit.converting;
 
+import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
+import org.junit.jupiter.api.DisplayName;
 
 import java.util.List;
 import java.util.Map;
@@ -8,8 +10,16 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@DisplayName("Parameterized collection element types")
+@Description("""
+        A collection's elements convert to the element type declared by the
+        parameter's generic signature. Each row below exercises every supported
+        element type at once — the empty case, the scalar types, and nested
+        collections.
+        """)
 public class JavaParameterizedTypeConversionTest {
 
+    @DisplayName("A list's elements convert to its declared element type")
     @TableTest("""
         Empty | Byte | Integer | Long | Double | String | List  | Map
         []    | [1]  | [2]     | [3]  | [4]    | [5]    | [[6]] | [[1: 7]]
@@ -34,6 +44,7 @@ public class JavaParameterizedTypeConversionTest {
         assertEquals(List.of(Map.of("1", 7L)), mapList);
     }
 
+    @DisplayName("A map's values convert to its declared value type")
     @TableTest("""
         Empty | Byte     | Integer  | Long     | Double   | String   | List       | Map
         [:]   | [key: 1] | [key: 2] | [key: 3] | [key: 4] | [key: 5] | [key: [6]] | [key: [1: 7]]
@@ -58,6 +69,7 @@ public class JavaParameterizedTypeConversionTest {
         assertEquals(Map.of("key", Map.of("1", 7L)), mapMap);
     }
 
+    @DisplayName("A set's elements convert to its declared element type")
     @TableTest("""
         Empty | Byte | Integer | Long | Double | String | List  | Map
         {}    | {1}  | {2}     | {3}  | {4}    | {5}    | {[6]} | {[1: 7]}
@@ -82,6 +94,7 @@ public class JavaParameterizedTypeConversionTest {
         assertEquals(Set.of(Map.of("1", 7L)), mapSet);
     }
 
+    @DisplayName("An array's elements convert to its declared component type")
     @TableTest("""
         Integer | Long | List  | Map
         [2]     | [3]  | [[6]] | [[1: 7]]

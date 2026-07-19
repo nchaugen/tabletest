@@ -1,9 +1,12 @@
 package org.tabletest.junit.converting;
 
+import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
 import org.tabletest.junit.TableTestException;
 import org.tabletest.junit.TypeConverter;
 import org.tabletest.junit.javadomain.Age;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Parameter;
@@ -14,8 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.tabletest.junit.ParameterTypeConverter.convertValue;
 import static org.tabletest.junit.TableTestExceptionAssertions.*;
 
+@DisplayName("Conversion failures")
 public class JavaConversionFailureTest {
 
+    @DisplayName("A value that fits no built-in conversion fails")
+    @Description("""
+            A number outside the target's range, a malformed date or character, and a
+            type with no available converter all raise a parse-time failure.
+            """)
     @TableTest("""
         table value | parameter type
         0.1         | java.lang.Byte
@@ -28,6 +37,9 @@ public class JavaConversionFailureTest {
         assertThrowsWhenFallbackFails(value, type);
     }
 
+    // Unpublished: converter-mechanism rule (ambiguous converter selection) whose meaning
+    // lives in converter code the report cannot show; stays conformance.
+    @Tag("unpublished")
     @TableTest("""
         table value | parameter type
         52          | org.tabletest.junit.javadomain.Age

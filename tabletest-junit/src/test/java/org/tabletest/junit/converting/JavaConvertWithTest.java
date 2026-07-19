@@ -1,6 +1,7 @@
 package org.tabletest.junit.converting;
 
 import org.tabletest.junit.TableTest;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.converter.AnnotationBasedArgumentConverter;
 import org.junit.jupiter.params.converter.ArgumentConversionException;
@@ -15,6 +16,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+// Unpublished: converter-mechanism rule whose meaning lives in converter code the report cannot show; stays conformance.
+@Tag("unpublished")
 public class JavaConvertWithTest {
 
     @TableTest("""

@@ -1,14 +1,12 @@
 package org.tabletest.junit.converting;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
 import org.tabletest.junit.TypeConverter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Tag("spec")
 @DisplayName("Custom type converters")
 @Description("""
         A static @TypeConverter method in the test class converts cell text to

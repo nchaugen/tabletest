@@ -1,6 +1,7 @@
 package org.tabletest.junit.converting;
 
 import org.tabletest.junit.TableTest;
+import org.junit.jupiter.api.Tag;
 import org.tabletest.junit.TypeConverter;
 import org.tabletest.junit.TypeConverterSources;
 import org.tabletest.junit.javatypeconverters.FirstTierTypeConverterSource;
@@ -18,6 +19,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TypeConverterSources({FirstTierTypeConverterSource.class, SecondTierTypeConverterSource.class})
+// Unpublished: converter-mechanism rule whose meaning lives in converter code the report cannot show; stays conformance.
+@Tag("unpublished")
 public class JavaTypeConverterSourcesTest {
 
     @TableTest("""

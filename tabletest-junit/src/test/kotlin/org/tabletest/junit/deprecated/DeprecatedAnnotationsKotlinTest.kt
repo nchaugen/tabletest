@@ -10,10 +10,13 @@ import org.tabletest.junit.javadomain.Age
 import org.tabletest.junit.javadomain.Ages
 import org.tabletest.junit.javafactories.FirstTierFactorySource
 import org.tabletest.junit.javafactories.SecondTierFactorySource
+import org.junit.jupiter.api.Tag
 
 @DisplayName("Leap Year Rules (Kotlin)")
 @Description("The following describes the rules for leap years.")
 @FactorySources(FirstTierFactorySource::class, SecondTierFactorySource::class)
+// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
+@Tag("unpublished")
 class DeprecatedAnnotationsKotlinTest {
 
     @Description("Testing that deprecated annotations still work in Kotlin")

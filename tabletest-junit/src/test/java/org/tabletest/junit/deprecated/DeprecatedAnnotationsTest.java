@@ -15,10 +15,13 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Tag;
 
 @DisplayName("Leap Year Rules")
 @Description("The following describes the rules for leap years.")
 @FactorySources({FirstTierFactorySource.class, SecondTierFactorySource.class})
+// Unpublished: exercises deprecated annotations for back-compat, not a current rule.
+@Tag("unpublished")
 public class DeprecatedAnnotationsTest {
 
     @Description("Testing that deprecated annotations still work")
