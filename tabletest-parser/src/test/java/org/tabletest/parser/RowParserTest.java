@@ -1,6 +1,7 @@
 package org.tabletest.parser;
 
 import org.tabletest.junit.TableTest;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -87,6 +88,10 @@ class RowParserTest {
         assertInstanceOf(List.class, map.get(keyB));
     }
 
+    // Unpublished conformance: drives package-private RowParser.parse(), so it cannot move
+    // into a black-box feature package. The Row-grammar feature is authored fresh against the
+    // public TableParser.parse() (living-docs-coverage roadmap 1.1).
+    @Tag("unpublished")
     @TableTest("""
         Input
         'a | b | c'

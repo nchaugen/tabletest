@@ -215,8 +215,9 @@
     </build>
 
     <profiles>
-        <!-- Living documentation: runs only the spec-tagged tests with the reporter
-             extension and generates the HTML report with
+        <!-- Living documentation: every @TableTest publishes by default; only tables
+             tagged @Tag("unpublished") are held back. Runs with the reporter extension
+             and generates the HTML report with
              `mvn -Preport -pl tabletest-parser test org.tabletest:tabletest-reporter-maven-plugin:report`. -->
         <profile>
             <id>report</id>
@@ -226,7 +227,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <groups>spec &amp; !unpublished</groups>
+                            <groups>!unpublished</groups>
                             <properties>
                                 <configurationParameters>
                                     junit.jupiter.extensions.autodetection.enabled=true
