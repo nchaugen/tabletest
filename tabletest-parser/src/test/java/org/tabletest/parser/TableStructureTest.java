@@ -25,16 +25,16 @@ public class TableStructureTest {
             lists the source one line per element.
             """)
     @TableTest("""
-        Scenario      | Input                          | Headers?  | Data rows?
-        One data row  | ["a | b", "1 | 2"]             | [a, b]    | "[[1, 2]]"
-        Two data rows | ["a | b", "1 | 2", "3 | 4"]    | [a, b]    | "[[1, 2], [3, 4]]"
-        Single column | [a, 1, 2]                      | [a]       | "[[1], [2]]"
-        Three columns | ["a | b | c", "1 | 2 | 3"]     | [a, b, c] | "[[1, 2, 3]]"
+        Scenario      | Input                       | Headers?  | Data rows?
+        One data row  | ["a | b", "1 | 2"]          | [a, b]    | [[1, 2]]
+        Two data rows | ["a | b", "1 | 2", "3 | 4"] | [a, b]    | [[1, 2], [3, 4]]
+        Single column | [a, 1, 2]                   | [a]       | [[1], [2]]
+        Three columns | ["a | b | c", "1 | 2 | 3"]  | [a, b, c] | [[1, 2, 3]]
         """)
     void shouldParseHeaderRowFollowedByDataRows(
         List<String> inputLines,
         List<String> expectedHeaders,
-        String expectedRows
+        List<List<String>> expectedRows
     ) {
         Table result = TableParser.parse(String.join("\n", inputLines));
 
@@ -51,20 +51,20 @@ public class TableStructureTest {
             element.
             """)
     @TableTest("""
-        Scenario                     | Input                                  | Headers? | Data rows?
-        Blank lines around the table | ['', '   ', "a | b", "1 | 2", '  ']    | [a, b]   | "[[1, 2]]"
-        Blank line between rows      | ["a | b", "1 | 2", '', "3 | 4"]        | [a, b]   | "[[1, 2], [3, 4]]"
-        Comment line above header    | ['// intro', "a | b", "1 | 2"]         | [a, b]   | "[[1, 2]]"
-        Comment line between rows    | ["a | b", '// note', "1 | 2"]          | [a, b]   | "[[1, 2]]"
-        Comment line holding pipes   | ["a | b", "// 0 | 1", "1 | 2"]         | [a, b]   | "[[1, 2]]"
-        Quoted leading slashes       | ["a | b", "'//2' | 3"]                 | [a, b]   | "[[//2, 3]]"
-        Slashes after cell text      | ["a | b", "4 // | 5"]                  | [a, b]   | "[[4 //, 5]]"
-        Slashes starting a cell      | ["a | b", "6 | // 7"]                  | [a, b]   | "[[6, // 7]]"
+        Scenario                     | Input                               | Headers? | Data rows?
+        Blank lines around the table | ['', '   ', "a | b", "1 | 2", '  '] | [a, b]   | [[1, 2]]
+        Blank line between rows      | ["a | b", "1 | 2", '', "3 | 4"]     | [a, b]   | [[1, 2], [3, 4]]
+        Comment line above header    | ['// intro', "a | b", "1 | 2"]      | [a, b]   | [[1, 2]]
+        Comment line between rows    | ["a | b", '// note', "1 | 2"]       | [a, b]   | [[1, 2]]
+        Comment line holding pipes   | ["a | b", "// 0 | 1", "1 | 2"]      | [a, b]   | [[1, 2]]
+        Quoted leading slashes       | ["a | b", "'//2' | 3"]              | [a, b]   | [['//2', 3]]
+        Slashes after cell text      | ["a | b", "4 // | 5"]               | [a, b]   | [['4 //', 5]]
+        Slashes starting a cell      | ["a | b", "6 | // 7"]               | [a, b]   | [[6, '// 7']]
         """)
     void shouldIgnoreBlankLinesAndCommentLines(
         List<String> inputLines,
         List<String> expectedHeaders,
-        String expectedRows
+        List<List<String>> expectedRows
     ) {
         Table result = TableParser.parse(String.join("\n", inputLines));
 
@@ -93,8 +93,8 @@ public class TableStructureTest {
         assertEquals(expectedErrorMessage, actualException.getMessage());
     }
 
-    private static String dataRowsOf(Table table) {
-        return table.rows().stream().map(Row::values).toList().toString();
+    private static List<List<Object>> dataRowsOf(Table table) {
+        return table.rows().stream().map(Row::values).toList();
     }
 
     @DisplayName("Blank header cells are rejected, naming the column")

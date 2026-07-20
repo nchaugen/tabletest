@@ -13,7 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         value: unquoted pipes are the separators, a missing field is null, and
         quotes are the only thing that protects a pipe from splitting the row.
         Each Row below is parsed as the sole data row under a one-column header;
-        Fields shows the captured field list.
+        Fields shows the captured field list printed back out. It is text rather
+        than a list column because a list value cannot hold a null element —
+        writing [a, , c] is itself a parse error — and null fields are exactly
+        what these rules are about.
         """)
 public class RowGrammarTest {
 
@@ -52,20 +55,19 @@ public class RowGrammarTest {
             splits the row mid-collection, leaving an unbalanced fragment, and the
             failure surfaces as a generic parse error naming the whole row rather
             than the pipe. To keep a pipe inside a collection, quote the element:
-            ['a | b'].
+            ['a | b']. Every row below fails with a TableTestParseException.
             """)
     @TableTest("""
-        Scenario                     | Row          | Throws?                                      | Error message?
-        Unquoted pipe in a list      | "[a | b]"    | org.tabletest.parser.TableTestParseException  | "Failed to parse `[a | b]` in row `[a | b]`"
-        Unquoted pipe in a set       | "{a | b}"    | org.tabletest.parser.TableTestParseException  | "Failed to parse `{a | b}` in row `{a | b}`"
-        Unquoted pipe in a map value | "[k: a | b]" | org.tabletest.parser.TableTestParseException  | "Failed to parse `[k: a | b]` in row `[k: a | b]`"
+        Scenario                     | Row          | Error message?
+        Unquoted pipe in a list      | "[a | b]"    | "Failed to parse `[a | b]` in row `[a | b]`"
+        Unquoted pipe in a set       | "{a | b}"    | "Failed to parse `{a | b}` in row `{a | b}`"
+        Unquoted pipe in a map value | "[k: a | b]" | "Failed to parse `[k: a | b]` in row `[k: a | b]`"
         """)
-    void shouldRejectUnquotedPipeInsideCollection(
-        String row,
-        Class<? extends Exception> expectedException,
-        String expectedErrorMessage
-    ) {
-        Exception actualException = assertThrows(expectedException, () -> TableParser.parse("Field\n" + row));
+    void shouldRejectUnquotedPipeInsideCollection(String row, String expectedErrorMessage) {
+        TableTestParseException actualException = assertThrows(
+            TableTestParseException.class,
+            () -> TableParser.parse("Field\n" + row)
+        );
 
         assertEquals(expectedErrorMessage, actualException.getMessage());
     }
