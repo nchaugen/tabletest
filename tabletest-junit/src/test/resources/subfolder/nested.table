@@ -1,0 +1,3 @@
+Scenario  | a | b | a - b?
+Positive  | 3 | 1 | 2
+Negative  | 1 | 3 | -2

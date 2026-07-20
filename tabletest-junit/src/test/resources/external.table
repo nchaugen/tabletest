@@ -1,4 +1,4 @@
-a | b | sum?
-0 | 0 | 0
-2 | 2 | 4
-2 | 0 | 2
+Scenario   | a | b | a + b?
+Zero sum   | 0 | 0 | 0
+Zero right | 2 | 0 | 2
+Two twos   | 2 | 2 | 4
