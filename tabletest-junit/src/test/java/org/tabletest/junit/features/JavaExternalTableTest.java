@@ -9,15 +9,16 @@ import org.tabletest.junit.TableTest;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("External table files")
 @Description("""
         A table can live in a classpath resource file instead of the annotation:
-        @TableTest(resource = "external.table", encoding = "UTF-8"). The first two
-        rules below load those files as data, so the table shows which paths resolve
-        and what text the file's bytes become; the rules after them are driven by
-        the very files shown, each row coming from a line of the file rather than
-        from the annotation.
+        @TableTest(resource = "external.table", encoding = "UTF-8"). The first three
+        rules below call the loading API with those same arguments, so the tables can
+        show which paths resolve, what text the file's bytes become, and how loading
+        fails; the rules after them are driven by the very files shown, each row
+        coming from a line of the file rather than from the annotation.
         """)
 public class JavaExternalTableTest {
 
@@ -57,6 +58,31 @@ public class JavaExternalTableTest {
         );
         assertEquals(expectedCharacterCount, firstCellOfLastRow.length());
         assertEquals(expectedCodePoints, firstCellOfLastRow.chars().boxed().toList());
+    }
+
+    @DisplayName("A resource that cannot be read fails with a message naming the file")
+    @Description("""
+            The two ways loading can fail: the path resolves to nothing, or the file
+            resolves but the declared encoding cannot decode it. Both raise the same
+            exception type, so the message is what tells the two apart.
+            """)
+    @TableTest("""
+        Scenario                 | Resource path  | Encoding   | Throws?                                | Error message?
+        No such file anywhere    | no_such.table  | UTF-8      | org.tabletest.junit.TableTestException | External table file no_such.table not found, searched the classpath relative to org.tabletest.junit.features.JavaExternalTableTest and from the root
+        Subfolder file misspelt  | subfolder/x    | UTF-8      | org.tabletest.junit.TableTestException | External table file subfolder/x not found, searched the classpath relative to org.tabletest.junit.features.JavaExternalTableTest and from the root
+        Encoding does not exist  | external.table | Latin-42   | org.tabletest.junit.TableTestException | Failed to read table from external file external.table using encoding Latin-42
+        """)
+    void reports_a_resource_it_cannot_read(
+        String resourcePath,
+        String encoding,
+        Class<? extends Throwable> expectedException,
+        String expectedMessage
+    ) {
+        Throwable thrown = assertThrows(
+            expectedException,
+            () -> InputResolver.loadResource(resourcePath, encoding, getClass())
+        );
+        assertEquals(expectedMessage, thrown.getMessage());
     }
 
     @DisplayName("A table loaded from a resource file runs like an inline table")
