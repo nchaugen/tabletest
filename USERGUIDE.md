@@ -112,7 +112,7 @@ void integerList(List<Integer> list, int expectedSize, int expectedSum) {
 ```
 
 ### Set Values
-Sets are enclosed in curly braces with comma-separated elements. Sets can contain single values or compound values (nested lists/sets/maps). Empty sets are represented by `{}`.
+Sets are enclosed in curly braces with comma-separated elements. Sets can contain single values or compound values (nested lists/sets/maps). Empty sets are represented by `{}`. A set parameter iterates in the order the cell wrote its elements — they are neither sorted nor reordered by hashing — so order-sensitive assertions on a `Set` parameter are safe.
 
 ```java
 @TableTest("""
@@ -127,7 +127,7 @@ void testSet(Set<String> set, int expectedSize) {
 ```
 
 ### Map Values
-Maps use square brackets with comma-separated key-value pairs. Colons separate keys and values. Keys can be unquoted or quoted. Unquoted keys cannot contain characters `,`, `:`, `|`, `[`, `]`, `{`, `}`, `'`, or `"`. To use keys containing these characters or whitespace, wrap them in single or double quotes. Keys must be unique within a map — repeating a key is a parse error, and quoted and unquoted spellings of the same key count as the same key. Values can be single (unquoted/quoted) or compound (list/set/map). Empty maps are represented by `[:]`.
+Maps use square brackets with comma-separated key-value pairs. Colons separate keys and values. Keys can be unquoted or quoted. Unquoted keys cannot contain characters `,`, `:`, `|`, `[`, `]`, `{`, `}`, `'`, or `"`. To use keys containing these characters or whitespace, wrap them in single or double quotes. Keys must be unique within a map — repeating a key is a parse error, and quoted and unquoted spellings of the same key count as the same key. Values can be single (unquoted/quoted) or compound (list/set/map). Empty maps are represented by `[:]`. A map parameter iterates its entries in the order the cell wrote them.
 
 ```java
 
