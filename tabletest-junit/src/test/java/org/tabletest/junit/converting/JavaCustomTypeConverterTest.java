@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         types the built-in conversion does not cover — letting tables speak
         domain language instead of programmer literals.
         """)
-public class JavaPrimitiveConversionTest {
+public class JavaCustomTypeConverterTest {
 
     @DisplayName("A @TypeConverter method converts cell text to the parameter type")
     @Description("""

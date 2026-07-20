@@ -6,7 +6,7 @@ import org.tabletest.junit.TableTest
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Tag
 
-@TypeConverterSources(JavaPrimitiveConversionTest::class)
+@TypeConverterSources(JavaCustomTypeConverterTest::class)
 // Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
 @Tag("unpublished")
 class KotlinPrimitiveConversionTest {
