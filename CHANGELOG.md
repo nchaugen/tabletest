@@ -1,6 +1,10 @@
 # TableTest Changelog
 
 ## [Unreleased]
+### Fixed
+- A missing `@TableTest(resource = ...)` file now fails with a `TableTestException` naming the file and where it was searched, instead of a raw `NullPointerException`
+### Documented
+- The iteration order of a `List`, `Set`, or `Map` parameter is the order written in the cell — stated in USERGUIDE.md and published as a specification rule
 
 ## [1.2.2] - 2026-07-18
 ### Changed

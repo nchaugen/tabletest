@@ -19,9 +19,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Objects;
 
 import static java.util.stream.Collectors.joining;
+import static org.tabletest.junit.TableTestException.externalTableNotFound;
 import static org.tabletest.junit.TableTestException.failedToReadExternalTable;
 
 public class InputResolver {
@@ -36,7 +36,7 @@ public class InputResolver {
      * @param encoding  Character encoding to use when reading the file
      * @param testClass Class to use for resource resolution
      * @return Contents of the resource as a string
-     * @throws RuntimeException if an IO error occurs during loading
+     * @throws TableTestException if the resource cannot be found or read
      */
     public static String loadResource(String resource, String encoding, Class<?> testClass) {
         try (InputStream resourceAsStream = resolveResourceStream(resource, testClass)) {
@@ -56,14 +56,17 @@ public class InputResolver {
      * @param resource  Path to the resource file
      * @param testClass Class to use for resource resolution
      * @return Input stream for the resource
-     * @throws NullPointerException if the resource cannot be found
+     * @throws TableTestException if the resource cannot be found
      */
     private static InputStream resolveResourceStream(String resource, Class<?> testClass) {
         InputStream resourceAsStream = testClass.getResourceAsStream(resource);
         if (resourceAsStream == null) {
             resourceAsStream = testClass.getResourceAsStream("/" + resource);
         }
+        if (resourceAsStream == null) {
+            throw new TableTestException(externalTableNotFound(resource, testClass));
+        }
 
-        return Objects.requireNonNull(resourceAsStream, "Could not load resource " + resource);
+        return resourceAsStream;
     }
 }

@@ -129,6 +129,14 @@ public class TableTestException extends ParameterResolutionException {
         );
     }
 
+    static String externalTableNotFound(String resource, Class<?> testClass) {
+        return String.format(
+            "External table file %s not found, searched the classpath relative to %s and from the root",
+            resource,
+            testClass.getTypeName()
+        );
+    }
+
     static String failedToReadExternalTable(String resource, String encoding) {
         return String.format("Failed to read table from external file %s using encoding %s", resource, encoding);
     }
