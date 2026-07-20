@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         """)
 public class JavaPlatformValueConversionTest {
 
-    @DisplayName("Class parameters accept fully qualified, nested, and primitive names")
+    @DisplayName("Class converts from a fully qualified, nested, or primitive type name")
     @TableTest("""
         Scenario        | Input value            | Parameter type? | Class simple name?
         Top-level class | java.lang.Integer      | java.lang.Class | Integer
@@ -34,7 +34,7 @@ public class JavaPlatformValueConversionTest {
         assertEquals(expectedSimpleName, value.getSimpleName());
     }
 
-    @DisplayName("Charsets convert from canonical names and aliases")
+    @DisplayName("Charset converts from a canonical name or an alias")
     @TableTest("""
         Scenario       | Input value | Parameter type?          | Charset canonical name?
         Canonical name | UTF-8       | java.nio.charset.Charset | UTF-8
@@ -50,7 +50,7 @@ public class JavaPlatformValueConversionTest {
         assertEquals(expectedCanonicalName, value.name());
     }
 
-    @DisplayName("Currencies convert from ISO 4217 codes")
+    @DisplayName("Currency converts from an ISO 4217 code")
     @TableTest("""
         Scenario        | Input value | Parameter type?    | Currency decimal places?
         Norwegian krone | NOK         | java.util.Currency | 2
@@ -62,7 +62,7 @@ public class JavaPlatformValueConversionTest {
         assertEquals(expectedDecimalPlaces, value.getDefaultFractionDigits());
     }
 
-    @DisplayName("Locales convert from IETF BCP 47 language tags")
+    @DisplayName("Locale converts from an IETF BCP 47 language tag")
     @Description("Language and country are separated by a hyphen, not an underscore.")
     @TableTest("""
         Scenario             | Input value | Parameter type?  | Locale language? | Locale country?
@@ -81,7 +81,7 @@ public class JavaPlatformValueConversionTest {
         assertEquals(expectedCountry, value.getCountry());
     }
 
-    @DisplayName("UUIDs convert from their standard text form")
+    @DisplayName("UUID converts from its standard text form")
     @Description("The first digit of the third group is the UUID version.")
     @TableTest("""
         Scenario        | Input value                          | Parameter type? | UUID version?

@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         """)
 public class JavaNumberConversionTest {
 
-    @DisplayName("byte holds a whole number in the 8-bit signed range")
+    @DisplayName("byte converts from a whole number in the 8-bit signed range")
     @Description("Decimal, hex, and octal text all convert, to the primitive and its wrapper alike.")
     @TableTest("""
         Scenario            | byte | Byte | Converted value?
@@ -44,7 +44,7 @@ public class JavaNumberConversionTest {
         assertEquals(expectedValue, boxedValue.byteValue());
     }
 
-    @DisplayName("short holds a whole number in the 16-bit signed range")
+    @DisplayName("short converts from a whole number in the 16-bit signed range")
     @TableTest("""
         Scenario            | short  | Short  | Converted value?
         Decimal digits      | 15     | 15     | 15
@@ -58,7 +58,7 @@ public class JavaNumberConversionTest {
         assertEquals(expectedValue, boxedValue.shortValue());
     }
 
-    @DisplayName("int holds a whole number in the 32-bit signed range")
+    @DisplayName("int converts from a whole number in the 32-bit signed range")
     @TableTest("""
         Scenario            | int         | Integer     | Converted value?
         Decimal digits      | 15          | 15          | 15
@@ -72,7 +72,7 @@ public class JavaNumberConversionTest {
         assertEquals(expectedValue, boxedValue.intValue());
     }
 
-    @DisplayName("long holds a whole number in the 64-bit signed range")
+    @DisplayName("long converts from a whole number in the 64-bit signed range")
     @TableTest("""
         Scenario            | long                 | Long                 | Converted value?
         Decimal digits      | 15                   | 15                   | 15
@@ -86,7 +86,7 @@ public class JavaNumberConversionTest {
         assertEquals(expectedValue, boxedValue.longValue());
     }
 
-    @DisplayName("float accepts plain and scientific notation")
+    @DisplayName("float converts from plain or scientific notation")
     @Description("Applies to the primitive and its wrapper alike.")
     @TableTest("""
         Scenario            | float   | Float   | Converted value?
@@ -100,7 +100,7 @@ public class JavaNumberConversionTest {
         assertEquals(expectedValue, boxedValue.floatValue());
     }
 
-    @DisplayName("double accepts plain and scientific notation")
+    @DisplayName("double converts from plain or scientific notation")
     @Description("Applies to the primitive and its wrapper alike.")
     @TableTest("""
         Scenario            | double  | Double  | Converted value?
@@ -114,7 +114,7 @@ public class JavaNumberConversionTest {
         assertEquals(expectedValue, boxedValue.doubleValue());
     }
 
-    @DisplayName("BigDecimal keeps the precision the text was written with")
+    @DisplayName("BigDecimal converts from decimal text, keeping the precision written")
     @Description("""
             Scale is the number of digits after the decimal point — negative when
             scientific notation places the value's precision above the point.
@@ -137,7 +137,7 @@ public class JavaNumberConversionTest {
         assertEquals(expectedScale, value.scale());
     }
 
-    @DisplayName("BigInteger holds whole numbers beyond the long range")
+    @DisplayName("BigInteger converts from whole numbers beyond the long range")
     @TableTest("""
         Scenario        | Input value                    | Parameter type?      | BigInteger beyond long range?
         Nineteen digits | 1234567890123456789            | java.math.BigInteger | false

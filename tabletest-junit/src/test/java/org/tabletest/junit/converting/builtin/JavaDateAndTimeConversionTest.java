@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         """)
 public class JavaDateAndTimeConversionTest {
 
-    @DisplayName("Durations use the ISO-8601 duration format")
+    @DisplayName("Duration converts from ISO-8601 duration text")
     @TableTest("""
         Scenario           | Input value | Parameter type?    | Duration in milliseconds?
         Whole seconds      | PT3S        | java.time.Duration | 3000
@@ -50,7 +50,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedMilliseconds, value.toMillis());
     }
 
-    @DisplayName("Periods use the ISO-8601 period format")
+    @DisplayName("Period converts from ISO-8601 period text")
     @TableTest("""
         Scenario            | Input value | Parameter type?  | Period years? | Period months? | Period days?
         Months and days     | P2M6D       | java.time.Period | 0             | 2              | 6
@@ -69,7 +69,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedDays, value.getDays());
     }
 
-    @DisplayName("Years hold a four-digit calendar year")
+    @DisplayName("Year converts from a four-digit calendar year")
     @TableTest("""
         Scenario       | Input value | Parameter type? | Year value? | Year is a leap year?
         Pi Day 2017    | 2017        | java.time.Year  | 2017        | false
@@ -81,7 +81,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedLeapYear, value.isLeap());
     }
 
-    @DisplayName("Year-months name a month of a specific year")
+    @DisplayName("YearMonth converts from a year and a month")
     @TableTest("""
         Scenario       | Input value | Parameter type?     | YearMonth year? | YearMonth month? | YearMonth length?
         March 2017     | 2017-03     | java.time.YearMonth | 2017            | MARCH            | 31
@@ -101,7 +101,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedLength, value.lengthOfMonth());
     }
 
-    @DisplayName("Month-days name a day of the year, written with two leading hyphens")
+    @DisplayName("MonthDay converts from a month and day written with two leading hyphens")
     @TableTest("""
         Scenario       | Input value | Parameter type?    | MonthDay month? | MonthDay day of month?
         Pi Day         | --03-14     | java.time.MonthDay | MARCH           | 14
@@ -118,7 +118,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedDayOfMonth, value.getDayOfMonth());
     }
 
-    @DisplayName("Local dates use the ISO-8601 date format")
+    @DisplayName("LocalDate converts from ISO-8601 date text")
     @TableTest("""
         Scenario        | Input value | Parameter type?     | LocalDate month? | LocalDate day of week?
         Pi Day 2017     | 2017-03-14  | java.time.LocalDate | MARCH            | TUESDAY
@@ -135,7 +135,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedDayOfWeek, value.getDayOfWeek());
     }
 
-    @DisplayName("Local times use the ISO-8601 time format, with optional fractional seconds")
+    @DisplayName("LocalTime converts from ISO-8601 time text, with optional fractional seconds")
     @TableTest("""
         Scenario           | Input value  | Parameter type?     | LocalTime hour? | LocalTime minute? | LocalTime nano?
         Fractional seconds | 12:34:56.789 | java.time.LocalTime | 12              | 34                | 789000000
@@ -155,7 +155,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedNano, value.getNano());
     }
 
-    @DisplayName("Local date-times join a date and a time with T")
+    @DisplayName("LocalDateTime converts from a date and a time joined with T")
     @Description("The expectation columns are themselves converted, to a LocalDate and a LocalTime.")
     @TableTest("""
         Scenario        | Input value             | Parameter type?         | LocalDateTime date? | LocalDateTime time?
@@ -173,7 +173,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedTime, value.toLocalTime());
     }
 
-    @DisplayName("Instants are a point on the UTC timeline, always written with a trailing Z")
+    @DisplayName("Instant converts from a UTC timestamp written with a trailing Z")
     @TableTest("""
         Scenario     | Input value          | Parameter type?    | Instant epoch second?
         Unix epoch   | 1970-01-01T00:00:00Z | java.time.Instant  | 0
@@ -184,7 +184,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedEpochSecond, value.getEpochSecond());
     }
 
-    @DisplayName("Offset date-times carry an offset from UTC")
+    @DisplayName("OffsetDateTime converts from a date-time carrying an offset from UTC")
     @Description("The expectation column is itself converted, to an Instant.")
     @TableTest("""
         Scenario    | Input value               | Parameter type?          | OffsetDateTime as instant in UTC?
@@ -197,7 +197,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedInstant, value.toInstant());
     }
 
-    @DisplayName("Zoned date-times may name a region id in brackets after the offset")
+    @DisplayName("ZonedDateTime converts from a date-time that may name a region id in brackets")
     @TableTest("""
         Scenario     | Input value                              | Parameter type?         | ZonedDateTime zone id? | ZonedDateTime as instant in UTC?
         Region zone  | 2017-03-14T13:00:00+01:00[Europe/Berlin] | java.time.ZonedDateTime | Europe/Berlin          | 2017-03-14T12:00:00Z
@@ -215,7 +215,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedInstant, value.toInstant());
     }
 
-    @DisplayName("Offset times are a time of day with an offset from UTC")
+    @DisplayName("OffsetTime converts from a time of day with an offset from UTC")
     @TableTest("""
         Scenario    | Input value    | Parameter type?      | OffsetTime hour? | OffsetTime offset in minutes?
         East of UTC | 12:00:00+02:30 | java.time.OffsetTime | 12               | 150
@@ -233,7 +233,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedOffsetMinutes, value.getOffset().getTotalSeconds() / 60);
     }
 
-    @DisplayName("Zone offsets are an offset from UTC on its own, with Z meaning none")
+    @DisplayName("ZoneOffset converts from an offset from UTC on its own, with Z meaning none")
     @TableTest("""
         Scenario    | Input value | Parameter type?      | ZoneOffset in minutes?
         East of UTC | +02:30      | java.time.ZoneOffset | 150
@@ -245,7 +245,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedOffsetMinutes, value.getTotalSeconds() / 60);
     }
 
-    @DisplayName("Zone ids accept region names, UTC, and fixed offsets")
+    @DisplayName("ZoneId converts from a region name, UTC, or a fixed offset")
     @Description("Region zones carry daylight-saving rules; UTC and plain offsets are fixed.")
     @TableTest("""
         Scenario     | Input value   | Parameter type?  | ZoneId fixed offset?

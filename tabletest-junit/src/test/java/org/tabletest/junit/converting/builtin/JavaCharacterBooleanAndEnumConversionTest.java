@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         """)
 public class JavaCharacterBooleanAndEnumConversionTest {
 
-    @DisplayName("Char cells hold a single character")
+    @DisplayName("char converts from a single character")
     @Description("Primitive and boxed alike; a digit cell becomes the digit character, not a number.")
     @TableTest("""
         Scenario         | char | Character | Code point?
@@ -41,7 +41,7 @@ public class JavaCharacterBooleanAndEnumConversionTest {
         assertEquals(expectedCodePoint, charBoxed.charValue());
     }
 
-    @DisplayName("Booleans convert from true and false")
+    @DisplayName("boolean converts from true and false")
     @TableTest("""
         Scenario | boolean | Boolean | Negated?
         True     | true    | true    | false
@@ -52,7 +52,7 @@ public class JavaCharacterBooleanAndEnumConversionTest {
         assertEquals(expectedNegated, !boolBoxed);
     }
 
-    @DisplayName("Enum values match by constant name")
+    @DisplayName("An enum converts from a constant name")
     @Description("The parameter type decides which enum to search — TimeUnit in this table.")
     @TableTest("""
         Scenario | Input value | Parameter type?               | TimeUnit seconds per unit?
