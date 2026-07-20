@@ -1,14 +1,17 @@
 package org.tabletest.junit.converting;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
 import org.tabletest.junit.javadomain.ConstructorDate;
 import org.tabletest.junit.javadomain.TypeFactoryDate;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
@@ -41,72 +44,119 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         became a valid object of that type, not merely that it converted.
 
         A parameter type is fixed by the test method signature and cannot vary by
-        row, so each type gets its own short table. Where one table does cover
-        several types at once, they are the same value in different widths and
-        the type is the value column's own header.
+        row, so each type gets its own short table. A primitive type shares its
+        table with its wrapper, since the two are one type in two forms and a
+        primitive's type cannot be observed once the value is boxed — there the
+        type is the value column's own header rather than a column of its own.
         """)
 public class JavaFallbackConversionTest {
 
-    @DisplayName("Integer types accept decimal, hex, and octal formats")
-    @Description("Applies to byte, short, int, and long — primitive or boxed.")
+    @DisplayName("byte holds a whole number in the 8-bit signed range")
+    @Description("Decimal, hex, and octal text all convert, to the primitive and its wrapper alike.")
     @TableTest("""
-        Scenario       | byte | short | int | long | Converted value?
-        Decimal digits | 15   | 15    | 15  | 15   | 15
-        Hex literal    | 0xF  | 0xF   | 0xF | 0xF  | 15
-        Octal literal  | 017  | 017   | 017 | 017  | 15
+        Scenario            | byte | Byte | Converted value?
+        Decimal digits      | 15   | 15   | 15
+        Hex literal         | 0xF  | 0xF  | 15
+        Octal literal       | 017  | 017  | 15
+        Most negative value | -128 | -128 | -128
+        Largest value       | 127  | 127  | 127
         """)
-    void converts_integer_formats(
-        byte byteValue,
-        short shortValue,
-        int intValue,
-        long longValue,
-        long expectedValue
-    ) {
-        assertEquals(expectedValue, byteValue);
-        assertEquals(expectedValue, shortValue);
-        assertEquals(expectedValue, intValue);
-        assertEquals(expectedValue, longValue);
+    void converts_bytes(byte value, Byte boxedValue, byte expectedValue) {
+        assertEquals(expectedValue, value);
+        assertEquals(expectedValue, boxedValue.byteValue());
     }
 
-    // Not published: boxed twin of the table above — renders identically.
-    @Tag("unpublished")
+    @DisplayName("short holds a whole number in the 16-bit signed range")
     @TableTest("""
-        Scenario       | Byte | Short | Integer | Long | Converted value?
-        Decimal digits | 15   | 15    | 15      | 15   | 15
-        Hex literal    | 0xF  | 0xF   | 0xF     | 0xF  | 15
-        Octal literal  | 017  | 017   | 017     | 017  | 15
+        Scenario            | short  | Short  | Converted value?
+        Decimal digits      | 15     | 15     | 15
+        Hex literal         | 0xF    | 0xF    | 15
+        Octal literal       | 017    | 017    | 15
+        Most negative value | -32768 | -32768 | -32768
+        Largest value       | 32767  | 32767  | 32767
         """)
-    void converts_integer_formats_to_boxed_types(
-        Byte byteValue,
-        Short shortValue,
-        Integer intValue,
-        Long longValue,
-        long expectedValue
-    ) {
-        assertEquals(expectedValue, byteValue.longValue());
-        assertEquals(expectedValue, shortValue.longValue());
-        assertEquals(expectedValue, intValue.longValue());
-        assertEquals(expectedValue, longValue.longValue());
+    void converts_shorts(short value, Short boxedValue, short expectedValue) {
+        assertEquals(expectedValue, value);
+        assertEquals(expectedValue, boxedValue.shortValue());
     }
 
-    @DisplayName("Decimal types accept plain and scientific notation")
-    @Description("Applies to float and double — primitive or boxed — and BigDecimal.")
+    @DisplayName("int holds a whole number in the 32-bit signed range")
     @TableTest("""
-        Scenario            | float   | double  | BigDecimal | Converted value?
-        Plain decimal       | 3.14159 | 3.14159 | 3.14159    | 3.14159
-        Leading zero        | 0.1     | 0.1     | 0.1        | 0.1
-        Scientific notation | 1.23e4  | 1.23e4  | 1.23e4     | 12300
-        No decimal point    | 123     | 123     | 123        | 123
+        Scenario            | int         | Integer     | Converted value?
+        Decimal digits      | 15          | 15          | 15
+        Hex literal         | 0xF         | 0xF         | 15
+        Octal literal       | 017         | 017         | 15
+        Most negative value | -2147483648 | -2147483648 | -2147483648
+        Largest value       | 2147483647  | 2147483647  | 2147483647
         """)
-    void converts_decimal_formats(
-        float floatValue,
-        double doubleValue,
-        BigDecimal bigDecimalValue,
-        double expectedValue
+    void converts_ints(int value, Integer boxedValue, int expectedValue) {
+        assertEquals(expectedValue, value);
+        assertEquals(expectedValue, boxedValue.intValue());
+    }
+
+    @DisplayName("long holds a whole number in the 64-bit signed range")
+    @TableTest("""
+        Scenario            | long                 | Long                 | Converted value?
+        Decimal digits      | 15                   | 15                   | 15
+        Hex literal         | 0xF                  | 0xF                  | 15
+        Octal literal       | 017                  | 017                  | 15
+        Most negative value | -9223372036854775808 | -9223372036854775808 | -9223372036854775808
+        Largest value       | 9223372036854775807  | 9223372036854775807  | 9223372036854775807
+        """)
+    void converts_longs(long value, Long boxedValue, long expectedValue) {
+        assertEquals(expectedValue, value);
+        assertEquals(expectedValue, boxedValue.longValue());
+    }
+
+    @DisplayName("float accepts plain and scientific notation")
+    @Description("Applies to the primitive and its wrapper alike.")
+    @TableTest("""
+        Scenario            | float   | Float   | Converted value?
+        Plain decimal       | 3.14159 | 3.14159 | 3.14159
+        Leading zero        | 0.1     | 0.1     | 0.1
+        Scientific notation | 1.23e4  | 1.23e4  | 12300
+        No decimal point    | 123     | 123     | 123
+        """)
+    void converts_floats(float value, Float boxedValue, float expectedValue) {
+        assertEquals(expectedValue, value);
+        assertEquals(expectedValue, boxedValue.floatValue());
+    }
+
+    @DisplayName("double accepts plain and scientific notation")
+    @Description("Applies to the primitive and its wrapper alike.")
+    @TableTest("""
+        Scenario            | double  | Double  | Converted value?
+        Plain decimal       | 3.14159 | 3.14159 | 3.14159
+        Leading zero        | 0.1     | 0.1     | 0.1
+        Scientific notation | 1.23e4  | 1.23e4  | 12300
+        No decimal point    | 123     | 123     | 123
+        """)
+    void converts_doubles(double value, Double boxedValue, double expectedValue) {
+        assertEquals(expectedValue, value);
+        assertEquals(expectedValue, boxedValue.doubleValue());
+    }
+
+    @DisplayName("BigDecimal keeps the precision the text was written with")
+    @Description("""
+            Scale is the number of digits after the decimal point — negative when
+            scientific notation places the value's precision above the point.
+            """)
+    @TableTest("""
+        Scenario            | Input value | Parameter type?      | BigDecimal as plain number? | BigDecimal scale?
+        Plain decimal       | 3.14159     | java.math.BigDecimal | 3.14159                     | 5
+        Leading zero        | 0.1         | java.math.BigDecimal | 0.1                         | 1
+        Scientific notation | 1.23e4      | java.math.BigDecimal | 12300                       | -2
+        No decimal point    | 123         | java.math.BigDecimal | 123                         | 0
+        """)
+    void converts_big_decimals(
+        BigDecimal value,
+        Class<?> parameterType,
+        String expectedPlainNumber,
+        int expectedScale
     ) {
-        assertEquals((float) expectedValue, floatValue);
-        assertEquals(expectedValue, doubleValue);
-        assertEquals(0, bigDecimalValue.compareTo(BigDecimal.valueOf(expectedValue)));
+        assertInstanceOf(parameterType, value);
+        assertEquals(expectedPlainNumber, value.toPlainString());
+        assertEquals(expectedScale, value.scale());
     }
 
     @DisplayName("BigInteger holds whole numbers beyond the long range")
@@ -157,35 +207,52 @@ public class JavaFallbackConversionTest {
         assertEquals(expectedSeconds, value.toSeconds(1));
     }
 
-    @DisplayName("Files and paths convert from path text")
+    @DisplayName("Files convert from path text")
     @TableTest("""
-        Scenario      | File            | Path            | File name?
-        Absolute path | /path/to/file   | /path/to/file   | file
-        Relative path | ./relative/path | ./relative/path | path
+        Scenario      | Input value     | Parameter type? | File name? | File is absolute?
+        Absolute path | /path/to/file   | java.io.File    | file       | true
+        Relative path | ./relative/path | java.io.File    | path       | false
         """)
-    void converts_files_and_paths(
-        java.io.File fileValue,
-        java.nio.file.Path pathValue,
-        String expectedFileName
-    ) {
-        assertEquals(expectedFileName, fileValue.getName());
-        assertEquals(expectedFileName, pathValue.getFileName().toString());
+    void converts_files(File value, Class<?> parameterType, String expectedName, boolean expectedAbsolute) {
+        assertInstanceOf(parameterType, value);
+        assertEquals(expectedName, value.getName());
+        assertEquals(expectedAbsolute, value.isAbsolute());
     }
 
-    @DisplayName("URIs and URLs convert from address text")
-    @Description("URI additionally accepts non-URL schemes such as urn:.")
+    @DisplayName("Paths convert from path text")
     @TableTest("""
-        Scenario   | URI                | URL                | Scheme?
-        Web        | https://junit.org/ | https://junit.org/ | https
-        Local file | file:///tmp/test   | file:///tmp/test   | file
+        Scenario      | Input value     | Parameter type?    | Path file name? | Path is absolute?
+        Absolute path | /path/to/file   | java.nio.file.Path | file            | true
+        Relative path | ./relative/path | java.nio.file.Path | path            | false
         """)
-    void converts_uris_and_urls(
-        java.net.URI uriValue,
-        java.net.URL urlValue,
-        String expectedScheme
-    ) {
-        assertEquals(expectedScheme, uriValue.getScheme());
-        assertEquals(expectedScheme, urlValue.getProtocol());
+    void converts_paths(Path value, Class<?> parameterType, String expectedFileName, boolean expectedAbsolute) {
+        assertInstanceOf(parameterType, value);
+        assertEquals(expectedFileName, value.getFileName().toString());
+        assertEquals(expectedAbsolute, value.isAbsolute());
+    }
+
+    @DisplayName("URIs convert from address text, including non-URL schemes")
+    @TableTest("""
+        Scenario   | Input value         | Parameter type? | URI scheme?
+        Web        | https://junit.org/  | java.net.URI    | https
+        Local file | file:///tmp/test    | java.net.URI    | file
+        URN        | urn:isbn:0451450523 | java.net.URI    | urn
+        """)
+    void converts_uris(URI value, Class<?> parameterType, String expectedScheme) {
+        assertInstanceOf(parameterType, value);
+        assertEquals(expectedScheme, value.getScheme());
+    }
+
+    @DisplayName("URLs convert from address text")
+    @Description("A URL needs a protocol handler, so unlike URI it rejects schemes such as urn:.")
+    @TableTest("""
+        Scenario   | Input value        | Parameter type? | URL protocol?
+        Web        | https://junit.org/ | java.net.URL    | https
+        Local file | file:///tmp/test   | java.net.URL    | file
+        """)
+    void converts_urls(URL value, Class<?> parameterType, String expectedProtocol) {
+        assertInstanceOf(parameterType, value);
+        assertEquals(expectedProtocol, value.getProtocol());
     }
 
     @DisplayName("Class parameters accept fully qualified, nested, and primitive names")
