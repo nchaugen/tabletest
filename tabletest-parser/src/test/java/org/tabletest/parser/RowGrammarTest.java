@@ -55,13 +55,19 @@ public class RowGrammarTest {
             ['a | b'].
             """)
     @TableTest("""
-        Scenario                   | Row          | Throws?
-        Unquoted pipe in a list    | "[a | b]"    | org.tabletest.parser.TableTestParseException
-        Unquoted pipe in a set     | "{a | b}"    | org.tabletest.parser.TableTestParseException
-        Unquoted pipe in a map value | "[k: a | b]" | org.tabletest.parser.TableTestParseException
+        Scenario                     | Row          | Throws?                                      | Error message?
+        Unquoted pipe in a list      | "[a | b]"    | org.tabletest.parser.TableTestParseException  | "Failed to parse `[a | b]` in row `[a | b]`"
+        Unquoted pipe in a set       | "{a | b}"    | org.tabletest.parser.TableTestParseException  | "Failed to parse `{a | b}` in row `{a | b}`"
+        Unquoted pipe in a map value | "[k: a | b]" | org.tabletest.parser.TableTestParseException  | "Failed to parse `[k: a | b]` in row `[k: a | b]`"
         """)
-    void shouldRejectUnquotedPipeInsideCollection(String row, Class<? extends Exception> expectedException) {
-        assertThrows(expectedException, () -> TableParser.parse("Field\n" + row));
+    void shouldRejectUnquotedPipeInsideCollection(
+        String row,
+        Class<? extends Exception> expectedException,
+        String expectedErrorMessage
+    ) {
+        Exception actualException = assertThrows(expectedException, () -> TableParser.parse("Field\n" + row));
+
+        assertEquals(expectedErrorMessage, actualException.getMessage());
     }
 
 }

@@ -9,7 +9,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Table structure")
 @Description("""
@@ -19,75 +18,88 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         """)
 public class TableStructureTest {
 
-    @Test
-    void shouldParseTable() {
-        //language=TableTest
-        String input = """
-            a | b | c
-            1 | 2 | 3
-            4 | 5 | 6
-            """;
+    @DisplayName("A table is a header row followed by at least one data row")
+    @Description("""
+            The first row read becomes the header; every row after it is a data
+            row, and each row divides into one cell per header. The Input column
+            lists the source one line per element.
+            """)
+    @TableTest("""
+        Scenario      | Input                          | Headers?  | Data rows?
+        One data row  | ["a | b", "1 | 2"]             | [a, b]    | "[[1, 2]]"
+        Two data rows | ["a | b", "1 | 2", "3 | 4"]    | [a, b]    | "[[1, 2], [3, 4]]"
+        Single column | [a, 1, 2]                      | [a]       | "[[1], [2]]"
+        Three columns | ["a | b | c", "1 | 2 | 3"]     | [a, b, c] | "[[1, 2, 3]]"
+        """)
+    void shouldParseHeaderRowFollowedByDataRows(
+        List<String> inputLines,
+        List<String> expectedHeaders,
+        String expectedRows
+    ) {
+        Table result = TableParser.parse(String.join("\n", inputLines));
 
-        Table result = TableParser.parse(input);
-
-        assertEquals(2, result.rowCount());
-        assertEquals(3, result.columnCount());
-
-        assertEquals("a", result.header(0));
-        assertEquals("b", result.header(1));
-        assertEquals("c", result.header(2));
-
-        assertEquals(List.of("a", "b", "c"), result.headers());
-        assertEquals(List.of("1", "2", "3"), result.row(0).values());
-        assertEquals(List.of("4", "5", "6"), result.row(1).values());
+        assertEquals(expectedHeaders, result.headers());
+        assertEquals(expectedHeaders.size(), result.columnCount());
+        assertEquals(expectedRows, dataRowsOf(result));
     }
 
-    @Test
-    void shouldIgnoreComments() {
-        //language=TableTest
-        String input = """
-            // this is a TableTest table
-            a     | b
-            // comment
-            // 0 | 1
-            '//2' | 3
-            4 //  | 5
-            6     | // 7
-            8     | 9 //
-            """;
+    @DisplayName("Blank lines and whole-line comments are ignored")
+    @Description("""
+            A line is a comment only when // is the first thing on it — anywhere
+            else // is ordinary cell text, and quoting makes even a leading //
+            part of the value. The Input column lists the source one line per
+            element.
+            """)
+    @TableTest("""
+        Scenario                     | Input                                  | Headers? | Data rows?
+        Blank lines around the table | ['', '   ', "a | b", "1 | 2", '  ']    | [a, b]   | "[[1, 2]]"
+        Blank line between rows      | ["a | b", "1 | 2", '', "3 | 4"]        | [a, b]   | "[[1, 2], [3, 4]]"
+        Comment line above header    | ['// intro', "a | b", "1 | 2"]         | [a, b]   | "[[1, 2]]"
+        Comment line between rows    | ["a | b", '// note', "1 | 2"]          | [a, b]   | "[[1, 2]]"
+        Comment line holding pipes   | ["a | b", "// 0 | 1", "1 | 2"]         | [a, b]   | "[[1, 2]]"
+        Quoted leading slashes       | ["a | b", "'//2' | 3"]                 | [a, b]   | "[[//2, 3]]"
+        Slashes after cell text      | ["a | b", "4 // | 5"]                  | [a, b]   | "[[4 //, 5]]"
+        Slashes starting a cell      | ["a | b", "6 | // 7"]                  | [a, b]   | "[[6, // 7]]"
+        """)
+    void shouldIgnoreBlankLinesAndCommentLines(
+        List<String> inputLines,
+        List<String> expectedHeaders,
+        String expectedRows
+    ) {
+        Table result = TableParser.parse(String.join("\n", inputLines));
 
-        Table result = TableParser.parse(input);
-
-        assertEquals(List.of("a", "b"), result.headers());
-        assertEquals(List.of("//2", "3"), result.row(0).values());
-        assertEquals(List.of("4 //", "5"), result.row(1).values());
-        assertEquals(List.of("6", "// 7"), result.row(2).values());
-        assertEquals(List.of("8", "9 //"), result.row(3).values());
+        assertEquals(expectedHeaders, result.headers());
+        assertEquals(expectedRows, dataRowsOf(result));
     }
 
     @DisplayName("Input without any data rows is rejected")
     @Description("""
-            A table needs a header row and at least one data row. \\n in the
-            Input column stands for a line break in the parsed source.
+            A table needs a header row and at least one data row. The Input
+            column lists the source one line per element.
             """)
     @TableTest("""
-        Scenario            | Input
-        Empty input         | ''
-        Blank input         | '   '
-        Comment only        | '// just a comment'
-        Comments and blanks | '// one\\n   \\n// two'
+        Scenario            | Input                          | Error message?
+        Empty input         | ['']                           | Table has no rows: input was empty or contained only blank lines and comments
+        Blank input         | ['   ']                        | Table has no rows: input was empty or contained only blank lines and comments
+        Comment only        | ['// just a comment']          | Table has no rows: input was empty or contained only blank lines and comments
+        Comments and blanks | ['// one', '   ', '// two']    | Table has no rows: input was empty or contained only blank lines and comments
         """)
-    void shouldRejectInputWithoutTableRows(String input) {
+    void shouldRejectInputWithoutTableRows(List<String> inputLines, String expectedErrorMessage) {
         TableTestParseException actualException = assertThrows(
             TableTestParseException.class,
-            () -> TableParser.parse(input.replace("\\n", "\n"))
+            () -> TableParser.parse(String.join("\n", inputLines))
         );
-        assertTrue(actualException.getMessage().startsWith("Table has no rows"), actualException.getMessage());
+
+        assertEquals(expectedErrorMessage, actualException.getMessage());
+    }
+
+    private static String dataRowsOf(Table table) {
+        return table.rows().stream().map(Row::values).toList().toString();
     }
 
     @DisplayName("Blank header cells are rejected, naming the column")
     @TableTest("""
-        Scenario            | Header Row  | Error Message?
+        Scenario            | Header Row  | Error message?
         Blank first header  | " | b | c"  | Header cell in column 1 is blank
         Blank middle header | "a |  | c"  | Header cell in column 2 is blank
         Blank last header   | "a | b | "  | Header cell in column 3 is blank
@@ -97,7 +109,7 @@ public class TableStructureTest {
             TableTestParseException.class,
             () -> TableParser.parse(headerRow + "\n1 | 2 | 3")
         );
-        assertTrue(actualException.getMessage().startsWith(expectedErrorMessage), actualException.getMessage());
+        assertEquals(expectedErrorMessage, actualException.getMessage());
     }
 
     @Test
@@ -112,29 +124,6 @@ public class TableStructureTest {
         String longComment = "// " + "x".repeat(20_000);
         Table result = TableParser.parse("a | b\n" + longComment + "\n1 | 2\n");
         assertEquals(List.of("1", "2"), result.row(0).values());
-    }
-
-    @Test
-    void shouldIgnoreBlankLines() {
-        //language=TableTest
-        String input = """
-                    \s
-             a | b | c
-            \s
-             1 | 2 | 3
-            \s
-                      \s
-             4 | 5 | 6
-                            \s
-            \s""";
-
-        Table result = TableParser.parse(input);
-
-        assertEquals(2, result.rowCount());
-        assertEquals(List.of("a", "b", "c"), result.headers());
-        assertEquals(List.of("1", "2", "3"), result.row(0).values());
-        assertEquals(List.of("4", "5", "6"), result.row(1).values());
-
     }
 
     @Test
