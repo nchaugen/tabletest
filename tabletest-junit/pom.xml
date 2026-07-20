@@ -321,6 +321,10 @@
                         <version>${version.tabletest-reporter}</version>
                         <configuration>
                             <format>html</format>
+                            <!-- Root index lists chapters, not every rule in them:
+                                 at the default 'infinite' the entry page is a flat
+                                 dump of all rules and unusable as a map. -->
+                            <indexDepth>2</indexDepth>
                         </configuration>
                     </plugin>
                 </plugins>
