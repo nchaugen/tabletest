@@ -4,130 +4,81 @@ import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
 import org.junit.jupiter.api.DisplayName;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Immutable collection parameters")
 @Description("""
-        Collections passed from a table — and every collection nested inside them —
-        are immutable. Any attempt to add, put, or otherwise modify one throws. Each
-        row lists the collection shapes exercised; the rule is that none of them can
-        be mutated.
+        A collection passed from a table is read-only: adding to a List or Set,
+        putting into a Map, or modifying any collection nested inside them throws
+        instead of changing the value. A row's data therefore stays as written
+        however the test method treats it.
         """)
 class JavaImmutableCollectionParametersTest {
 
-    @DisplayName("A List parameter and its nested collections reject modification")
+    @DisplayName("Modifying a collection parameter throws")
+    @Description("The modification attempted is add for a List or Set, and put for a Map.")
     @TableTest("""
-        list | nested list | nested set | nested map
-        []   | [[]]        | [{}]       | [[:]]
+        Scenario | Input value | Collection type? | Modification throws?
+        A list   | [a, b]      | java.util.List   | java.lang.UnsupportedOperationException
+        A set    | {a, b}      | java.util.Set    | java.lang.UnsupportedOperationException
+        A map    | [k: a]      | java.util.Map    | java.lang.UnsupportedOperationException
         """)
-    void passes_immutable_lists_to_test(
-        List<String> list,
-        List<List<String>> nestedList,
-        List<Set<String>> nestedSet,
-        List<Map<String, String>> nestedMap
+    void rejects_modifying_a_collection_parameter(
+        Object collection,
+        Class<?> expectedCollectionType,
+        Class<? extends Throwable> expectedException
     ) {
-        try {
-            list.add("x");
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
-        }
-        try {
-            nestedList.get(0).add("x");
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
-        }
-        try {
-            nestedSet.get(0).add("x");
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
-        }
-        try {
-            nestedMap.get(0).put("x", "y");
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
+        assertInstanceOf(expectedCollectionType, collection);
+        assertThrows(expectedException, () -> modify(collection));
+    }
+
+    @DisplayName("Modifying a nested collection throws, whatever collection holds it")
+    @Description("""
+            Immutability reaches every level of a row's value, so a collection
+            reached through another collection rejects modification too.
+            """)
+    @TableTest("""
+        Scenario         | Input value     | Nested collection? | Nested collection type? | Modification throws?
+        A list in a list | [[a, b]]        | [a, b]             | java.util.List          | java.lang.UnsupportedOperationException
+        A set in a list  | [{a, b}]        | {a, b}             | java.util.Set           | java.lang.UnsupportedOperationException
+        A map in a list  | [[k: a]]        | [k: a]             | java.util.Map           | java.lang.UnsupportedOperationException
+        A list in a set  | {[a, b]}        | [a, b]             | java.util.List          | java.lang.UnsupportedOperationException
+        A set in a set   | {{a, b}}        | {a, b}             | java.util.Set           | java.lang.UnsupportedOperationException
+        A map in a set   | {[k: a]}        | [k: a]             | java.util.Map           | java.lang.UnsupportedOperationException
+        A list in a map  | [outer: [a, b]] | [a, b]             | java.util.List          | java.lang.UnsupportedOperationException
+        A set in a map   | [outer: {a, b}] | {a, b}             | java.util.Set           | java.lang.UnsupportedOperationException
+        A map in a map   | [outer: [k: a]] | [k: a]             | java.util.Map           | java.lang.UnsupportedOperationException
+        """)
+    void rejects_modifying_a_nested_collection(
+        Object collection,
+        Object expectedNestedCollection,
+        Class<?> expectedNestedCollectionType,
+        Class<? extends Throwable> expectedException
+    ) {
+        Object nested = onlyElementOf(collection);
+        assertEquals(expectedNestedCollection, nested);
+        assertInstanceOf(expectedNestedCollectionType, nested);
+        assertThrows(expectedException, () -> modify(nested));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void modify(Object collection) {
+        if (collection instanceof Map) {
+            ((Map<String, String>) collection).put("added key", "added value");
+        } else {
+            ((Collection<String>) collection).add("added value");
         }
     }
 
-    @DisplayName("A Map parameter and its nested collections reject modification")
-    @TableTest("""
-        map | nested list | nested set  | nested map
-        [:] | [empty: []] | [empty: {}] | [empty: [:]]
-        """)
-    void passes_immutable_maps_to_test(
-        Map<String, String> map,
-        Map<String, List<String>> nestedList,
-        Map<String, Set<String>> nestedSet,
-        Map<String, Map<String, String>> nestedMap
-    ) {
-        try {
-            map.put("x", "y");
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
-        }
-        try {
-            nestedList.get("empty").add("x");
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
-        }
-        try {
-            nestedSet.get("empty").add("x");
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
-        }
-        try {
-            nestedMap.get("empty").put("x", "y");
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
-        }
-    }
-
-
-    @DisplayName("A Set parameter and its nested collections reject modification")
-    @TableTest("""
-        set | nested list | nested set | nested map
-        {}  | {[]}        | {{}}       | {[:]}
-        """)
-    void passes_immutable_sets_to_test(
-        Set<String> set,
-        Set<List<String>> nestedList,
-        Set<Set<String>> nestedSet,
-        Set<Map<String, String>> nestedMap
-    ) {
-        try {
-            set.add("x");
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
-        }
-        try {
-            nestedList.forEach(it -> it.add("x"));
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
-        }
-        try {
-            nestedSet.forEach(it -> it.add("x"));
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
-        }
-        try {
-            nestedMap.forEach(it -> it.put("x", "y"));
-            fail("modifying collections from the table should fail");
-        } catch (Exception e) {
-            // expected
-        }
+    private static Object onlyElementOf(Object collection) {
+        Collection<?> elements = collection instanceof Map<?, ?> map
+            ? map.values()
+            : (Collection<?>) collection;
+        return elements.iterator().next();
     }
 }
