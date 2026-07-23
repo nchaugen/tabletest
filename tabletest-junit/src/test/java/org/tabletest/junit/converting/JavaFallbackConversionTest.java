@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Description("""
         A type with no built-in conversion of its own still converts, as long as it
         can be built from the cell text alone. The built-in conversions are in the
-        chapters under builtin; this is what happens when none of them applies.
+        features under builtin; this is what happens when none of them applies.
         """)
 public class JavaFallbackConversionTest {
 
