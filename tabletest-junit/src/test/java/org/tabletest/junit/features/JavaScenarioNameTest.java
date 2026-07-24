@@ -1,7 +1,6 @@
 package org.tabletest.junit.features;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.tabletest.junit.Description;
 import org.tabletest.junit.Scenario;
 import org.tabletest.junit.TableTest;
@@ -46,9 +45,6 @@ public class JavaScenarioNameTest {
         assertEquals(expectedName, scenario);
     }
 
-    // Not published: asserts JUnit's internal `[n]`-prefixed display names —
-    // implementation detail, not spec.
-    @Tag("unpublished")
     @TableTest("""
         Scenario | Display Name?
                  | '[1] null, "[1]'
@@ -62,7 +58,6 @@ public class JavaScenarioNameTest {
         );
     }
 
-    @Tag("unpublished")
     @TableTest("""
         Display Name?   | Scenario
         "[1] Example"   | Example

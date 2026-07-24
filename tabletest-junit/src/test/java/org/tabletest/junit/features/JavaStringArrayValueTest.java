@@ -1,7 +1,6 @@
 package org.tabletest.junit.features;
 
 import org.tabletest.junit.TableTest;
-import org.junit.jupiter.api.Tag;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,8 +10,6 @@ import java.util.stream.LongStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// Unpublished: temporary — the Java string-array table form is invisible in the rendered report.
-@Tag("unpublished")
 public class JavaStringArrayValueTest {
 
     @TableTest({

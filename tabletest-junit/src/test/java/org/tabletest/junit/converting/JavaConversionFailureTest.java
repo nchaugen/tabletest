@@ -7,7 +7,6 @@ import org.tabletest.junit.TableTestException;
 import org.tabletest.junit.TypeConverter;
 import org.tabletest.junit.javadomain.Age;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Parameter;
@@ -50,9 +49,6 @@ public class JavaConversionFailureTest {
         return " Locations searched for type converters: " + ParameterFixture.class.getTypeName();
     }
 
-    // Unpublished: converter-mechanism rule (ambiguous converter selection) whose meaning
-    // lives in converter code the report cannot show; stays conformance.
-    @Tag("unpublished")
     @TableTest("""
         table value | parameter type
         52          | org.tabletest.junit.javadomain.Age

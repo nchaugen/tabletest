@@ -22,10 +22,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
-import org.junit.jupiter.api.Tag
 
-// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
-@Tag("unpublished")
 class KotlinFallbackConversionTest {
 
     @TableTest(

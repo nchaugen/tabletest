@@ -6,10 +6,7 @@ import java.util.stream.Collectors;
 import static org.tabletest.junit.ParameterFixture.parameter;
 import static org.tabletest.junit.ParameterTypeAnalyzer.typeStackOf;
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Tag;
 
-// Unpublished: internal mechanism (parameter-type analysis), not a user-facing rule.
-@Tag("unpublished")
 class ParameterTypeAnalyzerTest {
 
     @org.tabletest.junit.TableTest("""

@@ -1,17 +1,11 @@
 package org.tabletest.junit.features;
 
 import org.tabletest.junit.TableTest;
-import org.junit.jupiter.api.Tag;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-// Unpublished: permanent — duplicates the parser's published "Blank lines and whole-line
-// comments are ignored" rule (TableStructureTest), which states the same behaviour as data
-// the report can render. These tables demonstrate it self-referentially, in the source of
-// the very table being read, which no reporter capability can show.
-@Tag("unpublished")
 public class JavaCommentsAndBlankLinesTest {
 
     @TableTest("""

@@ -1,7 +1,6 @@
 package org.tabletest.junit.examples;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
 
@@ -70,9 +69,6 @@ public class BasicExamplesTest {
         assertEquals(expectedSize, map.size());
     }
 
-    // Not published: comment lines don't reach the report, so the published table
-    // would show two plain rows and none of what it demonstrates.
-    @Tag("unpublished")
     @DisplayName("Comment lines annotate or disable rows")
     @Description("""
             Lines starting with // are ignored: use them to explain rows or park a row

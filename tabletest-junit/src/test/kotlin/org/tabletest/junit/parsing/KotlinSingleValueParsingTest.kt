@@ -3,10 +3,7 @@ package org.tabletest.junit.parsing
 import org.tabletest.junit.TableTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Tag
 
-// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
-@Tag("unpublished")
 class KotlinSingleValueParsingTest {
 
     @TableTest(

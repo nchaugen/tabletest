@@ -11,11 +11,8 @@ import org.tabletest.junit.kotlintypeconverters.KotlinTypeConverterSourceForNest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import java.time.LocalDate
-import org.junit.jupiter.api.Tag
 
 @TypeConverterSources(FirstTierTypeConverterSource::class, SecondTierTypeConverterSource::class)
-// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
-@Tag("unpublished")
 class KotlinTypeConverterSourcesTest {
 
     @TableTest(

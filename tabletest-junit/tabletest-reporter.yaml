@@ -1,0 +1,65 @@
+# Report-time publish selection for the core (tabletest-junit) living spec.
+#
+# Every @TableTest publishes by default; the pages below are held back at report
+# time instead of with @Tag("unpublished") + a Surefire group filter. Report-time
+# selection keeps what publishes independent of what runs, and survives the second
+# (non-JVM) implementation that has no test tags. Each path carries the reason its
+# rule is not part of the curated spec (see the core decision
+# curated-spec-vs-conformance and the reporter decision
+# publish-selection-at-report-time).
+#
+# Paths name pages by the report URL slug. Excluding a class or feature page takes
+# its whole subtree; a trailing rule-slug excludes a single rule from an otherwise
+# published class (the method-level opt-outs, which a page path can still name).
+publish:
+  exclude:
+    # --- Kotlin twins: one language publishes; Kotlin mirrors the Java suite ---
+    - converting/kotlin-array-parameter-conversion-test
+    - converting/kotlin-conversion-failure-test
+    - converting/kotlin-convert-with-test
+    - converting/kotlin-factory-method-in-test-class-conversion-test
+    - converting/kotlin-fallback-conversion-test
+    - converting/kotlin-immutable-collection-parameters-test
+    - converting/kotlin-parameterized-type-conversion-test
+    - converting/kotlin-primitive-conversion-test
+    - converting/kotlin-type-converter-sources-test
+    - examples/kotlin-student-grades-example-test
+    - features/kotlin-comments-and-blank-lines-test
+    - features/kotlin-external-table-test
+    - features/kotlin-null-value-test
+    - features/kotlin-parameter-resolvers-test
+    - features/kotlin-scenario-name-test
+    - features/kotlin-value-set-test
+
+    # --- Converter-mechanism rules whose meaning lives in converter code the
+    #     report cannot show; stay conformance ---
+    - converting/java-convert-with-test
+    - converting/java-factory-method-in-test-class-conversion-test
+    - converting/java-type-converter-selection-test
+    - converting/java-type-converter-sources-test
+    - converting/conversion-failures/fails-when-multiple-type-converters-found  # one row: ambiguous converter selection
+
+    # --- Duplicates a rule the parser's own grammar spec (/spec/parser) already states ---
+    - parsing
+
+    # --- Deprecated annotations exercised for back-compat, not a current rule ---
+    - deprecated
+
+    # --- Internal mechanism (parameter-type analysis), not a user-facing rule ---
+    - parameter-type-analyzer-test
+
+    # --- Permanent duplicate: parser's published "blank lines and whole-line
+    #     comments are ignored" rule (TableStructureTest) already states this;
+    #     demonstrated self-referentially here, which no reporter capability can show ---
+    - features/java-comments-and-blank-lines-test
+
+    # --- Temporary: the Java string-array table form renders invisibly today;
+    #     re-admit once the reporter shows it ---
+    - features/java-string-array-value-test
+
+    # --- Rows that render nothing they demonstrate, or duplicate/implementation
+    #     detail within an otherwise published class ---
+    - examples/value-formats/comment-lines-annotate-or-disable-rows  # comment lines don't reach the report
+    - features/external-table-files/table-in-external-file-in-explicit-root  # duplicate of implicit-root, only a leading slash differs
+    - features/scenario-names/declared-scenario-name-becomes-display-name    # asserts JUnit's internal [n]-prefixed names
+    - features/scenario-names/declared-scenario-name-do-not-have-to-be-first-parameter  # ditto: implementation detail, not spec

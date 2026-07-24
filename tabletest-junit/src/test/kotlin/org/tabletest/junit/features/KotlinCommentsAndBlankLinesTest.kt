@@ -2,10 +2,7 @@ package org.tabletest.junit.features
 
 import org.tabletest.junit.TableTest
 import kotlin.test.assertNotEquals
-import org.junit.jupiter.api.Tag
 
-// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
-@Tag("unpublished")
 class KotlinCommentsAndBlankLinesTest {
 
     @TableTest(

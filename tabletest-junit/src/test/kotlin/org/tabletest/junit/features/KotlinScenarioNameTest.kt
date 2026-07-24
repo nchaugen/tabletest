@@ -5,10 +5,7 @@ import org.tabletest.junit.TableTest
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Tag
 
-// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
-@Tag("unpublished")
 class KotlinScenarioNameTest {
 
     @TableTest(

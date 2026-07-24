@@ -5,10 +5,7 @@ import org.junit.jupiter.api.Assertions.fail
 import java.util.List
 import java.util.Map
 import java.util.function.Consumer
-import org.junit.jupiter.api.Tag
 
-// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
-@Tag("unpublished")
 class KotlinImmutableCollectionParametersTest {
 
     @TableTest(

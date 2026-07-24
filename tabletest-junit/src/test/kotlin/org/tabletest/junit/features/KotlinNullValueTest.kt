@@ -4,10 +4,7 @@ import org.tabletest.junit.TableTest
 import org.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenFallbackFails
 import org.tabletest.junit.TableTestExceptionAssertions.assertThrowsWhenNullSpecifiedForPrimitiveType
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Tag
 
-// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
-@Tag("unpublished")
 class KotlinNullValueTest {
 
     @TableTest(

@@ -1,7 +1,6 @@
 package org.tabletest.junit.features;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.tabletest.junit.Description;
 import org.tabletest.junit.InputResolver;
 import org.tabletest.junit.TableTest;
@@ -92,9 +91,6 @@ public class JavaExternalTableTest {
         assertEquals(expectedSum, a + b);
     }
 
-    // Not published: same file as above, differing only in the leading slash of
-    // the resource path — the published table would be an exact duplicate.
-    @Tag("unpublished")
     @TableTest(resource = "/external.table")
     void table_in_external_file_in_explicit_root(int a, int b, int expectedSum) {
         assertEquals(expectedSum, a + b);

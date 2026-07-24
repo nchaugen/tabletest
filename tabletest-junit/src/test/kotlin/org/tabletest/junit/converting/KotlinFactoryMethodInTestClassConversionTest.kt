@@ -9,10 +9,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.platform.commons.support.conversion.ConversionException
 import java.time.LocalDate
-import org.junit.jupiter.api.Tag
 
-// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
-@Tag("unpublished")
 open class KotlinFactoryMethodInTestClassConversionTest : KotlinTestSuperClass() {
 
     @TableTest(

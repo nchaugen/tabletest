@@ -1,7 +1,6 @@
 package org.tabletest.junit.parsing;
 
 import org.tabletest.junit.TableTest;
-import org.junit.jupiter.api.Tag;
 
 import java.util.List;
 import java.util.Set;
@@ -9,8 +8,6 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-// Unpublished: duplicates the parser's own grammar spec (/spec/parser); see curated-spec-vs-conformance decision.
-@Tag("unpublished")
 public class JavaSetParsingTest {
 
     @TableTest(resource = "/parsing/set-values.table")

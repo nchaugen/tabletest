@@ -7,10 +7,7 @@ import org.junit.jupiter.params.converter.ArgumentConversionException
 import org.junit.jupiter.params.converter.ArgumentConverter
 import org.junit.jupiter.params.converter.ConvertWith
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Tag
 
-// Unpublished: Kotlin twin of the Java suite; one language publishes (curated-spec-vs-conformance decision).
-@Tag("unpublished")
 class KotlinConvertWithTest {
 
     @TableTest(
