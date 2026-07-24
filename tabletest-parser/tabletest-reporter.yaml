@@ -1,0 +1,12 @@
+# Report-time publish selection for the parser's living spec.
+#
+# Every @TableTest publishes by default; the table below exercises internal
+# mechanism rather than a grammar rule, so it is held back here instead of with
+# @Tag("unpublished") + a Surefire group filter. Report-time selection keeps what
+# publishes independent of what runs, and survives the second (non-JVM)
+# implementation that has no test tags.
+# See the reporter decision publish-selection-at-report-time.
+publish:
+  exclude:
+    - row-parser-test   # white-box test of the internal RowParser; the row grammar
+                        # publishes black-box via RowGrammarTest (row-grammar)
