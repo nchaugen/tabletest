@@ -24,6 +24,7 @@ TableTest allows you to express how the system is expected to behave through mul
   - [Value Sets](#value-sets)
   - [Comments and Blank Lines](#comments-and-blank-lines)
   - [Table in External File](#table-in-external-file)
+  - [Repeatable Datasets](#repeatable-datasets)
   - [Parameters Provided By ParameterResolvers](#parameters-provided-by-parameterresolvers)
   - [Escape Sequences](#escape-sequences)
   - [Explicit Argument Conversion](#explicit-argument-conversion)
@@ -513,6 +514,39 @@ void testExternalTableWithCustomEncoding(String string, int expectedLength) {
 }
 ```
 
+### Repeatable Datasets
+
+Multiple `@TableTest` annotations can be stacked on a single test method. This allows you to combine datasets from multiple external files, separate test cases into clean logical files, or mix external file resources with inline data overrides.
+
+**Key points:**
+- **Modular test data**: Split massive datasets into smaller, maintainable scenario files.
+- **Mixed sources**: Supplement static external file records with temporary inline data overrides.
+- **Independent configuration**: Each annotation instance retains its own isolated properties (e.g., custom encoding configurations).
+
+**Combining multiple external files:**
+```java
+@TableTest(resource = "/datasets/core-users.table")
+@TableTest(resource = "/datasets/enterprise-users.table")
+void testSubscriptionBilling(String tier, double price, boolean eligible) {
+    double actual = BillingSystem.calculate(tier, eligible);
+    assertEquals(price, actual);
+}
+```
+
+**Mixing external files with inline text blocks:**
+```java
+@TableTest(resource = "standard-pricing.table") // Loads default rows from classpath
+@TableTest({                                    // Appends localized edge-cases
+    "Scenario               | tier   | price  | eligible",
+    "Promo Black Friday     | PROMO  | 19.99  | true",
+    "Expired Legacy Sandbox | FREE   | 0.00   | false"
+})
+void testMixedSources(String scenario, String tier, double price, boolean eligible) {
+    assertEquals(price, BillingSystem.calculate(tier, eligible));
+}
+```
+
+Each annotation block maintains its own independent context and executes sequentially. When mixing files and inline text blocks, every individual block **must** include its own header definition row so the parameter positions map correctly.
 
 ### Parameters Provided By ParameterResolvers
 TableTest method parameters correspond to columns following a one-to-one correlation between table column index and method parameter index (scenario name column can be excluded). For TableTest methods to receive additional arguments provided by a ParameterResolver (TestInfo, TestReporter, etc.), these must be declared last. Also, if the table includes a scenario name column, this now needs an explicit parameter with `@Scenario` annotation:
