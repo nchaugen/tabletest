@@ -51,34 +51,24 @@ public class ValueGrammarTest {
             bracket, a letter before the bracket — capture as plain strings.
             """)
     @TableTest("""
-        Scenario                       | Input    | Success? | Parsed Type?     | Error Message?
-        Quoted brackets                | '"[]"'   | true     | java.lang.String |
-        Only opening bracket           | '['      | false    |                  | Failed to parse `[`
-        Only closing bracket           | ']'      | true     | java.lang.String |
-        Opening bracket, closing brace | '[a, b}' | false    |                  | Failed to parse `[a, b}`
-        Opening brace, closing bracket | '{a, b]' | false    |                  | Failed to parse `{a, b]`
-        Double opening bracket         | '[[]'    | false    |                  | Failed to parse `[[]`
-        Double closing bracket         | '[]]'    | false    |                  | Failed to parse `]`
-        Unexpected leading character   | 'a[]'    | true     | java.lang.String |
-        Unexpected trailing character  | '[]a'    | false    |                  | Failed to parse `a`
-        Missing element                | '[a,]'   | false    |                  | Failed to parse `[a,]`
+        Scenario                      | Input    | Parsed type?     | Error message?
+        Quoted brackets               | '"[]"'   | java.lang.String |
+        Only closing bracket          | ']'      | java.lang.String |
+        Unexpected leading character  | 'a[]'    | java.lang.String |
+        Only opening bracket          | '['      |                  | Failed to parse `[`
+        Closed by the wrong delimiter | '[a, b}' |                  | Failed to parse `[a, b}`
+        Double opening bracket        | '[[]'    |                  | Failed to parse `[[]`
+        Double closing bracket        | '[]]'    |                  | Failed to parse `]`
+        Unexpected trailing character | '[]a'    |                  | Failed to parse `a`
+        Missing element               | '[a,]'   |                  | Failed to parse `[a,]`
         """)
     void shouldHandleInvalidListSyntax(
         String input,
-        boolean expectedSuccess,
-        Class expectedType,
-        String expectedErrorMessage
+        Class<?> parsedType,
+        String errorMessage
     ) {
-        String table = "Scenario | Input\nInvalid | " + input;
-        if (expectedSuccess) {
-            assertInstanceOf(expectedType, TableParser.parse(table).row(0).value(1));
-        } else {
-            TableTestParseException actualException = assertThrows(
-                TableTestParseException.class,
-                () -> TableParser.parse(table)
-            );
-            assertTrue(actualException.getMessage().startsWith(expectedErrorMessage), actualException.getMessage());
-        }
+        assertEquals(parsedType, parsedTypeOf(input));
+        assertEquals(errorMessage, parseErrorFor(input));
     }
 
     @DisplayName("Sets in {curly braces} keep each distinct value once")
@@ -104,34 +94,24 @@ public class ValueGrammarTest {
     @DisplayName("A value starting with { must be a well-formed set")
     @Description("Values that do not open a set capture as plain strings.")
     @TableTest("""
-        Scenario                       | Input    | Success? | Parsed Type?     | Error Message?
-        Quoted braces                  | '"{}"'   | true     | java.lang.String |
-        Missing closing brace          | '{'      | false    |                  | Failed to parse `{`
-        Missing opening brace          | '}'      | true     | java.lang.String |
-        Opening bracket, closing brace | '[a, b}' | false    |                  | Failed to parse `[a, b}`
-        Opening brace, closing bracket | '{a, b]' | false    |                  | Failed to parse `{a, b]`
-        Double opening brace           | '{{}'    | false    |                  | Failed to parse `{{}`
-        Double closing brace           | '{}}'    | false    |                  | Failed to parse `}`
-        Unexpected leading character   | 'a{}'    | true     | java.lang.String |
-        Unexpected trailing character  | '{}a'    | false    |                  | Failed to parse `a`
-        Missing element                | '{a,}'   | false    |                  | Failed to parse `{a,}`
+        Scenario                      | Input    | Parsed type?     | Error message?
+        Quoted braces                 | '"{}"'   | java.lang.String |
+        Missing opening brace         | '}'      | java.lang.String |
+        Unexpected leading character  | 'a{}'    | java.lang.String |
+        Missing closing brace         | '{'      |                  | Failed to parse `{`
+        Closed by the wrong delimiter | '{a, b]' |                  | Failed to parse `{a, b]`
+        Double opening brace          | '{{}'    |                  | Failed to parse `{{}`
+        Double closing brace          | '{}}'    |                  | Failed to parse `}`
+        Unexpected trailing character | '{}a'    |                  | Failed to parse `a`
+        Missing element               | '{a,}'   |                  | Failed to parse `{a,}`
         """)
     void shouldHandleInvalidSetSyntax(
         String input,
-        boolean expectedSuccess,
-        Class expectedType,
-        String expectedErrorMessage
+        Class<?> parsedType,
+        String errorMessage
     ) {
-        String table = "Scenario | Input\nInvalid | " + input;
-        if (expectedSuccess) {
-            assertInstanceOf(expectedType, TableParser.parse(table).row(0).value(1));
-        } else {
-            TableTestParseException actualException = assertThrows(
-                TableTestParseException.class,
-                () -> TableParser.parse(table)
-            );
-            assertTrue(actualException.getMessage().startsWith(expectedErrorMessage), actualException.getMessage());
-        }
+        assertEquals(parsedType, parsedTypeOf(input));
+        assertEquals(errorMessage, parseErrorFor(input));
     }
 
     @DisplayName("Maps in [key: value] form support nesting and quoted keys")
@@ -161,36 +141,48 @@ public class ValueGrammarTest {
     @DisplayName("A malformed map or a duplicate key fails parsing")
     @Description("Values that do not open a map capture as plain strings.")
     @TableTest("""
-        Scenario                       | Input    | Success? | Parsed Type?     | Error Message?
-        Quoted empty map               | '"[:]"'  | true     | java.lang.String |
-        Missing closing bracket        | '[:'     | false    |                  | Failed to parse `[:`
-        Missing opening bracket        | ':]'     | true     | java.lang.String |
-        Opening bracket, closing brace | '[a: b}' | false    |                  | Failed to parse `[a: b}`
-        Opening brace, closing bracket | '{a: b]' | false    |                  | Failed to parse `{a: b]`
-        Double opening bracket         | '[[:]'   | false    |                  | Failed to parse `[[:]`
-        Double closing bracket         | '[:]]'   | false    |                  | Failed to parse `]`
-        Unexpected leading character   | 'a[:]'   | true     | java.lang.String |
-        Unexpected trailing character  | '[:]a'   | false    |                  | Failed to parse `a`
-        Missing element                | '[a:b,]' | false    |                  | Failed to parse `[a:b,]`
-        Duplicate keys                 | '[a:b, a:c]' | false |                 | Duplicate key `a`
-        Duplicate quoted key           | '[a:b, "a":c]' | false |               | Duplicate key `a`
-        Same key different value types | '[a:b, a:[b], a:{b}, a:[b:c]]' | false | | Duplicate key `a`
+        Scenario                       | Input                          | Parsed type?     | Error message?
+        Quoted empty map               | '"[:]"'                        | java.lang.String |
+        Missing opening bracket        | ':]'                           | java.lang.String |
+        Unexpected leading character   | 'a[:]'                         | java.lang.String |
+        Missing closing bracket        | '[:'                           |                  | Failed to parse `[:`
+        Closed by the wrong delimiter  | '[a: b}'                       |                  | Failed to parse `[a: b}`
+        Double opening bracket         | '[[:]'                         |                  | Failed to parse `[[:]`
+        Double closing bracket         | '[:]]'                         |                  | Failed to parse `]`
+        Unexpected trailing character  | '[:]a'                         |                  | Failed to parse `a`
+        Missing element                | '[a:b,]'                       |                  | Failed to parse `[a:b,]`
+        Duplicate keys                 | '[a:b, a:c]'                   |                  | Duplicate key `a` in map `[a:b, a:c]`
+        Duplicate quoted key           | '[a:b, "a":c]'                 |                  | 'Duplicate key `a` in map `[a:b, "a":c]`'
+        Same key different value types | '[a:b, a:[b], a:{b}, a:[b:c]]' |                  | 'Duplicate key `a` in map `[a:b, a:[b], a:{b}, a:[b:c]]`'
         """)
     void shouldHandleInvalidMapSyntax(
         String input,
-        boolean expectedSuccess,
-        Class expectedType,
-        String expectedErrorMessage
+        Class<?> parsedType,
+        String errorMessage
     ) {
-        String table = "Scenario | Input\nInvalid | " + input;
-        if (expectedSuccess) {
-            assertInstanceOf(expectedType, TableParser.parse(table).row(0).value(1));
-        } else {
-            TableTestParseException actualException = assertThrows(
-                TableTestParseException.class,
-                () -> TableParser.parse(table)
-            );
-            assertTrue(actualException.getMessage().startsWith(expectedErrorMessage), actualException.getMessage());
+        assertEquals(parsedType, parsedTypeOf(input));
+        assertEquals(errorMessage, parseErrorFor(input));
+    }
+
+    /** The type the value captures as, or null when it does not parse. */
+    private static Class<?> parsedTypeOf(String input) {
+        try {
+            return TableParser.parse("Scenario | Input\nInvalid | " + input)
+                    .row(0)
+                    .value(1)
+                    .getClass();
+        } catch (TableTestParseException e) {
+            return null;
+        }
+    }
+
+    /** The start of the message the value fails to parse with, or null when it parses. */
+    private static String parseErrorFor(String input) {
+        try {
+            TableParser.parse("Scenario | Input\nInvalid | " + input);
+            return null;
+        } catch (TableTestParseException e) {
+            return e.getMessage().split(" in row ")[0];
         }
     }
 
@@ -314,31 +306,25 @@ public class ValueGrammarTest {
         assertTrue(exception.getMessage().startsWith("Failed to parse `[2025-08-01T00:00:00] | 0` in row `Purchase too old"), exception.getMessage());
     }
 
-    @DisplayName("Stray quotes and unbalanced brackets fail with a parse error")
-    @Description("The error names the offending fragment and the row it is in.")
+    @DisplayName("A stray quote fails, and the error names the row it is in")
+    @Description("""
+            A quote that opens nothing is a parse failure like any unbalanced delimiter. Every
+            parse error also names the row it happened in, quoting the row as written, so a
+            table with many rows says which one to look at. The unbalanced-bracket cases
+            themselves are the well-formed list and set rules above.
+            """)
     @TableTest("""
-        Scenario                   | Input  | Error Message?
-        Triple single quotes       | "'''"  | Failed to parse `'`
-        Triple double quotes       | '\"""' | Failed to parse `"`
-        Standalone opening bracket | '['    | Failed to parse `[`
-        Standalone opening brace   | '{'    | Failed to parse `{`
-        Additional opening bracket | '[[]'  | Failed to parse `[[]`
-        Additional opening brace   | '{{}'  | Failed to parse `{{}`
-        Additional closing bracket | '[]]'  | Failed to parse `]`
-        Additional closing brace   | '{}}'  | Failed to parse `}`
+        Scenario             | Input  | Error message?
+        Triple single quotes | "'''"  | "Failed to parse `'` in row `Triple single quotes | '''`"
+        Triple double quotes | '\"""' | 'Failed to parse `"` in row `Triple double quotes | \"""`'
         """)
-    void shouldHandleInvalidQuotedStringSyntax(
-        @Scenario String scenario,
-        String input,
-        String expectedErrorMessage
-    ) {
+    void shouldHandleInvalidQuotedStringSyntax(@Scenario String scenario, String input, String errorMessage) {
         String table = "Scenario | Input\n" + scenario + " | " + input;
         TableTestParseException actualException = assertThrows(
             TableTestParseException.class,
             () -> TableParser.parse(table)
         );
-        assertTrue(actualException.getMessage().startsWith(expectedErrorMessage), actualException.getMessage());
-        assertTrue(actualException.getMessage().contains("in row `" + scenario), actualException.getMessage());
+        assertEquals(errorMessage, actualException.getMessage());
     }
 
 }

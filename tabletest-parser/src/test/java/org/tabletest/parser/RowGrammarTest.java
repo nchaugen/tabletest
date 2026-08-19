@@ -40,10 +40,9 @@ public class RowGrammarTest {
     @DisplayName("Quotes protect a pipe so the value stays in one field")
     @Description("Either quote style works; the surrounding quotes are discarded from the field.")
     @TableTest("""
-        Scenario                | Row           | Fields?
-        Double-quoted pipe      | '"a | b" | c' | "[a | b, c]"
-        Single-quoted pipe      | "'a | b' | c" | "[a | b, c]"
-        Whole row quoted        | '"a | b | c"' | "[a | b | c]"
+        Scenario           | Row                            | Fields?
+        Either quote style | {'"a | b" | c', "'a | b' | c"} | "[a | b, c]"
+        Whole row quoted   | '"a | b | c"'                  | "[a | b | c]"
         """)
     void shouldKeepPipeInsideQuotedField(String row, String fields) {
         assertEquals(fields, TableParser.parse("Field\n" + row).row(0).values().toString());
