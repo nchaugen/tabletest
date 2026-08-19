@@ -1,11 +1,22 @@
-# Report-time publish selection for the parser's living spec.
+# Report-time curation for the parser's living spec.
 #
-# Every @TableTest publishes by default; the table below exercises internal
-# mechanism rather than a grammar rule, so it is held back here instead of with
-# @Tag("unpublished") + a Surefire group filter. Report-time selection keeps what
-# publishes independent of what runs, and survives the second (non-JVM)
-# implementation that has no test tags.
-# See the reporter decision publish-selection-at-report-time.
+# Spec metadata (title, intro, feature reading order) and publish selection are both applied
+# when the report is generated, not when the tests run. Nothing here is a test-code concern,
+# and nothing here is JVM-specific — the second (non-JVM) implementation ships the same file.
+# See the reporter decisions spec-metadata-sidecar-file and publish-selection-at-report-time.
+
+# --- Spec metadata --------------------------------------------------------------------
+# Without a title the root index is named by the deepest common package segment ("parser").
+title: "TableTest Format — Specification"
+intro: >
+  The grammar of the TableTest table format: how text divides into rows, how a row divides
+  into cells, and how a cell becomes a value. Every rule below is executable — it is a test
+  that runs in CI against the Java parser, and each scenario is one row of that test's table.
+
+# --- Publish selection ----------------------------------------------------------------
+# Every @TableTest publishes by default; the table below exercises internal mechanism rather
+# than a grammar rule, so it is held back here instead of with @Tag("unpublished") + a
+# Surefire group filter.
 publish:
   exclude:
     - row-parser-test   # white-box test of the internal RowParser; the row grammar

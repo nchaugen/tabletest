@@ -1,16 +1,33 @@
-# Report-time publish selection for the core (tabletest-junit) living spec.
+# Report-time curation for the core (tabletest-junit) living spec.
 #
-# Every @TableTest publishes by default; the pages below are held back at report
-# time instead of with @Tag("unpublished") + a Surefire group filter. Report-time
-# selection keeps what publishes independent of what runs, and survives the second
-# (non-JVM) implementation that has no test tags. Each path carries the reason its
-# rule is not part of the curated spec (see the core decision
-# curated-spec-vs-conformance and the reporter decision
-# publish-selection-at-report-time).
-#
-# Paths name pages by the report URL slug. Excluding a class or feature page takes
-# its whole subtree; a trailing rule-slug excludes a single rule from an otherwise
-# published class (the method-level opt-outs, which a page path can still name).
+# Spec metadata (title, intro, feature titles) and publish selection are both applied when
+# the report is generated, not when the tests run. Nothing here is a test-code concern, and
+# nothing here is JVM-specific — the second (non-JVM) implementation ships the same file.
+# See the reporter decisions spec-metadata-sidecar-file and publish-selection-at-report-time.
+
+# --- Spec metadata --------------------------------------------------------------------
+# Without this section the root index is titled by the deepest common package segment
+# ("junit") and each feature page by its lowercase package name ("converting", "features",
+# "examples", "builtin"). Feature titles come from the Feature map in the living-docs-coverage
+# roadmap; declared features lead in the order given, undeclared siblings follow alphabetically.
+title: "TableTest Core — Specification"
+intro: >
+  How a TableTest table becomes test scenarios: what each cell value is converted to, what the
+  table syntax means to the test runner, and what the whole thing looks like in use. Every rule
+  below is executable — it is a test that runs in CI, and each scenario is one row of that
+  test's table. The table format's own grammar is specified separately, under Format.
+features:
+  - name: converting
+    title: "Value conversion"
+    features:
+      - name: builtin
+        title: "Built-in conversion"
+  - name: features
+    title: "Table semantics"
+  - name: examples
+    title: "Worked examples"
+
+# --- Publish selection ----------------------------------------------------------------
 publish:
   exclude:
     # --- Kotlin twins: one language publishes; Kotlin mirrors the Java suite ---
