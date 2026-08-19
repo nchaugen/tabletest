@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         """)
 public class JavaParameterizedTypeConversionTest {
 
-    @DisplayName("Byte elements hold a whole number in the 8-bit signed range")
+    @DisplayName("Converts elements to Byte from a whole number in the 8-bit signed range")
     @TableTest("""
         Scenario         | List input  | Set input   | Map input          | Element type?  | Converted elements?
         Decimal digits   | [15]        | {15}        | [a: 15]            | java.lang.Byte | [15]
@@ -46,7 +46,7 @@ public class JavaParameterizedTypeConversionTest {
         assertElements(expectedElementType, expectedElements, list, set, map.values());
     }
 
-    @DisplayName("Integer elements hold a whole number in the 32-bit signed range")
+    @DisplayName("Converts elements to Integer from a whole number in the 32-bit signed range")
     @TableTest("""
         Scenario         | List input | Set input | Map input          | Element type?     | Converted elements?
         Decimal digits   | [15]       | {15}      | [a: 15]            | java.lang.Integer | [15]
@@ -63,7 +63,7 @@ public class JavaParameterizedTypeConversionTest {
         assertElements(expectedElementType, expectedElements, list, set, map.values());
     }
 
-    @DisplayName("Long elements hold whole numbers beyond the int range")
+    @DisplayName("Converts elements to Long from whole numbers beyond the int range")
     @TableTest("""
         Scenario         | List input   | Set input    | Map input          | Element type?  | Converted elements?
         Decimal digits   | [15]         | {15}         | [a: 15]            | java.lang.Long | [15]
@@ -80,7 +80,7 @@ public class JavaParameterizedTypeConversionTest {
         assertElements(expectedElementType, expectedElements, list, set, map.values());
     }
 
-    @DisplayName("Double elements accept plain and scientific notation")
+    @DisplayName("Converts elements to Double from plain or scientific notation")
     @TableTest("""
         Scenario            | List input | Set input  | Map input        | Element type?    | Converted elements?
         Plain decimal       | [1.5]      | {1.5}      | [a: 1.5]         | java.lang.Double | [1.5]
@@ -98,7 +98,7 @@ public class JavaParameterizedTypeConversionTest {
         assertElements(expectedElementType, expectedElements, list, set, map.values());
     }
 
-    @DisplayName("String elements keep the cell text unconverted")
+    @DisplayName("Keeps String elements as the cell text, unconverted")
     @TableTest("""
         Scenario         | List input | Set input | Map input    | Element type?    | Converted elements?
         Words            | [a, b]     | {a, b}    | [k: a, l: b] | java.lang.String | [a, b]
@@ -114,7 +114,7 @@ public class JavaParameterizedTypeConversionTest {
         assertElements(expectedElementType, expectedElements, list, set, map.values());
     }
 
-    @DisplayName("Collection elements convert one level deeper")
+    @DisplayName("Converts the elements of a nested collection one level deeper")
     @Description("""
             The element type is itself a collection, so its own element type decides
             what the innermost values become — Short in this table.
@@ -137,7 +137,7 @@ public class JavaParameterizedTypeConversionTest {
         assertEquals(expectedInnermostElements, flattened(map.values()));
     }
 
-    @DisplayName("Map elements convert their own values one level deeper")
+    @DisplayName("Converts the values of a nested map one level deeper")
     @Description("The nested map's declared value type is Long in this table.")
     @TableTest("""
         Scenario            | List input       | Set input        | Map input              | Element type? | Innermost values?
@@ -157,7 +157,7 @@ public class JavaParameterizedTypeConversionTest {
         assertEquals(expectedInnermostValues, flattenedValues(map.values()));
     }
 
-    @DisplayName("An empty collection converts to an empty collection of the declared type")
+    @DisplayName("Converts an empty collection to an empty collection of the declared type")
     @TableTest("""
         Scenario       | List input | Set input | Map input | Element count?
         Empty          | []         | {}        | [:]       | 0
@@ -174,7 +174,7 @@ public class JavaParameterizedTypeConversionTest {
         assertEquals(expectedElementCount, map.size());
     }
 
-    @DisplayName("Map keys stay text whatever key type the signature declares")
+    @DisplayName("Keeps map keys as text whatever key type the signature declares")
     @Description("""
             The parameter in this table is declared Map<Integer, Integer>, yet its
             keys arrive as the cell text: only the value type takes part in

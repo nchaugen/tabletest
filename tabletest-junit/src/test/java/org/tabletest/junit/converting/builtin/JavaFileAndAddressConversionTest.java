@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         """)
 public class JavaFileAndAddressConversionTest {
 
-    @DisplayName("File converts from path text")
+    @DisplayName("Converts path text to File")
     @TableTest("""
         Scenario      | Input value     | Parameter type? | File name? | File is absolute?
         Absolute path | /path/to/file   | java.io.File    | file       | true
@@ -38,7 +38,7 @@ public class JavaFileAndAddressConversionTest {
         assertEquals(expectedAbsolute, value.isAbsolute());
     }
 
-    @DisplayName("Path converts from path text")
+    @DisplayName("Converts path text to Path")
     @TableTest("""
         Scenario      | Input value     | Parameter type?    | Path file name? | Path is absolute?
         Absolute path | /path/to/file   | java.nio.file.Path | file            | true
@@ -50,7 +50,7 @@ public class JavaFileAndAddressConversionTest {
         assertEquals(expectedAbsolute, value.isAbsolute());
     }
 
-    @DisplayName("URI converts from address text, including non-URL schemes")
+    @DisplayName("Converts address text to URI, including non-URL schemes")
     @TableTest("""
         Scenario   | Input value         | Parameter type? | URI scheme?
         Web        | https://junit.org/  | java.net.URI    | https
@@ -62,7 +62,7 @@ public class JavaFileAndAddressConversionTest {
         assertEquals(expectedScheme, value.getScheme());
     }
 
-    @DisplayName("URL converts from address text")
+    @DisplayName("Converts address text to URL")
     @Description("A URL needs a protocol handler, so unlike URI it rejects schemes such as urn:.")
     @TableTest("""
         Scenario   | Input value        | Parameter type? | URL protocol?

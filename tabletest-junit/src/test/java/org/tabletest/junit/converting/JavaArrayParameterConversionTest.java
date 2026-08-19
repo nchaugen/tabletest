@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         """)
 public class JavaArrayParameterConversionTest {
 
-    @DisplayName("A list converts to a String array, and a blank cell to a null array")
+    @DisplayName("Converts a list to a String array, and a blank cell to a null array")
     @TableTest("""
         Scenario       | Input value | Parameter type? | Converted value?
         Single element | "[hello]"   | String[]        | [hello]
@@ -36,7 +36,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(inputValue, renderedValueOf(values));
     }
 
-    @DisplayName("A list converts to a boxed Integer array")
+    @DisplayName("Converts a list to a boxed Integer array")
     @TableTest("""
         Scenario       | Input value | Parameter type? | Converted value?
         Single element | "[1]"       | Integer[]       | [1]
@@ -48,7 +48,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(inputValue, renderedValueOf(values));
     }
 
-    @DisplayName("A list converts to a primitive int array")
+    @DisplayName("Converts a list to a primitive int array")
     @TableTest("""
         Scenario       | Input value | Parameter type? | Converted value?
         Single element | "[1]"       | int[]           | [1]
@@ -60,7 +60,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(inputValue, Arrays.toString(values));
     }
 
-    @DisplayName("A list converts to a primitive long array")
+    @DisplayName("Converts a list to a primitive long array")
     @TableTest("""
         Scenario       | Input value | Parameter type? | Converted value?
         Single element | "[1]"       | long[]          | [1]
@@ -71,7 +71,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(inputValue, Arrays.toString(values));
     }
 
-    @DisplayName("A list converts to a primitive double array")
+    @DisplayName("Converts a list to a primitive double array")
     @TableTest("""
         Scenario       | Input value       | Parameter type? | Converted value?
         Single element | "[1.5]"           | double[]        | [1.5]
@@ -82,7 +82,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(inputValue, Arrays.toString(values));
     }
 
-    @DisplayName("Nested lists convert to a two-dimensional array")
+    @DisplayName("Converts nested lists to a two-dimensional array")
     @TableTest("""
         Scenario     | Input value        | Parameter type? | Converted value?
         Nested lists | "[[a, b], [c, d]]" | String[][]      | [[a, b], [c, d]]
@@ -93,7 +93,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(inputValue, renderedValueOf(values));
     }
 
-    @DisplayName("A list of maps converts to an array of maps")
+    @DisplayName("Converts a list of maps to an array of maps")
     @Description("""
             Each element is a Map, shown here by the keys and values it holds in
             order — the array prints in Java's own map notation, which is not a
@@ -115,7 +115,7 @@ public class JavaArrayParameterConversionTest {
         assertEquals(expectedValues, entriesOf(values, Map::values));
     }
 
-    @DisplayName("Arrays nest as elements of a list")
+    @DisplayName("Converts each element of a list to an array")
     @Description("The parameter is a List, so the element type is the array — shown per element.")
     @TableTest("""
         Scenario      | Input value     | Element type? | Converted value?
