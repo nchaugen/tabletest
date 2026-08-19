@@ -10,7 +10,7 @@
 # ("junit") and each feature page by its lowercase package name ("converting", "features",
 # "examples", "builtin"). Feature titles come from the Feature map in the living-docs-coverage
 # roadmap; declared features lead in the order given, undeclared siblings follow alphabetically.
-title: "TableTest JUnit — Specification"
+title: "TableTest JUnit"
 intro: >
   How a TableTest table becomes test scenarios: what each cell value is converted to, what the
   table syntax means to the test runner, and what the whole thing looks like in use. Every rule

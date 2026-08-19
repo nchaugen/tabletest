@@ -7,7 +7,7 @@
 
 # --- Spec metadata --------------------------------------------------------------------
 # Without a title the root index is named by the deepest common package segment ("parser").
-title: "TableTest Parser — Specification"
+title: "TableTest Parser"
 intro: >
   The grammar of the TableTest table format: how text divides into rows, how a row divides
   into cells, and how a cell becomes a value. Every rule below is executable — it is a test
