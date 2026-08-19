@@ -8,20 +8,27 @@ import java.util.stream.Stream;
 import static org.tabletest.junit.ParameterFixture.parameter;
 import static org.tabletest.junit.ParameterTypeConverter.convertValue;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TableTestExceptionAssertions {
 
-    public static void assertConversionFails(Object parsedValue, Class<?> type, String expectedMessagePart) {
+    /** Asserts the whole message the conversion fails with, not a fragment of it. */
+    public static void assertConversionFails(Object parsedValue, Class<?> type, String expectedMessage) {
         Exception exception = assertThrows(
             TableTestException.class,
             () -> convertValue(parsedValue, parameter(type))
         );
-        assertTrue(
-            exception.getMessage().contains(expectedMessagePart),
-            String.format("Message `%s` did not contain `%s`", exception.getMessage(), expectedMessagePart)
-        );
+        assertEquals(expectedMessage, exception.getMessage());
+    }
+
+    /**
+     * The suffix every converter-lookup failure ends with, naming the classes searched. It depends
+     * on where the test lives, so a table states the message without it.
+     */
+    public static String searchedLocations() {
+        return " Locations searched for type converters: " + ParameterFixture.class.getTypeName();
     }
 
     public static void assertThrowsWhenFallbackFails(Object parsedValue, Class<?> type) {

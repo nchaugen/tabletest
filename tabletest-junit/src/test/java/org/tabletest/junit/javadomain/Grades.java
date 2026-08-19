@@ -17,7 +17,7 @@ public record Grades(List<Integer> grades) {
             .orElse(0.0);
     }
 
-     public boolean hasPassed() {
-        return averageGrade() >= 70.0;
+     public boolean hasPassed(int passMark) {
+        return averageGrade() >= passMark;
     }
 }

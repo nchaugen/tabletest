@@ -47,6 +47,8 @@ public class LeapYearExampleTest {
         Divisible by 4                  | 2004 | Yes
         Divisible by 100 but not by 400 | 2100 | No
         Divisible by 400                | 2000 | Yes
+        Year zero                       | 0    | Yes
+        A year before the common era    | -1   | No
         """)
     void testLeapYear(int year, boolean isLeapYear) {
         assertEquals(isLeapYear, Year.isLeap(year));
@@ -73,8 +75,6 @@ public class LeapYearExampleTest {
         Divisible by 4                  | {4, 2004, 30008}   | Yes
         Divisible by 100 but not by 400 | {100, 2100, 30300} | No
         Divisible by 400                | {400, 2000, 30000} | Yes
-        Year 0                          | 0                  | Yes
-        Negative input                  | -1                 | No
         """)
     void testLeapYears(Year year, boolean isLeapYear) {
         assertEquals(isLeapYear, year.isLeap());

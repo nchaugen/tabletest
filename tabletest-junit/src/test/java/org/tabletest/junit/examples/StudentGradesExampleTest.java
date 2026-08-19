@@ -22,21 +22,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class StudentGradesExampleTest {
 
     @DisplayName("Nested collections convert to domain types")
+    @Description("""
+            A student passes on their own average, so Pass Count is a count of students rather
+            than of grades. Emma's average in the second row is exactly the pass mark, which is
+            the boundary the rule is decided at.
+            """)
     @TableTest("""
-        Student grades                                                  | Highest Grade? | Average Grade? | Pass Count?
-        [Alice: [95, 87, 92], Bob: [78, 85, 90], Charlie: [98, 89, 91]] | 98             | 89.4           | 3
-        [David: [45, 60, 70], Emma: [65, 70, 75], Frank: [82, 78, 60]]  | 82             | 67.2           | 2
-        [:]                                                             | 0              | 0.0            | 0
+        Scenario                     | Student grades                                                  | Pass Mark | Highest Grade? | Average Grade? | Pass Count?
+        Every student above the mark | [Alice: [95, 87, 92], Bob: [78, 85, 90], Charlie: [98, 89, 91]] | 70        | 98             | 89.4           | 3
+        One below, one at the mark   | [David: [45, 60, 70], Emma: [65, 70, 75], Frank: [82, 78, 60]]  | 70        | 82             | 67.2           | 2
+        No students at all           | [:]                                                             | 70        | 0              | 0.0            | 0
         """)
     void testNestedParameterizedTypes(
         Students students,
+        int passMark,
         int expectedHighestGrade,
         double expectedAverageGrade,
         int expectedPassCount
     ) {
         assertEquals(expectedHighestGrade, students.highestGrade());
         assertEquals(expectedAverageGrade, students.averageGrade(), 0.1);
-        assertEquals(expectedPassCount, students.passCount());
+        assertEquals(expectedPassCount, students.passCount(passMark));
     }
 
     @TypeConverter

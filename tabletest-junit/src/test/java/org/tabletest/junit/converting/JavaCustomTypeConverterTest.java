@@ -29,11 +29,11 @@ public class JavaCustomTypeConverterTest {
     @DisplayName("A converter turns cell text into the declared parameter type")
     @Description("Yes and No become booleans, for a primitive and a boxed parameter alike.")
     @TableTest("""
-        Scenario           | boolean | Boolean | Converted value as text?
-        Affirmative        | Yes     | Yes     | true
-        Negative           | No      | No      | false
-        Case is ignored    | yES     | yES     | true
-        Anything else is No| maybe   | maybe   | false
+        Scenario          | boolean | Boolean | Converted value as text?
+        Affirmative       | Yes     | Yes     | true
+        Negative          | No      | No      | false
+        Case is ignored   | yES     | yES     | true
+        Unrecognised word | maybe   | maybe   | false
         """)
     void converts_text_to_booleans(boolean value, Boolean boxedValue, String expectedText) {
         assertEquals(expectedText, String.valueOf(value));
@@ -68,10 +68,10 @@ public class JavaCustomTypeConverterTest {
             the sum the test method computed from the converted parameters.
             """)
     @TableTest("""
-        Scenario      | int | Integer | Sum?  | Sum in digits?
-        One and three | one | three   | four  | 4
-        Two and two   | two | two     | four  | 4
-        Two and three | two | three   | five  | 5
+        Scenario      | int | Integer | Sum? | Sum in digits?
+        One and three | one | three   | four | 4
+        Two and two   | two | two     | four | 4
+        Two and three | two | three   | five | 5
         """)
     void converts_number_words_in_every_column(int a, Integer b, int expectedSum, String expectedDigits) {
         assertEquals(expectedSum, a + b);

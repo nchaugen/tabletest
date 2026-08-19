@@ -22,12 +22,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class JavaExternalTableTest {
 
     @DisplayName("A resource path resolves from the classpath root, with or without a leading slash")
-    @Description("Read as UTF-8; the loaded text is shown one file line per element.")
+    @Description("""
+            Read as UTF-8; the loaded text is shown one file line per element. A leading slash
+            makes no difference — both spellings of a root path are in the first row.
+            """)
     @TableTest("""
-        Scenario            | Resource path           | Lines loaded from the file?
-        Path from the root  | external.table          | ["Scenario   | a | b | a + b?", "Zero sum   | 0 | 0 | 0", "Zero right | 2 | 0 | 2", "Two twos   | 2 | 2 | 4"]
-        Leading slash       | /external.table         | ["Scenario   | a | b | a + b?", "Zero sum   | 0 | 0 | 0", "Zero right | 2 | 0 | 2", "Two twos   | 2 | 2 | 4"]
-        Path in a subfolder | subfolder/nested.table  | ["Scenario  | a | b | a - b?", "Positive  | 3 | 1 | 2", "Negative  | 1 | 3 | -2"]
+        Scenario            | Resource path                     | Lines loaded from the file?
+        Path at the root    | {external.table, /external.table} | ["Scenario   | a | b | a + b?", "Zero sum   | 0 | 0 | 0", "Zero right | 2 | 0 | 2", "Two twos   | 2 | 2 | 4"]
+        Path in a subfolder | subfolder/nested.table            | ["Scenario  | a | b | a - b?", "Positive  | 3 | 1 | 2", "Negative  | 1 | 3 | -2"]
         """)
     void resolves_resource_paths(String resourcePath, List<String> expectedLines) {
         assertEquals(
@@ -43,9 +45,9 @@ public class JavaExternalTableTest {
             characters, so the encoding belongs with the resource path.
             """)
     @TableTest("""
-        Scenario                    | Encoding   | Characters in the last row's first cell? | Code points?
-        The encoding the file uses  | ISO-8859-1 | 6                                       | [201, 220, 165, 198, 216, 197]
-        Read as UTF-8 instead       | UTF-8      | 5                                       | [65533, 1829, 65533, 65533, 65533]
+        Scenario                   | Encoding   | Characters in the last row's first cell? | Code points?
+        The encoding the file uses | ISO-8859-1 | 6                                        | [201, 220, 165, 198, 216, 197]
+        Read as UTF-8 instead      | UTF-8      | 5                                        | [65533, 1829, 65533, 65533, 65533]
         """)
     void decodes_bytes_with_the_declared_encoding(
         String encoding,
@@ -66,10 +68,10 @@ public class JavaExternalTableTest {
             exception type, so the message is what tells the two apart.
             """)
     @TableTest("""
-        Scenario                 | Resource path  | Encoding   | Throws?                                | Error message?
-        No such file anywhere    | no_such.table  | UTF-8      | org.tabletest.junit.TableTestException | External table file no_such.table not found, searched the classpath relative to org.tabletest.junit.features.JavaExternalTableTest and from the root
-        Subfolder file misspelt  | subfolder/x    | UTF-8      | org.tabletest.junit.TableTestException | External table file subfolder/x not found, searched the classpath relative to org.tabletest.junit.features.JavaExternalTableTest and from the root
-        Encoding does not exist  | external.table | Latin-42   | org.tabletest.junit.TableTestException | Failed to read table from external file external.table using encoding Latin-42
+        Scenario                | Resource path  | Encoding | Throws?                                | Error message?
+        No such file anywhere   | no_such.table  | UTF-8    | org.tabletest.junit.TableTestException | External table file no_such.table not found, searched the classpath relative to org.tabletest.junit.features.JavaExternalTableTest and from the root
+        Subfolder file misspelt | subfolder/x    | UTF-8    | org.tabletest.junit.TableTestException | External table file subfolder/x not found, searched the classpath relative to org.tabletest.junit.features.JavaExternalTableTest and from the root
+        Encoding does not exist | external.table | Latin-42 | org.tabletest.junit.TableTestException | Failed to read table from external file external.table using encoding Latin-42
         """)
     void reports_a_resource_it_cannot_read(
         String resourcePath,

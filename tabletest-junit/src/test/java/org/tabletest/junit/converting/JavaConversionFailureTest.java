@@ -30,12 +30,12 @@ public class JavaConversionFailureTest {
             depend on where the test lives, so they are left out of the table.
             """)
     @TableTest("""
-        Scenario                          | Input value | Parameter type                      | Error message?
-        Decimal for a whole-number type   | 0.1         | java.lang.Byte                      | Built-in conversion of value "0.1" to type java.lang.Byte failed. Are you missing a type converter for this conversion?
-        Whole number outside the range    | 256         | java.lang.Byte                      | Built-in conversion of value "256" to type java.lang.Byte failed. Are you missing a type converter for this conversion?
-        More than a single character      | abc         | java.lang.Character                 | Built-in conversion of value "abc" to type java.lang.Character failed. Are you missing a type converter for this conversion?
-        Malformed date                    | invalid     | java.time.LocalDate                 | Built-in conversion of value "invalid" to type java.time.LocalDate failed. Are you missing a type converter for this conversion?
-        Type with no built-in conversion  | 52          | org.tabletest.junit.javadomain.Ages | Built-in conversion of value "52" to type org.tabletest.junit.javadomain.Ages failed. Are you missing a type converter for this conversion?
+        Scenario                         | Input value | Parameter type                      | Error message?
+        Decimal for a whole-number type  | 0.1         | java.lang.Byte                      | Built-in conversion of value "0.1" to type java.lang.Byte failed. Are you missing a type converter for this conversion?
+        Whole number outside the range   | 128         | java.lang.Byte                      | Built-in conversion of value "128" to type java.lang.Byte failed. Are you missing a type converter for this conversion?
+        More than a single character     | abc         | java.lang.Character                 | Built-in conversion of value "abc" to type java.lang.Character failed. Are you missing a type converter for this conversion?
+        Malformed date                   | invalid     | java.time.LocalDate                 | Built-in conversion of value "invalid" to type java.time.LocalDate failed. Are you missing a type converter for this conversion?
+        Type with no built-in conversion | 52          | org.tabletest.junit.javadomain.Ages | Built-in conversion of value "52" to type org.tabletest.junit.javadomain.Ages failed. Are you missing a type converter for this conversion?
         """)
     void fails_builtin_conversion(String value, Class<?> type, String expectedMessage) {
         TableTestException exception = assertThrows(

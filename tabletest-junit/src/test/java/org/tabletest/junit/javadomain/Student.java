@@ -9,7 +9,7 @@ public record Student(String name, Grades grades) {
         return grades.averageGrade();
     }
 
-    public boolean hasPassed() {
-        return grades.hasPassed();
+    public boolean hasPassed(int passMark) {
+        return grades.hasPassed(passMark);
     }
 }

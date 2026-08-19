@@ -18,10 +18,10 @@ public class BasicExamplesTest {
 
     @DisplayName("Plain values convert to the parameter type")
     @TableTest("""
-        Augend | Addend | Sum?
-        2      | 3      | 5
-        0      | 0      | 0
-        1      | 1      | 2
+        Scenario           | Augend | Addend | Sum?
+        Two positive terms | 2      | 3      | 5
+        Both zero          | 0      | 0      | 0
+        Both one           | 1      | 1      | 2
         """)
     void testAddition(int augend, int addend, int sum) {
         assertEquals(sum, augend + addend);
@@ -33,11 +33,11 @@ public class BasicExamplesTest {
             either quote style works. "" is the empty string.
             """)
     @TableTest("""
-        Value          | Length?
-        Hello world    | 11
-        "World, hello" | 12
-        '|'            | 1
-        ""             | 0
+        Scenario                   | Value          | Length?
+        Plain text needs no quotes | Hello world    | 11
+        A comma needs quotes       | "World, hello" | 12
+        A pipe needs quotes        | '|'            | 1
+        An empty string            | ""             | 0
         """)
     void testString(String value, int expectedLength) {
         assertEquals(expectedLength, value.length());
@@ -45,13 +45,13 @@ public class BasicExamplesTest {
 
     @DisplayName("Lists nest values, lists, and maps")
     @TableTest("""
-        List             | Size?
-        [Hello, World]   | 2
-        ["World, Hello"] | 1
-        ['|', ",", abc]  | 3
-        [[1, 2], [3, 4]] | 2
-        [[a: 4], [b: 5]] | 2
-        []               | 0
+        Scenario                   | List             | Size?
+        Two plain values           | [Hello, World]   | 2
+        A comma inside one element | ["World, Hello"] | 1
+        Both quote styles at once  | ['|', ",", abc]  | 3
+        Lists inside a list        | [[1, 2], [3, 4]] | 2
+        Maps inside a list         | [[a: 4], [b: 5]] | 2
+        No elements                | []               | 0
         """)
     void testList(List<Object> list, int expectedSize) {
         assertEquals(expectedSize, list.size());
@@ -59,11 +59,11 @@ public class BasicExamplesTest {
 
     @DisplayName("Maps hold mixed value types")
     @TableTest("""
-        Map                                      | Size?
-        [1: Hello, 2: World]                     | 2
-        [pipe: "|", comma: ',']                  | 2
-        [string: abc, list: [1, 2], map: [a: 4]] | 3
-        [:]                                      | 0
+        Scenario                    | Map                                      | Size?
+        Digits as keys              | [1: Hello, 2: World]                     | 2
+        Values needing either quote | [pipe: "|", comma: ',']                  | 2
+        A value per kind            | [string: abc, list: [1, 2], map: [a: 4]] | 3
+        No entries                  | [:]                                      | 0
         """)
     void testMap(Map<String, Object> map, int expectedSize) {
         assertEquals(expectedSize, map.size());
@@ -76,13 +76,13 @@ public class BasicExamplesTest {
             between its two live rows.
             """)
     @TableTest("""
-        String         | Length?
-        Hello world    | 11
+        Scenario        | String      | Length?
+        An ordinary row | Hello world | 11
         // The next row is currently disabled
-        // "World, hello" | 12
+        // A comma        | "World, hello" | 12
         //
         // Special characters must be quoted
-        '|'            | 1
+        A quoted pipe   | '|'         | 1
         """)
     void testComment(String string, int expectedLength) {
         assertEquals(expectedLength, string.length());

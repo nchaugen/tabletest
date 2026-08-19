@@ -19,9 +19,9 @@ public record Students(List<Student> students) {
             .orElse(0.0);
     }
 
-    public long passCount() {
+    public long passCount(int passMark) {
         return students.stream()
-            .filter(Student::hasPassed)
+            .filter(student -> student.hasPassed(passMark))
             .count();
     }
 }
