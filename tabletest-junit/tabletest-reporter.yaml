@@ -10,12 +10,12 @@
 # ("junit") and each feature page by its lowercase package name ("converting", "features",
 # "examples", "builtin"). Feature titles come from the Feature map in the living-docs-coverage
 # roadmap; declared features lead in the order given, undeclared siblings follow alphabetically.
-title: "TableTest Core — Specification"
+title: "TableTest JUnit — Specification"
 intro: >
   How a TableTest table becomes test scenarios: what each cell value is converted to, what the
   table syntax means to the test runner, and what the whole thing looks like in use. Every rule
   below is executable — it is a test that runs in CI, and each scenario is one row of that
-  test's table. The table format's own grammar is specified separately, under Format.
+  test's table. The table format's own grammar is specified separately, by TableTest Parser.
 features:
   - name: converting
     title: "Value conversion"
