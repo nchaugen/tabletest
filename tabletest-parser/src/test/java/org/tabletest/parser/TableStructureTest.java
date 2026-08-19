@@ -74,15 +74,14 @@ public class TableStructureTest {
 
     @DisplayName("Input without any data rows is rejected")
     @Description("""
-            A table needs a header row and at least one data row. The Input
-            column lists the source one line per element.
+            A table needs a header row and at least one data row. The Input column lists the
+            source one line per element, and groups every input that carries no row: the
+            failure is the same whether the source is empty, blank, commented out, or a
+            mixture.
             """)
     @TableTest("""
-        Scenario            | Input                          | Error message?
-        Empty input         | ['']                           | Table has no rows: input was empty or contained only blank lines and comments
-        Blank input         | ['   ']                        | Table has no rows: input was empty or contained only blank lines and comments
-        Comment only        | ['// just a comment']          | Table has no rows: input was empty or contained only blank lines and comments
-        Comments and blanks | ['// one', '   ', '// two']    | Table has no rows: input was empty or contained only blank lines and comments
+        Scenario           | Input                                                               | Error message?
+        No row of any kind | {[''], ['   '], ['// just a comment'], ['// one', '   ', '// two']} | Table has no rows: input was empty or contained only blank lines and comments
         """)
     void shouldRejectInputWithoutTableRows(List<String> inputLines, String expectedErrorMessage) {
         TableTestParseException actualException = assertThrows(
@@ -99,10 +98,10 @@ public class TableStructureTest {
 
     @DisplayName("Blank header cells are rejected, naming the column")
     @TableTest("""
-        Scenario            | Header Row  | Error message?
-        Blank first header  | " | b | c"  | Header cell in column 1 is blank
-        Blank middle header | "a |  | c"  | Header cell in column 2 is blank
-        Blank last header   | "a | b | "  | Header cell in column 3 is blank
+        Scenario            | Header Row | Error message?
+        Blank first header  | " | b | c" | Header cell in column 1 is blank
+        Blank middle header | "a |  | c" | Header cell in column 2 is blank
+        Blank last header   | "a | b | " | Header cell in column 3 is blank
         """)
     void shouldRejectBlankHeaderCells(String headerRow, String expectedErrorMessage) {
         TableTestParseException actualException = assertThrows(
