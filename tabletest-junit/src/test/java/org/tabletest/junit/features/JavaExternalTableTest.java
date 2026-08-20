@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         """)
 public class JavaExternalTableTest {
 
-    @DisplayName("A resource path resolves from the classpath root, with or without a leading slash")
+    @DisplayName("Resolves a resource path from the classpath root")
     @Description("""
             Read as UTF-8; the loaded text is shown one file line per element. A leading slash
             makes no difference — both spellings of a root path are in the first row.

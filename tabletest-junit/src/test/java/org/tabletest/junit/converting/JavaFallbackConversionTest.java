@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         """)
 public class JavaFallbackConversionTest {
 
-    @DisplayName("Converts text to any type through its String constructor or static factory method")
+    @DisplayName("Converts text through a String constructor or factory method")
     @Description("""
             When no built-in conversion exists, TableTest falls back to a
             single-argument constructor or a static factory method on the

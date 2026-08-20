@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         """)
 class JavaValueSetTest {
 
-    @DisplayName("A value set runs the row once per value; a Set parameter gets the set itself")
+    @DisplayName("Runs a row once per value, unless the parameter is a Set")
     @Description("""
             The "Adding any of" column binds to a scalar parameter, so the row
             expands into one invocation per value. The "To set" column binds to
@@ -48,7 +48,7 @@ class JavaValueSetTest {
         assertEquals(expectedEvenSum, (x + y) % 2 == 0);
     }
 
-    @DisplayName("A value set groups values that share one expectation; fixed columns repeat")
+    @DisplayName("Groups values sharing an expectation, repeating fixed columns")
     @Description("""
             A value set is a claim that the outcome is the same whichever value is
             chosen, so every value in the set must lead to the same result. Columns

@@ -53,7 +53,7 @@ class JavaNullValueTest {
         assertConversionFails(value, type, errorMessage);
     }
 
-    @DisplayName("An empty string is a value, not null, and non-String types cannot convert it")
+    @DisplayName("Refuses an empty string for a type other than String")
     @Description("""
             '' and "" convert fine to String parameters, but there is no
             built-in conversion from an empty string to other types — without a

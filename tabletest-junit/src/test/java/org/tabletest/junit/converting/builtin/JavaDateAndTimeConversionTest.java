@@ -135,7 +135,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedDayOfWeek, value.getDayOfWeek());
     }
 
-    @DisplayName("Converts ISO-8601 time text to LocalTime, with optional fractional seconds")
+    @DisplayName("Converts ISO-8601 time text to LocalTime")
     @TableTest("""
         Scenario           | Input value  | Parameter type?     | LocalTime hour? | LocalTime minute? | LocalTime nano?
         Fractional seconds | 12:34:56.789 | java.time.LocalTime | 12              | 34                | 789000000
@@ -197,7 +197,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedInstant, value.toInstant());
     }
 
-    @DisplayName("Converts a date-time that may name a region id in brackets to ZonedDateTime")
+    @DisplayName("Converts a date-time with a region id to ZonedDateTime")
     @TableTest("""
         Scenario     | Input value                              | Parameter type?         | ZonedDateTime zone id? | ZonedDateTime as instant in UTC?
         Region zone  | 2017-03-14T13:00:00+01:00[Europe/Berlin] | java.time.ZonedDateTime | Europe/Berlin          | 2017-03-14T12:00:00Z
@@ -233,7 +233,7 @@ public class JavaDateAndTimeConversionTest {
         assertEquals(expectedOffsetMinutes, value.getOffset().getTotalSeconds() / 60);
     }
 
-    @DisplayName("Converts an offset from UTC on its own to ZoneOffset, with Z meaning none")
+    @DisplayName("Converts an offset from UTC to ZoneOffset, Z meaning none")
     @TableTest("""
         Scenario    | Input value | Parameter type?      | ZoneOffset in minutes?
         East of UTC | +02:30      | java.time.ZoneOffset | 150

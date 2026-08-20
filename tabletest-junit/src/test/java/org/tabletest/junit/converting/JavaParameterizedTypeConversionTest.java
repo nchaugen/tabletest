@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         """)
 public class JavaParameterizedTypeConversionTest {
 
-    @DisplayName("Converts elements to Byte from a whole number in the 8-bit signed range")
+    @DisplayName("Converts elements to Byte from an 8-bit whole number")
     @TableTest("""
         Scenario         | List input  | Set input   | Map input          | Element type?  | Converted elements?
         Decimal digits   | [15]        | {15}        | [a: 15]            | java.lang.Byte | [15]
@@ -46,7 +46,7 @@ public class JavaParameterizedTypeConversionTest {
         assertElements(expectedElementType, expectedElements, list, set, map.values());
     }
 
-    @DisplayName("Converts elements to Integer from a whole number in the 32-bit signed range")
+    @DisplayName("Converts elements to Integer from a 32-bit whole number")
     @TableTest("""
         Scenario         | List input | Set input | Map input          | Element type?     | Converted elements?
         Decimal digits   | [15]       | {15}      | [a: 15]            | java.lang.Integer | [15]
@@ -157,7 +157,7 @@ public class JavaParameterizedTypeConversionTest {
         assertEquals(expectedInnermostValues, flattenedValues(map.values()));
     }
 
-    @DisplayName("Converts an empty collection to an empty collection of the declared type")
+    @DisplayName("Converts an empty collection to the declared type")
     @TableTest("""
         Scenario       | List input | Set input | Map input | Element count?
         Empty          | []         | {}        | [:]       | 0
