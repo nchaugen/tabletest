@@ -14,17 +14,19 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 @DisplayName("Parameterized collection element types")
 @Description("""
-        The generic signature of a List, Set, or Map parameter decides what its
-        elements become: the same cell text converts to a different type depending
-        on the element type the test method declares. Every table below reads the
-        same way — one input column per collection kind, all three holding the same
-        values, then the element type the method received and the elements
-        themselves, which the input columns must convert to.
+        The generic signature of a List, Set, or Map parameter decides what its elements become.
+        The same cell text converts to a different type according to the element type the test
+        method declares.
 
-        An element type is fixed by the method signature and cannot vary by row, so
-        each element type gets its own table. Only a Map's value type takes part in
-        conversion: its keys are always the cell text, whatever key type the
-        signature declares.
+        Every table below reads the same way. It holds one input column per collection kind, all
+        three carrying the same values. Then it holds the element type the method received, and
+        the elements themselves, which the input columns must convert to.
+
+        An element type is fixed by the method signature and cannot vary by row, so each element
+        type gets its own table.
+
+        Only a Map's value type takes part in conversion. Its keys are always the cell text,
+        whatever key type the signature declares.
         """)
 public class JavaParameterizedTypeConversionTest {
 

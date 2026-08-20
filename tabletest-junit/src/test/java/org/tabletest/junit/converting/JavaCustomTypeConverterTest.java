@@ -13,16 +13,16 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 @DisplayName("Custom type converters")
 @Description("""
-        A static @TypeConverter method in the test class decides what a cell's text
-        becomes, so a table can speak the domain's language instead of programmer
-        literals. Three converters serve the tables below: Yes/No becomes a boolean,
-        a number word becomes an integer, and a day word becomes a date.
+        A static @TypeConverter method in the test class decides what a cell's text becomes. A
+        table can then speak the domain's language instead of programmer literals.
 
-        The rules are written so the conversion itself stays visible. Each table
-        pairs the text as written in the cell with the value the test method
-        received, printed back as plain text — a String column no converter touches,
-        and therefore one that shows what the converter produced instead of
-        restating what it was given.
+        Three converters serve the tables below. Yes/No becomes a boolean. A number word becomes
+        an integer. A day word becomes a date.
+
+        The rules are written so the conversion itself stays visible. Each table pairs the text as
+        written in the cell with the value the test method received, printed back as plain text.
+        That column is a String, which no converter touches, so it shows what the converter
+        produced rather than restating what it was given.
         """)
 public class JavaCustomTypeConverterTest {
 

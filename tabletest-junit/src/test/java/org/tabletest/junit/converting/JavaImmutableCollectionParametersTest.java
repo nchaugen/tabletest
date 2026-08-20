@@ -13,10 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Immutable collection parameters")
 @Description("""
-        A collection passed from a table is read-only: adding to a List or Set,
-        putting into a Map, or modifying any collection nested inside them throws
-        instead of changing the value. A row's data therefore stays as written
-        however the test method treats it.
+        A collection passed from a table is read-only. Adding to a List or a Set throws. Putting
+        into a Map throws. Modifying any collection nested inside them throws. A row's data
+        therefore stays as written, however the test method treats it.
         """)
 class JavaImmutableCollectionParametersTest {
 

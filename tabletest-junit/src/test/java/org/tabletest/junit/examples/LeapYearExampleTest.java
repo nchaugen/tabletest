@@ -62,12 +62,12 @@ public class LeapYearExampleTest {
 
     @DisplayName("Each rule holds across eras")
     @Description("""
-        A leap year is a year with an extra day added to the calendar — February 29 — to keep the calendar
-        year aligned with Earth’s orbit around the Sun.
-        
-        * A normal year has 365 days, but Earth takes about 365.2422 days to orbit the Sun.
-        * To account for this extra fraction, we add one day every 4 years.
-        * Exception: Years divisible by 100 are not leap years unless they are also divisible by 400.
+        A leap year is a year with an extra day, February 29. The extra day keeps the calendar
+        year aligned with Earth's orbit around the Sun.
+
+        A normal year has 365 days. Earth takes about 365.2422 days to orbit the Sun. To account
+        for that extra fraction, we add one day every four years. Years divisible by 100 are an
+        exception: they are not leap years, unless they are also divisible by 400.
         """)
     @TableTest("""
         Scenario                        | Year               | Is Leap Year?

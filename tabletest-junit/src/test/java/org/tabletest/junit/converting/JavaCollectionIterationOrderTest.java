@@ -12,16 +12,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Collection iteration order")
 @Description("""
-        A collection cell decides the order its parameter iterates in: elements come
-        out in the order the cell wrote them, never sorted and never in some hash
-        order of their own. Order-sensitive assertions against a List, Set, or Map
-        parameter are therefore safe to write.
+        A collection cell decides the order its parameter iterates in. Elements come out in the
+        order the cell wrote them. They are never sorted, and never in a hash order of their own.
+        An order-sensitive assertion against a List, Set, or Map parameter is therefore safe to
+        write.
 
-        The elements below are text, but the guarantee is about position rather than
-        element type and holds whatever type the signature declares. Each rule shows
-        the parameter's iteration as a list, so a row whose input is already in
-        ascending order proves nothing on its own — the rows that reverse or shuffle
-        the written order are the ones that pin it down.
+        The elements below are text. The guarantee is about position rather than element type,
+        and it holds whatever type the signature declares.
+
+        Each rule shows the parameter's iteration as a list. A row whose input is already in
+        ascending order proves nothing on its own. The rows that reverse or shuffle the written
+        order are the ones that pin it down.
         """)
 public class JavaCollectionIterationOrderTest {
 

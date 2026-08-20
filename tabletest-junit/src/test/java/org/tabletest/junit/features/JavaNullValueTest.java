@@ -55,11 +55,11 @@ class JavaNullValueTest {
 
     @DisplayName("Refuses an empty string for a type other than String")
     @Description("""
-            '' and "" convert fine to String parameters, but there is no
-            built-in conversion from an empty string to other types — without a
-            custom type converter the row fails. Each message closes by naming the
-            classes searched for a type converter; those depend on where the test
-            lives, so they are left out of the table.
+            '' and "" convert to a String parameter without trouble. There is no built-in conversion
+            from an empty string to another type, so the row fails without a custom type converter.
+
+            Each message closes by naming the classes searched for a type converter. Those depend on
+            where the test lives, so the table leaves them out.
             """)
     @TableTest("""
         Scenario            | Input value | Parameter type    | Error message?

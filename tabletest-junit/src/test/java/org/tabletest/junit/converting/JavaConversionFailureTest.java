@@ -24,10 +24,11 @@ public class JavaConversionFailureTest {
 
     @DisplayName("A value that fits no built-in conversion fails")
     @Description("""
-            A number outside the target's range, a malformed date or character, and a
-            type with no available converter all raise a parse-time failure. Each
-            message closes by naming the classes searched for a type converter; those
-            depend on where the test lives, so they are left out of the table.
+            Three things raise a parse-time failure: a number outside the target's range, a malformed
+            date or character, and a type with no available converter.
+
+            Each message closes by naming the classes searched for a type converter. Those depend on
+            where the test lives, so the table leaves them out.
             """)
     @TableTest("""
         Scenario                         | Input value | Parameter type                      | Error message?

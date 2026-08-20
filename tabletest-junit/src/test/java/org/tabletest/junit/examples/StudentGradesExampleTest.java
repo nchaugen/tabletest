@@ -15,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Student grades")
 @Description("""
-        A richer domain example: each cell holds a whole class register — a map of
-        student names to grade lists — converted to domain types (Students, Grades)
-        by custom type converters before the test method runs.
+        A richer domain example. Each cell holds a whole class register, which is a map of student
+        names to grade lists. Custom type converters turn it into the domain types Students and
+        Grades before the test method runs.
         """)
 public class StudentGradesExampleTest {
 

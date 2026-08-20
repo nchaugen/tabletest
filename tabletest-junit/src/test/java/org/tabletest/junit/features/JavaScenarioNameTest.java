@@ -11,9 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Scenario names")
 @Description("""
-        A table can carry one more column than the method has table-bound
-        parameters; the extra first column then names each row's scenario and
-        becomes the invocation display name.
+        A table can carry one more column than the method has table-bound parameters. The extra
+        first column then names each row's scenario, and becomes the invocation display name.
         """)
 public class JavaScenarioNameTest {
 

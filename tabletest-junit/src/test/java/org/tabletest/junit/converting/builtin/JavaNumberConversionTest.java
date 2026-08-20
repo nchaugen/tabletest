@@ -12,20 +12,20 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 @DisplayName("Numbers")
 @Description("""
-        Cell text converts automatically to the declared parameter type, with no
-        type converter to write. Every table below reads the same way: an Input
-        value column holding the text as written in the cell, the parameter type
-        it is converted to, and expectation columns stating observable properties
-        of the object the test method received — so each row shows that the text
-        became a valid object of that type, not merely that it converted.
+        Cell text converts automatically to the declared parameter type. There is no type
+        converter to write.
 
-        A parameter type is fixed by the test method signature and cannot vary by
-        row, so each type gets its own short table.
+        Every table below reads the same way. An Input value column holds the text as written in
+        the cell. A Parameter type column holds the type it converts to. Expectation columns
+        state observable properties of the object the test method received, so each row shows
+        that the text became a valid object of that type, not merely that it converted.
 
-        A primitive type shares its table with its wrapper, since the two are one
-        type in two forms and a primitive's type cannot be observed once the value
-        is boxed — there the type is the value column's own header rather than a
-        column of its own.
+        A parameter type is fixed by the test method signature and cannot vary by row, so each
+        type gets its own short table.
+
+        A primitive type shares its table with its wrapper. The two are one type in two forms,
+        and a primitive's type cannot be observed once the value is boxed. There the type is the
+        value column's own header rather than a column of its own.
         """)
 public class JavaNumberConversionTest {
 

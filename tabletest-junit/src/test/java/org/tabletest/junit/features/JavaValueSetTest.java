@@ -50,10 +50,9 @@ class JavaValueSetTest {
 
     @DisplayName("Groups values sharing an expectation, repeating fixed columns")
     @Description("""
-            A value set is a claim that the outcome is the same whichever value is
-            chosen, so every value in the set must lead to the same result. Columns
-            that are not sets — here the pass mark — keep their single value across
-            the whole expansion.
+            A value set is a claim that the outcome is the same whichever value is chosen. Every value
+            in the set must therefore lead to the same result. A column that is not a set, here the
+            pass mark, keeps its single value across the whole expansion.
             """)
     @TableTest("""
         Scenario          | Score (any of) | Pass mark | Passes?

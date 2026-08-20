@@ -13,11 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DisplayName("External table files")
 @Description("""
         A table can live in a classpath resource file instead of the annotation:
-        @TableTest(resource = "external.table", encoding = "UTF-8"). The first three
-        rules below call the loading API with those same arguments, so the tables can
-        show which paths resolve, what text the file's bytes become, and how loading
-        fails; the rules after them are driven by the very files shown, each row
-        coming from a line of the file rather than from the annotation.
+        @TableTest(resource = "external.table", encoding = "UTF-8").
+
+        The first three rules below call the loading API with those same arguments. Their tables
+        can therefore show which paths resolve, what text the file's bytes become, and how loading
+        fails.
+
+        The rules after them are driven by the very files shown. Each row comes from a line of the
+        file rather than from the annotation.
         """)
 public class JavaExternalTableTest {
 
@@ -100,10 +103,9 @@ public class JavaExternalTableTest {
 
     @DisplayName("Resource files can declare a non-default character encoding")
     @Description("""
-            The rows below are the lines of src/test/resources/subfolder/custom_encoding.table,
-            read with encoding = "ISO-8859-1" — the last row's letters only count as
-            six characters because the file was decoded in the encoding it was
-            written in.
+            The rows below are the lines of src/test/resources/subfolder/custom_encoding.table, read
+            with encoding = "ISO-8859-1". The letters in the last row count as six characters only
+            because the file was decoded in the encoding it was written in.
             """)
     @TableTest(resource = "/subfolder/custom_encoding.table", encoding = "ISO-8859-1")
     void table_in_external_file_in_subfolder_with_custom_encoding(String string, int expectedLength) {

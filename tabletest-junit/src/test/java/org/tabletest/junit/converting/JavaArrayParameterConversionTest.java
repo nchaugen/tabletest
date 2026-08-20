@@ -14,12 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Array parameters")
 @Description("""
-        A [bracketed] list converts to an array parameter for any element type —
-        object, primitive, nested, or map — and arrays nest inside other
-        collection parameters. Every table below reads the same way: Input value
-        is the text exactly as written in the cell, Parameter type is the array
-        type the test method declares, and Converted value is the array the
-        method received, one entry per element.
+        A [bracketed] list converts to an array parameter for any element type: object,
+        primitive, nested, or map. An array also nests inside another collection parameter.
+
+        Every table below reads the same way. Input value is the text exactly as written in the
+        cell. Parameter type is the array type the test method declares. Converted value is the
+        array the method received, one entry per element.
         """)
 public class JavaArrayParameterConversionTest {
 
@@ -95,9 +95,8 @@ public class JavaArrayParameterConversionTest {
 
     @DisplayName("Converts a list of maps to an array of maps")
     @Description("""
-            Each element is a Map, shown here by the keys and values it holds in
-            order — the array prints in Java's own map notation, which is not a
-            TableTest format.
+            Each element is a Map, shown here by the keys and values it holds, in order. The array
+            prints in Java's own map notation, which is not a TableTest format.
             """)
     @TableTest("""
         Scenario   | Input value      | Parameter type? | Map keys? | Map values?
