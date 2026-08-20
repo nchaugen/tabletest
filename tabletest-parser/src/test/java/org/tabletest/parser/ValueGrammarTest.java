@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Values")
 @Description("""
-        The grammar of a single cell value: strings and quoting, the three
-        collection forms — lists, sets, and maps — and the parse errors a
-        malformed value raises.
+        These rules cover one cell value: strings, quoting, the three collection forms, and
+        the errors a malformed value raises. The three collection forms are a list, a set,
+        and a map.
         """)
 public class ValueGrammarTest {
 
-    @DisplayName("Lists in [square brackets] hold values, nested collections, and quoted strings")
+    @DisplayName("Reads a value in square brackets as a list")
     @Description("A blank cell captures null; unquoted elements are trimmed.")
     @TableTest("""
         Scenario               | Input               | Captured?
@@ -45,10 +45,10 @@ public class ValueGrammarTest {
         );
     }
 
-    @DisplayName("A value starting with [ must be a well-formed list")
+    @DisplayName("Refuses a value that opens with [ and is not a list")
     @Description("""
-            Values that do not open a list — quoted brackets, a stray closing
-            bracket, a letter before the bracket — capture as plain strings.
+            A value that does not open a list captures as a plain string. Quoted brackets, a
+            stray closing bracket, and a letter before the bracket are all such values.
             """)
     @TableTest("""
         Scenario                      | Input    | Parsed type?     | Error message?
@@ -71,7 +71,7 @@ public class ValueGrammarTest {
         assertEquals(errorMessage, parseErrorFor(input));
     }
 
-    @DisplayName("Sets in {curly braces} keep each distinct value once")
+    @DisplayName("Collects curly braces into a set, each value once")
     @TableTest("""
         Scenario              | Input               | Captured?
         Null set              | ''                  |
@@ -91,7 +91,7 @@ public class ValueGrammarTest {
         );
     }
 
-    @DisplayName("A value starting with { must be a well-formed set")
+    @DisplayName("Refuses a value that opens with { and is not a set")
     @Description("Values that do not open a set capture as plain strings.")
     @TableTest("""
         Scenario                      | Input    | Parsed type?     | Error message?
@@ -114,7 +114,7 @@ public class ValueGrammarTest {
         assertEquals(errorMessage, parseErrorFor(input));
     }
 
-    @DisplayName("Maps in [key: value] form support nesting and quoted keys")
+    @DisplayName("Reads bracketed key: value pairs as a map")
     @TableTest("""
         Scenario              | Input                          | Captured?
         Null map              | ''                             |
@@ -138,7 +138,7 @@ public class ValueGrammarTest {
         );
     }
 
-    @DisplayName("A malformed map or a duplicate key fails parsing")
+    @DisplayName("Refuses a malformed map or a duplicate key")
     @Description("Values that do not open a map capture as plain strings.")
     @TableTest("""
         Scenario                       | Input                          | Parsed type?     | Error message?
@@ -186,11 +186,11 @@ public class ValueGrammarTest {
         }
     }
 
-    @DisplayName("Quotes delimit values and are discarded from the captured value")
+    @DisplayName("Discards the quotes that delimit a value")
     @Description("""
-            Unquoted values are trimmed; quoted values keep their whitespace.
-            Either quote style protects pipes, brackets, and braces. A blank
-            cell captures null.
+            The parser trims an unquoted value. It keeps the whitespace of a quoted value.
+            Either quote style protects a pipe, a bracket, and a brace. A blank cell captures
+            null.
             """)
     @TableTest("""
         Scenario                          | Input             | Captured Value? | Captured Type?
@@ -237,10 +237,10 @@ public class ValueGrammarTest {
         assertEquals(expectedValue, actualValue);
     }
 
-    @DisplayName("In quote-preserving mode values capture with their quotes intact")
+    @DisplayName("Keeps the quotes when asked to preserve them")
     @Description("""
-            The mode used by tools that rewrite tables, such as the formatter,
-            so the original quoting survives a round trip.
+            Tools that rewrite a table use this mode, the formatter among them. The original
+            quoting then survives the round trip.
             """)
     @TableTest("""
         Scenario                          | Input             | Captured?         | Captured Type?
@@ -306,12 +306,13 @@ public class ValueGrammarTest {
         assertTrue(exception.getMessage().startsWith("Failed to parse `[2025-08-01T00:00:00] | 0` in row `Purchase too old"), exception.getMessage());
     }
 
-    @DisplayName("A stray quote fails, and the error names the row it is in")
+    @DisplayName("Names the row when a stray quote fails the parse")
     @Description("""
-            A quote that opens nothing is a parse failure like any unbalanced delimiter. Every
-            parse error also names the row it happened in, quoting the row as written, so a
-            table with many rows says which one to look at. The unbalanced-bracket cases
-            themselves are the well-formed list and set rules above.
+            A quote that opens nothing fails like any unbalanced delimiter.
+
+            Every parse error names the row it happened in, and quotes that row as written, so a
+            table of many rows says which one to look at. The unbalanced bracket and brace have
+            their own rules above.
             """)
     @TableTest("""
         Scenario             | Input  | Error message?

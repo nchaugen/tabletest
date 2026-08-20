@@ -12,17 +12,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Table structure")
 @Description("""
-        The shape a table must have before its values are read: a header row
-        followed by at least one data row, non-blank header cells, and the
-        lines the parser ignores — comments and blanks.
+        These rules cover the shape a table must have. They apply before the parser reads
+        any value.
+
+        The Input column lists the source, one line per element.
         """)
 public class TableStructureTest {
 
-    @DisplayName("A table is a header row followed by at least one data row")
+    @DisplayName("Reads a table as a header row and its data rows")
     @Description("""
-            The first row read becomes the header; every row after it is a data
-            row, and each row divides into one cell per header. The Input column
-            lists the source one line per element.
+            The first row read becomes the header. Every row after it is a data row. Each row
+            divides into one cell per header.
             """)
     @TableTest("""
         Scenario      | Input                       | Headers?  | Data rows?
@@ -43,12 +43,10 @@ public class TableStructureTest {
         assertEquals(expectedRows, dataRowsOf(result));
     }
 
-    @DisplayName("Blank lines and whole-line comments are ignored")
+    @DisplayName("Ignores a blank line and a whole-line comment")
     @Description("""
-            A line is a comment only when // is the first thing on it — anywhere
-            else // is ordinary cell text, and quoting makes even a leading //
-            part of the value. The Input column lists the source one line per
-            element.
+            A line is a comment only when // is the first thing on it. Anywhere else // is
+            ordinary cell text, and quoting makes even a leading // part of the value.
             """)
     @TableTest("""
         Scenario                     | Input                               | Headers? | Data rows?
@@ -72,12 +70,10 @@ public class TableStructureTest {
         assertEquals(expectedRows, dataRowsOf(result));
     }
 
-    @DisplayName("Input without any data rows is rejected")
+    @DisplayName("Refuses input that holds no data row")
     @Description("""
-            A table needs a header row and at least one data row. The Input column lists the
-            source one line per element, and groups every input that carries no row: the
-            failure is the same whether the source is empty, blank, commented out, or a
-            mixture.
+            The rows below group every input that carries no data row. The failure is the same
+            whether the source is empty, blank, commented out, or a mixture.
             """)
     @TableTest("""
         Scenario           | Input                                                               | Error message?
@@ -96,7 +92,7 @@ public class TableStructureTest {
         return table.rows().stream().map(Row::values).toList();
     }
 
-    @DisplayName("Blank header cells are rejected, naming the column")
+    @DisplayName("Names the column when a header cell is blank")
     @TableTest("""
         Scenario            | Header Row | Error message?
         Blank first header  | " | b | c" | Header cell in column 1 is blank

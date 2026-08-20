@@ -9,18 +9,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Row grammar")
 @Description("""
-        How a single line divides into fields, before any field is read as a
-        value: unquoted pipes are the separators, a missing field is null, and
-        quotes are the only thing that protects a pipe from splitting the row.
-        Each Row below is parsed as the sole data row under a one-column header;
-        Fields shows the captured field list printed back out. It is text rather
-        than a list column because a list value cannot hold a null element —
-        writing [a, , c] is itself a parse error — and null fields are exactly
-        what these rules are about.
+        These rules cover how one line divides into fields. They apply before the parser
+        reads a field as a value.
+
+        Each Row below is parsed as the only data row under a one-column header. Fields
+        shows the captured field list, printed back out. Fields is text rather than a list
+        column because a list cannot hold a null element: writing [a, , c] is itself a parse
+        error. A null field is what several of these rules are about.
         """)
 public class RowGrammarTest {
 
-    @DisplayName("Unquoted pipes divide a row into fields")
+    @DisplayName("Divides a row into fields at each unquoted pipe")
     @Description("A missing field — from a leading, trailing, or doubled pipe — is captured as null.")
     @TableTest("""
         Scenario                     | Row         | Fields?
@@ -37,7 +36,7 @@ public class RowGrammarTest {
         assertEquals(fields, TableParser.parse("Field\n" + row).row(0).values().toString());
     }
 
-    @DisplayName("Quotes protect a pipe so the value stays in one field")
+    @DisplayName("Keeps a quoted pipe inside its field")
     @Description("Either quote style works; the surrounding quotes are discarded from the field.")
     @TableTest("""
         Scenario           | Row                            | Fields?
@@ -48,13 +47,13 @@ public class RowGrammarTest {
         assertEquals(fields, TableParser.parse("Field\n" + row).row(0).values().toString());
     }
 
-    @DisplayName("An unquoted pipe inside a list, set, or map fails to parse")
+    @DisplayName("Refuses an unquoted pipe inside a list, set, or map")
     @Description("""
-            Brackets and braces do not protect a pipe — only quotes do. The pipe
-            splits the row mid-collection, leaving an unbalanced fragment, and the
-            failure surfaces as a generic parse error naming the whole row rather
-            than the pipe. To keep a pipe inside a collection, quote the element:
-            ['a | b']. Every row below fails with a TableTestParseException.
+            Brackets and braces do not protect a pipe. Only quotes do.
+
+            The pipe splits the row inside the collection and leaves an unbalanced fragment. The
+            parser therefore names the whole row, not the pipe. To keep a pipe inside a
+            collection, quote the element: ['a | b'].
             """)
     @TableTest("""
         Scenario                     | Row          | Error message?
