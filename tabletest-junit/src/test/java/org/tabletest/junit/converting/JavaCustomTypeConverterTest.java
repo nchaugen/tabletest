@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         """)
 public class JavaCustomTypeConverterTest {
 
-    @DisplayName("A converter turns cell text into the declared parameter type")
+    @DisplayName("Turns cell text into the declared type with a converter")
     @Description("Yes and No become booleans, for a primitive and a boxed parameter alike.")
     @TableTest("""
         Scenario          | boolean | Boolean | Converted value as text?
@@ -40,7 +40,7 @@ public class JavaCustomTypeConverterTest {
         assertEquals(expectedText, String.valueOf(boxedValue));
     }
 
-    @DisplayName("A converter takes precedence over built-in conversion of the same type")
+    @DisplayName("Prefers a converter to the built-in conversion of a type")
     @Description("""
             Day words are the dates this converter knows; anything else it hands to
             the built-in LocalDate conversion, so ISO text still works.
@@ -62,7 +62,7 @@ public class JavaCustomTypeConverterTest {
         assertEquals(expectedDayOfWeek, value.getDayOfWeek().name());
     }
 
-    @DisplayName("Every column converts — inputs and expectations alike")
+    @DisplayName("Converts every column, input and expectation alike")
     @Description("""
             The expected sum is written as a number word too; the digits column shows
             the sum the test method computed from the converted parameters.
@@ -78,7 +78,7 @@ public class JavaCustomTypeConverterTest {
         assertEquals(expectedDigits, String.valueOf(a + b));
     }
 
-    @DisplayName("A converter reaches the elements inside a collection")
+    @DisplayName("Applies a converter to the elements inside a collection")
     @TableTest("""
         Scenario      | Number words    | Element type?     | Sum in digits?
         Two words     | [one, three]    | java.lang.Integer | 4

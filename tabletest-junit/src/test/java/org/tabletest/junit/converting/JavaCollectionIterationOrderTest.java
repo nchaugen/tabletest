@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         """)
 public class JavaCollectionIterationOrderTest {
 
-    @DisplayName("A list or set parameter iterates in the order the cell wrote it")
+    @DisplayName("Iterates a list or set in the order the cell wrote it")
     @Description("Both input columns hold the same elements in the same order.")
     @TableTest("""
         Scenario             | List input | Set input | Iteration order?
@@ -44,7 +44,7 @@ public class JavaCollectionIterationOrderTest {
         assertEquals(expectedOrder, List.copyOf(set));
     }
 
-    @DisplayName("A map parameter iterates its entries in the order the cell wrote them")
+    @DisplayName("Iterates a map in the order the cell wrote its entries")
     @Description("Keys and values are read off the same map, entry by entry.")
     @TableTest("""
         Scenario                  | Map input          | Key order? | Value order?

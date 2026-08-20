@@ -41,7 +41,7 @@ public class JavaExternalTableTest {
         );
     }
 
-    @DisplayName("The declared encoding decides what the file's bytes become")
+    @DisplayName("Decodes the file's bytes with the declared encoding")
     @Description("""
             The last row of /subfolder/custom_encoding.table holds the six ISO-8859-1
             letters ÉÜ¥ÆØÅ. Read in another encoding the same bytes decode to other
@@ -64,7 +64,7 @@ public class JavaExternalTableTest {
         assertEquals(expectedCodePoints, firstCellOfLastRow.chars().boxed().toList());
     }
 
-    @DisplayName("A resource that cannot be read fails with a message naming the file")
+    @DisplayName("Names the file when a resource cannot be read")
     @Description("""
             The two ways loading can fail: the path resolves to nothing, or the file
             resolves but the declared encoding cannot decode it. Both raise the same
@@ -89,7 +89,7 @@ public class JavaExternalTableTest {
         assertEquals(expectedMessage, thrown.getMessage());
     }
 
-    @DisplayName("A table loaded from a resource file runs like an inline table")
+    @DisplayName("Runs a table loaded from a resource like an inline one")
     @Description("The rows below are the lines of src/test/resources/external.table.")
     @TableTest(resource = "external.table")
     void table_in_external_file_in_implicit_root(int a, int b, int expectedSum) {

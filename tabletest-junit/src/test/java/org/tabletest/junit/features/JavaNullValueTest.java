@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         """)
 class JavaNullValueTest {
 
-    @DisplayName("A blank cell converts to null for any parameter type")
+    @DisplayName("Converts a blank cell to null for any parameter type")
     @TableTest("""
         Scenario              | String | Integer | List | Map | Set | All null?
         Every column is blank |        |         |      |     |     | true
@@ -38,7 +38,7 @@ class JavaNullValueTest {
         );
     }
 
-    @DisplayName("A blank cell for a primitive parameter fails the row")
+    @DisplayName("Fails the row when a primitive parameter gets a blank cell")
     @Description("""
             Primitives cannot hold null — declare the boxed type instead if the
             column can be blank.

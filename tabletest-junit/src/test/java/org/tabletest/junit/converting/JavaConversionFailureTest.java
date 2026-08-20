@@ -22,7 +22,7 @@ import static org.tabletest.junit.TableTestExceptionAssertions.*;
 @DisplayName("Conversion failures")
 public class JavaConversionFailureTest {
 
-    @DisplayName("A value that fits no built-in conversion fails")
+    @DisplayName("Fails a value that fits no built-in conversion")
     @Description("""
             Three things raise a parse-time failure: a number outside the target's range, a malformed
             date or character, and a type with no available converter.

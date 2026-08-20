@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         """)
 public class JavaScenarioNameTest {
 
-    @DisplayName("An extra first column names the row without binding to a parameter")
+    @DisplayName("Names a row from an extra first column, binding nothing")
     @Description("""
             The method takes two parameters, the table has three columns — the
             first column is the scenario name. The name may be empty or blank;
@@ -32,7 +32,7 @@ public class JavaScenarioNameTest {
         assertEquals(doubled, 2 * number);
     }
 
-    @DisplayName("A @Scenario parameter receives the scenario name as an argument")
+    @DisplayName("Passes the scenario name to a @Scenario parameter")
     @Description("A blank scenario cell arrives as null, an empty one as the empty string.")
     @TableTest("""
         Scenario | Received name?
