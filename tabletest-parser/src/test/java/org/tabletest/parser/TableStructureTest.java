@@ -2,6 +2,7 @@ package org.tabletest.parser;
 
 import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
+import org.tabletest.reporter.junit.Lines;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +33,7 @@ public class TableStructureTest {
         Three columns | ["a | b | c", "1 | 2 | 3"]  | [a, b, c] | [[1, 2, 3]]
         """)
     void shouldParseHeaderRowFollowedByDataRows(
-        List<String> inputLines,
+        @Lines List<String> inputLines,
         List<String> expectedHeaders,
         List<List<String>> expectedRows
     ) {
@@ -60,7 +61,7 @@ public class TableStructureTest {
         Slashes starting a cell      | ["a | b", "6 | // 7"]               | [a, b]   | [[6, '// 7']]
         """)
     void shouldIgnoreBlankLinesAndCommentLines(
-        List<String> inputLines,
+        @Lines List<String> inputLines,
         List<String> expectedHeaders,
         List<List<String>> expectedRows
     ) {
@@ -79,7 +80,7 @@ public class TableStructureTest {
         Scenario           | Input                                                               | Error message?
         No row of any kind | {[''], ['   '], ['// just a comment'], ['// one', '   ', '// two']} | Table has no rows: input was empty or contained only blank lines and comments
         """)
-    void shouldRejectInputWithoutTableRows(List<String> inputLines, String expectedErrorMessage) {
+    void shouldRejectInputWithoutTableRows(@Lines List<String> inputLines, String expectedErrorMessage) {
         TableTestParseException actualException = assertThrows(
             TableTestParseException.class,
             () -> TableParser.parse(String.join("\n", inputLines))
