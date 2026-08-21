@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.tabletest.junit.Description;
 import org.tabletest.junit.InputResolver;
 import org.tabletest.junit.TableTest;
+import org.tabletest.reporter.junit.Lines;
 
 import java.util.List;
 
@@ -26,15 +27,15 @@ public class JavaExternalTableTest {
 
     @DisplayName("Resolves a resource path from the classpath root")
     @Description("""
-            Read as UTF-8; the loaded text is shown one file line per element. A leading slash
-            makes no difference — both spellings of a root path are in the first row.
+            Read as UTF-8; the column holds the lines of the file itself. A leading slash makes
+            no difference — both spellings of a root path are in the first row.
             """)
     @TableTest("""
         Scenario            | Resource path                     | Lines loaded from the file?
         Path at the root    | {external.table, /external.table} | ["Scenario   | a | b | a + b?", "Zero sum   | 0 | 0 | 0", "Zero right | 2 | 0 | 2", "Two twos   | 2 | 2 | 4"]
         Path in a subfolder | subfolder/nested.table            | ["Scenario  | a | b | a - b?", "Positive  | 3 | 1 | 2", "Negative  | 1 | 3 | -2"]
         """)
-    void resolves_resource_paths(String resourcePath, List<String> expectedLines) {
+    void resolves_resource_paths(String resourcePath, @Lines List<String> expectedLines) {
         assertEquals(
             String.join("\n", expectedLines),
             InputResolver.loadResource(resourcePath, "UTF-8", getClass())

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         These rules cover the shape a table must have. They apply before the parser reads
         any value.
 
-        The Input column lists the source, one line per element.
+        The Input column holds the lines of the source.
         """)
 public class TableStructureTest {
 
