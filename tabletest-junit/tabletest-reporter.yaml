@@ -27,6 +27,13 @@ features:
   - name: examples
     title: "Worked examples"
 
+# --- Site link ------------------------------------------------------------------------
+# The spec is published under tabletest.org/spec/junit, where every link inside the
+# report is relative to the report's own tree. This is the one link back out to the site.
+site:
+  label: "TableTest"
+  url: "https://tabletest.org/"
+
 # --- Publish selection ----------------------------------------------------------------
 publish:
   exclude:

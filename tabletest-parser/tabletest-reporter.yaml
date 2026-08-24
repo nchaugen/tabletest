@@ -13,6 +13,13 @@ intro: >
   into cells, and how a cell becomes a value. Every rule below is executable — it is a test
   that runs in CI against the Java parser, and each scenario is one row of that test's table.
 
+# --- Site link ------------------------------------------------------------------------
+# The spec is published under tabletest.org/spec/parser, where every link inside the
+# report is relative to the report's own tree. This is the one link back out to the site.
+site:
+  label: "TableTest"
+  url: "https://tabletest.org/"
+
 # --- Publish selection ----------------------------------------------------------------
 # Every @TableTest publishes by default; the table below exercises internal mechanism rather
 # than a grammar rule, so it is held back here instead of with @Tag("unpublished") + a
