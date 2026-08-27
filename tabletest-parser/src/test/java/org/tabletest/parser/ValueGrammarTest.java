@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -186,103 +187,83 @@ public class ValueGrammarTest {
         }
     }
 
-    @DisplayName("Discards the quotes that delimit a value")
+    @DisplayName("Captures a value with its quotes discarded or kept")
     @Description("""
-            The parser trims an unquoted value. It keeps the whitespace of a quoted value.
-            Either quote style protects a pipe, a bracket, and a brace. A blank cell captures
-            null.
+            The parser trims an unquoted value and keeps the whitespace of a quoted one. Either
+            quote style protects a pipe, a bracket, and a brace. A blank cell captures null, and
+            its Captured Type is blank because nothing was captured.
+
+            The two expectation columns are the same parse in its two modes. Discarding is what a
+            test method sees. Keeping is for a tool that rewrites a table, the formatter among
+            them, so the original quoting survives the round trip. Where the two columns agree,
+            the value carried no delimiting quotes to discard.
+
+            Nothing here converts a number: 1 and 3.14 capture as text, because a parameter type
+            is what decides that and the parser never sees one.
             """)
     @TableTest("""
-        Scenario                          | Input             | Captured Value? | Captured Type?
-        Unquoted                          | 'abc'             | abc             | java.lang.String
-        Single quoted                     | "'abc'"           | abc             | java.lang.String
-        Double quoted                     | '"abc"'           | abc             | java.lang.String
-        With spaces                       | 'abc def'         | abc def         | java.lang.String
-        Unquoted is trimmed               | ' a b c '         | 'a b c'         | java.lang.String
-        Single quoted is not trimmed      | "' a b c '"       | ' a b c '       | java.lang.String
-        Double quoted is not trimmed      | '" a b c "'       | ' a b c '       | java.lang.String
-        Blank is null                     | ' '               |                 |
-        Empty single quoted               | "''"              | ''              | java.lang.String
-        Empty double quoted               | '""'              | ''              | java.lang.String
-        Unmatched single quote            | "'"               | "'"             | java.lang.String
-        Unmatched double quote            | '"'               | '"'             | java.lang.String
-        Unterminated quote is literal     | "'abc"            | "'abc"          | java.lang.String
-        Quotes inside unquoted value      | a'b"c             | a'b"c           | java.lang.String
-        Single quoted pipe                | "'|'"             | '|'             | java.lang.String
-        Double quoted pipe                | '"|"'             | '|'             | java.lang.String
-        Single quoted opening bracket     | "'['"             | '['             | java.lang.String
-        Double quoted opening bracket     | '"["'             | '['             | java.lang.String
-        Single quoted opening brace       | "'{'"             | '{'             | java.lang.String
-        Double quoted opening brace       | '"{"'             | '{'             | java.lang.String
-        Integer                           | '1'               | 1               | java.lang.String
-        Decimal                           | '3.14'            | 3.14            | java.lang.String
-        Number with underscores           | '1_000_000'       | 1_000_000       | java.lang.String
-        List with unquoted string         | '[a]'             | [a]             | java.util.List
-        List with double quoted string    | '["a"]'           | [a]             | java.util.List
-        List with single quoted string    | "['a']"           | [a]             | java.util.List
-        Set with unquoted string          | '{a}'             | {a}             | java.util.Set
-        Set with double quoted string     | '{"a"}'           | {a}             | java.util.Set
-        Set with single quoted string     | "{'a'}"           | {a}             | java.util.Set
-        Map with unquoted string          | '[a: a]'          | [a: a]          | java.util.Map
-        Map with double quoted string     | '[a: "a"]'        | [a: a]          | java.util.Map
-        Map with single quoted string     | "[a: 'a']"        | [a: a]          | java.util.Map
-        Nested with double quoted strings | '[double: ["a"]]' | [double: [a]]   | java.util.Map
-        Nested with single quoted strings | "[single: ['a']]" | [single: [a]]   | java.util.Map
-        Map with double quoted key        | '["k": v]'        | [k: v]          | java.util.Map
-        Map with single quoted key        | "['k': v]"        | [k: v]          | java.util.Map
+        Scenario                          | Input             | Discarding quotes? | Keeping quotes?   | Captured Type?
+        Unquoted                          | 'abc'             | abc                | abc               | java.lang.String
+        Single quoted                     | "'abc'"           | abc                | "'abc'"           | java.lang.String
+        Double quoted                     | '"abc"'           | abc                | '"abc"'           | java.lang.String
+        With spaces                       | 'abc def'         | abc def            | abc def           | java.lang.String
+        Unquoted is trimmed               | ' a b c '         | 'a b c'            | 'a b c'           | java.lang.String
+        Single quoted is not trimmed      | "' a b c '"       | ' a b c '          | "' a b c '"       | java.lang.String
+        Double quoted is not trimmed      | '" a b c "'       | ' a b c '          | '" a b c "'       | java.lang.String
+        Blank is null                     | ' '               |                    |                   |
+        Empty single quoted               | "''"              | ''                 | "''"              | java.lang.String
+        Empty double quoted               | '""'              | ''                 | '""'              | java.lang.String
+        Unmatched single quote            | "'"               | "'"                | "'"               | java.lang.String
+        Unmatched double quote            | '"'               | '"'                | '"'               | java.lang.String
+        Unterminated quote is literal     | "'abc"            | "'abc"             | "'abc"            | java.lang.String
+        Quotes inside unquoted value      | a'b"c             | a'b"c              | a'b"c             | java.lang.String
+        Single quoted pipe                | "'|'"             | '|'                | "'|'"             | java.lang.String
+        Double quoted pipe                | '"|"'             | '|'                | '"|"'             | java.lang.String
+        Single quoted opening bracket     | "'['"             | '['                | "'['"             | java.lang.String
+        Double quoted opening bracket     | '"["'             | '['                | '"["'             | java.lang.String
+        Single quoted opening brace       | "'{'"             | '{'                | "'{'"             | java.lang.String
+        Double quoted opening brace       | '"{"'             | '{'                | '"{"'             | java.lang.String
+        Integer                           | '1'               | 1                  | 1                 | java.lang.String
+        Decimal                           | '3.14'            | 3.14               | 3.14              | java.lang.String
+        Number with underscores           | '1_000_000'       | 1_000_000          | 1_000_000         | java.lang.String
+        List with unquoted string         | '[a]'             | [a]                | [a]               | java.util.List
+        List with double quoted string    | '["a"]'           | [a]                | ['"a"']           | java.util.List
+        List with single quoted string    | "['a']"           | [a]                | ["'a'"]           | java.util.List
+        Set with unquoted string          | '{a}'             | {a}                | {a}               | java.util.Set
+        Set with double quoted string     | '{"a"}'           | {a}                | {'"a"'}           | java.util.Set
+        Set with single quoted string     | "{'a'}"           | {a}                | {"'a'"}           | java.util.Set
+        Map with unquoted string          | '[a: a]'          | [a: a]             | [a: a]            | java.util.Map
+        Map with double quoted string     | '[a: "a"]'        | [a: a]             | [a: '"a"']        | java.util.Map
+        Map with single quoted string     | "[a: 'a']"        | [a: a]             | [a: "'a'"]        | java.util.Map
+        Nested with double quoted strings | '[double: ["a"]]' | [double: [a]]      | [double: ['"a"']] | java.util.Map
+        Nested with single quoted strings | "[single: ['a']]" | [single: [a]]      | [single: ["'a'"]] | java.util.Map
+        Map with double quoted key        | '["k": v]'        | [k: v]             | ['"k"': v]        | java.util.Map
+        Map with single quoted key        | "['k': v]"        | [k: v]             | ["'k'": v]        | java.util.Map
         """)
-    void shouldCaptureStringsDiscardingQuotes(String input, Object expectedValue, Class expectedType) {
-        Object actualValue = TableParser.parse("Scenario | Input\nString value | " + input).row(0).value(1);
-        if (expectedType != null) assertInstanceOf(expectedType, actualValue);
-        assertEquals(expectedValue, actualValue);
+    void shouldCaptureValuesWithQuotesDiscardedOrKept(
+        String input,
+        Object discardingQuotes,
+        Object keepingQuotes,
+        Class<?> capturedType
+    ) {
+        Object discarded = capturedFrom(input, false);
+        Object kept = capturedFrom(input, true);
+
+        assertEquals(discardingQuotes, discarded);
+        assertEquals(keepingQuotes, kept);
+        assertTypeOf(capturedType, discarded);
+        assertTypeOf(capturedType, kept);
     }
 
-    @DisplayName("Keeps the quotes when asked to preserve them")
-    @Description("""
-            Tools that rewrite a table use this mode, the formatter among them. The original
-            quoting then survives the round trip.
-            """)
-    @TableTest("""
-        Scenario                          | Input             | Captured?         | Captured Type?
-        Unquoted                          | 'abc'             | abc               | java.lang.String
-        Single quoted                     | "'abc'"           | "'abc'"           | java.lang.String
-        Double quoted                     | '"abc"'           | '"abc"'           | java.lang.String
-        With spaces                       | 'abc def'         | abc def           | java.lang.String
-        Unquoted is trimmed               | ' a b c '         | 'a b c'           | java.lang.String
-        Single quoted is not trimmed      | "' a b c '"       | "' a b c '"       | java.lang.String
-        Double quoted is not trimmed      | '" a b c "'       | '" a b c "'       | java.lang.String
-        Blank is null                     | ' '               |                   |
-        Empty single quoted               | "''"              | "''"              | java.lang.String
-        Empty double quoted               | '""'              | '""'              | java.lang.String
-        Unmatched single quote            | "'"               | "'"               | java.lang.String
-        Unmatched double quote            | '"'               | '"'               | java.lang.String
-        Single quoted pipe                | "'|'"             | "'|'"             | java.lang.String
-        Double quoted pipe                | '"|"'             | '"|"'             | java.lang.String
-        Single quoted opening bracket     | "'['"             | "'['"             | java.lang.String
-        Double quoted opening bracket     | '"["'             | '"["'             | java.lang.String
-        Single quoted opening brace       | "'{'"             | "'{'"             | java.lang.String
-        Double quoted opening brace       | '"{"'             | '"{"'             | java.lang.String
-        Integer                           | '1'               | 1                 | java.lang.String
-        Decimal                           | '3.14'            | 3.14              | java.lang.String
-        Number with underscores           | '1_000_000'       | 1_000_000         | java.lang.String
-        List with unquoted string         | '[a]'             | [a]               | java.util.List
-        List with double quoted string    | '["a"]'           | ['"a"']           | java.util.List
-        List with single quoted string    | "['a']"           | ["'a'"]           | java.util.List
-        Set with unquoted string          | '{a}'             | {a}               | java.util.Set
-        Set with double quoted string     | '{"a"}'           | {'"a"'}           | java.util.Set
-        Set with single quoted string     | "{'a'}"           | {"'a'"}           | java.util.Set
-        Map with unquoted string          | '[a: a]'          | [a: a]            | java.util.Map
-        Map with double quoted string     | '[a: "a"]'        | [a: '"a"']        | java.util.Map
-        Map with single quoted string     | "[a: 'a']"        | [a: "'a'"]        | java.util.Map
-        Nested with double quoted strings | '[double: ["a"]]' | [double: ['"a"']] | java.util.Map
-        Nested with single quoted strings | "[single: ['a']]" | [single: ["'a'"]] | java.util.Map
-        Map with double quoted key        | '["k": v]'        | ['"k"': v]        | java.util.Map
-        Map with single quoted key        | "['k': v]"        | ["'k'": v]        | java.util.Map
-        """)
-    void shouldCaptureStringsKeepingQuotes(String input, Object expectedValue, Class expectedType) {
-        Object actualValue = TableParser.parse("Scenario | Input\nString value | " + input, true).row(0).value(1);
-        if (expectedType != null) assertInstanceOf(expectedType, actualValue);
-        assertEquals(expectedValue, actualValue);
+    /** The value the parser captures from this cell text, in the mode asked for. */
+    private static Object capturedFrom(String input, boolean keepQuotes) {
+        return TableParser.parse("Scenario | Input\nString value | " + input, keepQuotes).row(0).value(1);
+    }
+
+    /** Asserts the captured type, where a blank type column means nothing was captured. */
+    private static void assertTypeOf(Class<?> expectedType, Object captured) {
+        assertEquals(expectedType == null, captured == null, "type column disagrees with the value");
+        Optional.ofNullable(expectedType).ifPresent(type -> assertInstanceOf(type, captured));
     }
 
     @Test
