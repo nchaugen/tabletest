@@ -14,15 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 @DisplayName("Custom type converters")
 @Description("""
         A static @TypeConverter method in the test class decides what a cell's text becomes. A
-        table can then speak the domain's language instead of programmer literals.
+        table can then use the language of the domain, in place of programmer literals.
 
         Three converters serve the tables below. Yes/No becomes a boolean. A number word becomes
         an integer. A day word becomes a date.
 
-        The rules are written so the conversion itself stays visible. Each table pairs the text as
-        written in the cell with the value the test method received, printed back as plain text.
-        That column is a String, which no converter touches, so it shows what the converter
-        produced rather than restating what it was given.
+        Each rule below keeps the conversion visible. Each table pairs the text of the cell with
+        the value the test method receives, printed back as plain text. That column is a String,
+        and no converter touches a String. The column therefore shows what the converter
+        produced, and does not restate what the converter was given.
         """)
 public class JavaCustomTypeConverterTest {
 
@@ -30,10 +30,10 @@ public class JavaCustomTypeConverterTest {
     @Description("""
             Yes and No become booleans, for a primitive and a boxed parameter alike.
 
-            A converter does not extend the built-in conversion of its type; it replaces it. The
-            last row is what that costs, and it is the row to read before adding a converter for a
-            common type: a cell written true arrives as false, because this converter recognises
-            yes and nothing else, and the built-in conversion that would have read it never runs.
+            A converter does not extend the built-in conversion of its type. It replaces it. Read
+            the last row before you add a converter for a common type. A cell written true arrives
+            as false, because this converter recognises yes and nothing else. The built-in
+            conversion that would have read true never runs.
             """)
     @TableTest("""
         Scenario                   | boolean | Boolean | Converted value as text?
@@ -50,11 +50,14 @@ public class JavaCustomTypeConverterTest {
 
     @DisplayName("Reaches the converter for every cell of its type")
     @Description("""
-            Every cell declared LocalDate goes through the converter, whether or not the built-in
-            conversion could have read it. Day words are the dates this converter knows; for
-            anything else it calls the built-in conversion itself, which is why ISO text still
-            works. That last part is this converter's own choice, not something TableTest does
-            after it — the rule above shows what happens to a converter that does not make it.
+            Every cell declared LocalDate goes through the converter. That holds whether or not
+            the built-in conversion could have read the cell. Day words are the dates this
+            converter knows. For any other text it calls the built-in conversion itself, and ISO
+            text therefore still works.
+
+            That call is this converter's own choice. TableTest does not make it after the
+            converter returns. The rule above shows what happens to a converter that does not
+            make the call.
             """)
     @TableTest("""
         Scenario         | Input value | Parameter type?     | Converted date as text? | Date day of week?
@@ -75,8 +78,8 @@ public class JavaCustomTypeConverterTest {
 
     @DisplayName("Converts every column, input and expectation alike")
     @Description("""
-            The expected sum is written as a number word too; the digits column shows
-            the sum the test method computed from the converted parameters.
+            The expected sum is a number word too. The digits column shows the sum the test
+            method computes from the converted parameters.
             """)
     @TableTest("""
         Scenario      | int | Integer | Sum? | Sum in digits?

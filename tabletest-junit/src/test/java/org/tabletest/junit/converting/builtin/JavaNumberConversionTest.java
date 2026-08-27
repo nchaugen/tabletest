@@ -16,16 +16,17 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         converter to write.
 
         Every table below reads the same way. An Input value column holds the text as written in
-        the cell. A Parameter type column holds the type it converts to. Expectation columns
-        state observable properties of the object the test method received, so each row shows
-        that the text became a valid object of that type, not merely that it converted.
+        the cell. A Parameter type column holds the type the text converts to. Expectation
+        columns state observable properties of the object the test method receives. Each row
+        therefore shows that the text became a valid object of that type, and not merely that
+        it converted.
 
-        A parameter type is fixed by the test method signature and cannot vary by row, so each
-        type gets its own short table.
+        The test method signature fixes a parameter type, and no row can vary it. Each type
+        therefore gets its own short table.
 
         A primitive type shares its table with its wrapper. The two are one type in two forms,
-        and a primitive's type cannot be observed once the value is boxed. There the type is the
-        value column's own header rather than a column of its own.
+        and a boxed value does not report its primitive type. The value column's own header names it
+        there, in place of a column of its own.
         """)
 public class JavaNumberConversionTest {
 
@@ -116,8 +117,8 @@ public class JavaNumberConversionTest {
 
     @DisplayName("Converts decimal text to BigDecimal, keeping the precision written")
     @Description("""
-            Scale is the number of digits after the decimal point — negative when
-            scientific notation places the value's precision above the point.
+            Scale is the number of digits after the decimal point. It is negative when
+            scientific notation places the precision of the value above the point.
             """)
     @TableTest("""
         Scenario            | Input value | Parameter type?      | BigDecimal as plain number? | BigDecimal scale?
@@ -139,10 +140,10 @@ public class JavaNumberConversionTest {
 
     @DisplayName("Converts whole numbers beyond the long range to BigInteger")
     @Description("""
-            BigInteger is the type for a whole number no other type can hold, so the pair below
-            straddles the largest value a long holds. A number either side of it is written out in
-            full rather than as a count of digits, because the boundary falls inside the
-            nineteen-digit numbers rather than between two digit counts.
+            BigInteger holds a whole number that no other type can hold. The pair below therefore
+            sits either side of the largest value a long holds. Each row writes its number in
+            full, and not as a count of digits. The boundary falls inside the nineteen-digit
+            numbers, and not between two digit counts.
             """)
     @TableTest("""
         Scenario                     | Input value          | Parameter type?      | BigInteger beyond long range?

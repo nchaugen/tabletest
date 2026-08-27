@@ -11,18 +11,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Leap year rules")
 @Description("""
-        The classic introductory example: the Gregorian leap year rules, first as one
-        example per rule, then with value sets showing each rule holds across eras.
+        The classic introductory example is the Gregorian leap year rules. The first rule below
+        gives one example year per rule. The second uses value sets, and shows that each rule
+        holds across eras.
         """)
 public class LeapYearExampleTest {
 
     @DisplayName("The four rules, one example year each")
     @Description("""
-            Yes/No in the expectation column is read by a custom type converter.
+            A custom type converter reads Yes and No in the expectation column.
 
-            Six rows for four rules: the last two are outside them. Year zero and a year before
-            the common era are where a reader wonders whether the arithmetic still holds, and the
-            rows say that it does.
+            The table has six rows for four rules. The last two rows are outside the four rules.
+            They are year zero and a year before the common era, where the same arithmetic
+            applies.
             """)
     @TableTest("""
         Scenario                        | Year | Is Leap Year?

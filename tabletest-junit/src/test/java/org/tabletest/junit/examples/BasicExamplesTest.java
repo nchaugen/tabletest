@@ -29,8 +29,8 @@ public class BasicExamplesTest {
 
     @DisplayName("Strings are quoted only when they need to be")
     @Description("""
-            Quotes are required around values containing pipes or commas in collections;
-            either quote style works. "" is the empty string.
+            A value that holds a pipe needs quotes. So does a value that holds a comma inside a
+            collection. Either quote style works. The value "" is the empty string.
             """)
     @TableTest("""
         Scenario                   | Value          | Length?
@@ -71,9 +71,9 @@ public class BasicExamplesTest {
 
     @DisplayName("Comment lines annotate or disable rows")
     @Description("""
-            Lines starting with // are ignored: use them to explain rows or park a row
-            without deleting it. This table has a disabled row and two comment lines
-            between its two live rows.
+            The parser ignores a line that starts with //. Use such a line to explain a row, or
+            to disable a row without deleting it. This table holds one disabled row and two
+            comment lines between its two live rows.
             """)
     @TableTest("""
         Scenario        | String      | Length?

@@ -13,18 +13,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Constructor and factory fallback")
 @Description("""
-        A type with no built-in conversion of its own still converts, as long as it
-        can be built from the cell text alone. The built-in conversions are in the
-        features under builtin; this is what happens when none of them applies.
+        A type with no built-in conversion of its own still converts. It needs a way to build
+        itself from the cell text alone. The features under builtin hold the built-in
+        conversions. This feature covers what happens when none of them applies.
         """)
 public class JavaFallbackConversionTest {
 
     @DisplayName("Converts text through a String constructor or factory method")
     @Description("""
-            When no built-in conversion exists, TableTest falls back to a
-            single-argument constructor or a static factory method on the
-            target type — inside collections too. Both custom date types here
-            wrap the LocalDate in the expectation column.
+            Where no built-in conversion exists, TableTest uses a single-argument constructor on
+            the target type, or a static factory method on it. It does the same inside a
+            collection. Both custom date types here wrap the LocalDate in the expectation
+            column.
             """)
     @TableTest("""
         Scenario                | Constructor | Factory method in type | List with fallback | Wrapped date?

@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         three carrying the same values. Then it holds the element type the method received, and
         the elements themselves, which the input columns must convert to.
 
-        An element type is fixed by the method signature and cannot vary by row, so each element
-        type gets its own table.
+        The method signature fixes an element type, and no row can vary it. Each element type
+        therefore gets its own table.
 
         Only a Map's value type takes part in conversion. Its keys are always the cell text,
         whatever key type the signature declares.
@@ -118,8 +118,8 @@ public class JavaParameterizedTypeConversionTest {
 
     @DisplayName("Converts the elements of a nested collection one level deeper")
     @Description("""
-            The element type is itself a collection, so its own element type decides
-            what the innermost values become — Short in this table.
+            The element type is itself a collection. Its own element type decides what the
+            innermost values become. That type is Short in this table.
             """)
     @TableTest("""
         Scenario             | List input | Set input  | Map input        | Element type?  | Innermost elements?
@@ -178,9 +178,8 @@ public class JavaParameterizedTypeConversionTest {
 
     @DisplayName("Keeps map keys as text whatever key type the signature declares")
     @Description("""
-            The parameter in this table is declared Map<Integer, Integer>, yet its
-            keys arrive as the cell text: only the value type takes part in
-            conversion.
+            This table declares the parameter Map<Integer, Integer>. Its keys still arrive as
+            the cell text, because only the value type takes part in conversion.
             """)
     @TableTest("""
         Scenario       | Map input      | Key type?        | Keys?      | Value type?       | Values?

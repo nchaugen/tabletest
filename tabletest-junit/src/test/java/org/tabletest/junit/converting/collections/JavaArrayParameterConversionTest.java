@@ -21,15 +21,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         quoted so that it stays text. Parameter type is the array type the test method declares.
         Converted value is the array the method received, one entry per element.
 
-        A family of array types that convert the same text shares one table. There the type is the
-        value column's own header rather than a column of its own, and each column holds the list
-        that column's type receives. A cell that fails to convert never reaches the test method, so
-        a row that runs is a row that converted.
+        A family of array types that convert the same text shares one table. The value column's
+        own header names the type there, in place of a column of its own. Each column holds the
+        list that its own type receives. A cell that fails to convert never reaches the test
+        method, so every row that runs is a row that converted.
 
         The map rule is the exception. Its input column is unquoted, because that column is the
-        array itself, so the published cell shows the parsed value rather than the text. It reports
-        the keys and the values in place of a converted value, because Java's map notation is not a
-        TableTest format.
+        array itself. The published cell therefore shows the parsed value, and not the text. The
+        rule reports the keys and the values in place of a converted value, because Java's map
+        notation is not a TableTest format.
         """)
 public class JavaArrayParameterConversionTest {
 
@@ -141,7 +141,7 @@ public class JavaArrayParameterConversionTest {
     }
 
     @DisplayName("Converts each element of a list to an array")
-    @Description("The parameter is a List, so the element type is the array — shown per element.")
+    @Description("The parameter is a List, so the element type is the array. Each element shows it.")
     @TableTest("""
         Scenario      | Input value     | Element type? | Converted value?
         String arrays | "[[a, b], [c]]" | String[]      | [[a, b], [c]]

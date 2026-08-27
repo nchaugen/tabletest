@@ -24,13 +24,13 @@ class JavaNullValueTest {
 
     @DisplayName("Converts a blank cell to null for any parameter type")
     @Description("""
-            A blank cell means the value is absent, whatever type the parameter declares. The
-            second row is what makes the first contradictable: the same five columns holding
-            values arrive as values, so a conversion that answered null for everything would
-            fail it.
+            A blank cell means the value is absent. The parameter type does not change that.
 
-            The expectation names the parameters that arrived null, in the order the columns
-            are written.
+            The second row holds a value in each of the five columns. A conversion that answers
+            null for every cell fails that row. The first row alone cannot show this.
+
+            The expectation names each parameter that receives null, in the order of the
+            columns.
             """)
     @TableTest("""
         Scenario              | String | Integer | List | Map    | Set | Parameters left null?
@@ -64,8 +64,8 @@ class JavaNullValueTest {
 
     @DisplayName("Fails the row when a primitive parameter gets a blank cell")
     @Description("""
-            Primitives cannot hold null — declare the boxed type instead if the
-            column can be blank.
+            A primitive cannot hold null. Declare the boxed type where the column can be
+            blank.
             """)
     @TableTest("""
         Scenario           | Input value | Parameter type | Error message?
@@ -79,17 +79,18 @@ class JavaNullValueTest {
 
     @DisplayName("Refuses an empty string for a type other than String")
     @Description("""
-            An empty string is a value, not an absent one, so it reaches conversion where a blank
-            cell does not. Only String has a built-in conversion from it; every other type fails
-            and asks for a custom type converter. The String row is what the other three are
-            measured against — strike it and the rule reads as though nothing accepts an empty
-            string.
+            An empty string is a value. It is not an absent value, so it reaches conversion
+            where a blank cell does not. Only String has a built-in conversion from an empty
+            string. Every other type fails and asks for a custom type converter.
 
-            A quote style is invisible here. '' and "" are the same value once the cell is parsed,
-            so the rows vary the parameter type instead.
+            The String row is the accepted case. Without it the rule reads as though no type
+            accepts an empty string.
 
-            Each failure message closes by naming the classes searched for a type converter. Those
-            depend on where the test lives, so the table leaves them out.
+            The quote style is not visible to this rule. The parser reads '' and "" as the same
+            value, so the rows vary the parameter type.
+
+            Each failure message ends with the classes searched for a type converter. Those
+            classes depend on where the test lives, so the table leaves them out.
             """)
     @TableTest("""
         Scenario         | Input value | Parameter type    | Error message?

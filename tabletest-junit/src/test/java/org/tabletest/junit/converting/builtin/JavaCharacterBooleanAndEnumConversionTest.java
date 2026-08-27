@@ -15,21 +15,22 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         converter to write.
 
         Every table below reads the same way. An Input value column holds the text as written in
-        the cell. A Parameter type column holds the type it converts to. Expectation columns
-        state observable properties of the object the test method received, so each row shows
-        that the text became a valid object of that type, not merely that it converted.
+        the cell. A Parameter type column holds the type the text converts to. Expectation
+        columns state observable properties of the object the test method receives. Each row
+        therefore shows that the text became a valid object of that type, and not merely that
+        it converted.
 
-        A parameter type is fixed by the test method signature and cannot vary by row, so each
-        type gets its own short table.
+        The test method signature fixes a parameter type, and no row can vary it. Each type
+        therefore gets its own short table.
 
         A primitive type shares its table with its wrapper. The two are one type in two forms,
-        and a primitive's type cannot be observed once the value is boxed. There the type is the
-        value column's own header rather than a column of its own.
+        and a boxed value does not report its primitive type. The value column's own header names it
+        there, in place of a column of its own.
         """)
 public class JavaCharacterBooleanAndEnumConversionTest {
 
     @DisplayName("Converts a single character to char")
-    @Description("Primitive and boxed alike; a digit cell becomes the digit character, not a number.")
+    @Description("Primitive and boxed alike. A digit cell becomes the digit character, not a number.")
     @TableTest("""
         Scenario         | char | Character | Code point?
         Lowercase letter | a    | a         | 97
@@ -43,12 +44,12 @@ public class JavaCharacterBooleanAndEnumConversionTest {
 
     @DisplayName("Converts true and false to boolean")
     @Description("""
-            Case does not matter, so each word gets a row in lower case and a row in upper case.
-            A value set would not do here: it holds converted values, so every spelling of true
-            would collapse to one member and only one of them would run.
+            Case does not matter. Each word therefore gets a row in lower case and a row in upper
+            case. A value set does not work here. A set holds converted values, so every spelling
+            of true collapses to one member, and only that member runs.
 
-            No other text converts. A cell holding yes or 1 fails rather than quietly becoming
-            false, which Conversion failures shows.
+            No other text converts. A cell holding yes or 1 fails, and does not become false.
+            Conversion failures shows that row.
             """)
     @TableTest("""
         Scenario                    | boolean | Boolean | Negated?
@@ -63,7 +64,7 @@ public class JavaCharacterBooleanAndEnumConversionTest {
     }
 
     @DisplayName("Converts a constant name to an enum")
-    @Description("The parameter type decides which enum to search — TimeUnit in this table.")
+    @Description("The parameter type decides which enum to search. It is TimeUnit in this table.")
     @TableTest("""
         Scenario | Input value | Parameter type?               | TimeUnit seconds per unit?
         Second   | SECONDS     | java.util.concurrent.TimeUnit | 1

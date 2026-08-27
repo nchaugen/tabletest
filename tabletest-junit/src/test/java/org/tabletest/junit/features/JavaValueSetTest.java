@@ -12,20 +12,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DisplayName("Value sets")
 @Description("""
         A cell in {curly braces} lists several example values that share one
-        expectation. Scalar parameters expand the row into one invocation per
-        value; a Set-typed parameter receives the whole set as a single argument.
+        expectation. A scalar parameter expands the row into one invocation per
+        value. A Set parameter receives the whole set as one argument.
 
-        A value here is a converted value, not the text written in the cell. The last
-        rule says what follows from that, and it is the one to read before using a
-        value set to show that several spellings of something are accepted.
+        A value in a set is a converted value, not the text in the cell. The last two
+        rules say what follows from that. Read them before you write a value set for
+        several spellings of one value.
         """)
 class JavaValueSetTest {
 
     @DisplayName("Runs a row once per value, unless the parameter is a Set")
     @Description("""
-            The "Adding any of" column binds to a scalar parameter, so the row
-            expands into one invocation per value. The "To set" column binds to
-            a Set parameter, so the whole set is passed as one argument.
+            The "Adding any of" column binds to a scalar parameter, so the row expands into one
+            invocation per value. The "To set" column binds to a Set parameter, which receives
+            the whole set as one argument.
             """)
     @TableTest("""
         Scenario               | Adding any of | To set    | Makes size?
@@ -40,8 +40,8 @@ class JavaValueSetTest {
 
     @DisplayName("Value sets in several columns expand to every combination")
     @Description("""
-            Each row runs once per combination of values — three x values times
-            two y values give six invocations per row.
+            Each row runs once per combination of values. Three x values and two y values give
+            six invocations per row.
             """)
     @TableTest("""
         Scenario       | x         | y       | Is sum even?
@@ -54,14 +54,14 @@ class JavaValueSetTest {
 
     @DisplayName("Passes the whole set to any parameter that can hold one")
     @Description("""
-            A row expands only where the set cannot be the parameter's own value. A Set parameter
-            takes it whole, and so does any type a Set can be assigned to — Object, Collection,
-            Iterable. A method declaring one of those sees a single invocation holding every
-            member, which is the opposite of what a value set is usually written for.
+            A row expands only when the set cannot be the value of the parameter. A Set
+            parameter receives the whole set. An Object parameter receives the whole set too,
+            because a Set is assignable to Object. A method with such a parameter runs once, and
+            that one invocation holds every member.
 
-            The two input columns hold the same cell, bound to an Object parameter and to a Set
-            parameter. The counts show the Object parameter received the set itself rather than
-            one of its members.
+            The two input columns hold the same cell. One column binds to an Object parameter and
+            one to a Set parameter. The counts show that the Object parameter receives the set,
+            and not one member of it.
             """)
     @TableTest("""
         Scenario      | Bound to Object | Bound to Set | Members via Object? | Members via Set?
@@ -80,13 +80,15 @@ class JavaValueSetTest {
 
     @DisplayName("Counts a value once however it is spelled")
     @Description("""
-            A set holds converted values, so two cells that convert to the same object are one
-            member and the row expands once rather than twice. The hexadecimal, decimal and octal
-            spellings of fifteen are one value.
+            A set holds converted values. Two cells that convert to the same object are one
+            member, and the row expands once. The hexadecimal, decimal and octal spellings of
+            fifteen are one value.
 
-            This is the trap in reaching for a value set to show that several spellings are all
-            accepted: the set keeps one of them and the others never run. Give each spelling a row
-            instead. A value set claims the outcome is the same for several values, which is a
+            Do not write a value set to show that TableTest accepts several spellings. The set keeps
+            one spelling and drops the others, and a dropped spelling never runs. Give each
+            spelling a row.
+
+            A value set states that the outcome is the same for several values. That is a
             different claim.
             """)
     @TableTest("""

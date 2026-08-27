@@ -27,8 +27,9 @@ public class JavaExternalTableTest {
 
     @DisplayName("Resolves a resource path from the classpath root")
     @Description("""
-            Read as UTF-8; the column holds the lines of the file itself. A leading slash makes
-            no difference — both spellings of a root path are in the first row.
+            The rule reads each file as UTF-8, and the column holds the lines of the file
+            itself. A leading slash makes no difference, and the first row holds both spellings
+            of a root path.
             """)
     @TableTest("""
         Scenario            | Resource path                     | Lines loaded from the file?
@@ -67,11 +68,13 @@ public class JavaExternalTableTest {
 
     @DisplayName("Names the file when a resource cannot be read")
     @Description("""
-            Loading fails in two ways, and the first is shown twice because the search has two
-            halves: a path can resolve to nothing at the classpath root, or inside a folder on it.
-            The second way is a file that resolves while the declared encoding cannot decode it.
-            Every failure raises the same exception type, so the message is what tells them apart,
-            and each message names the file it could not read.
+            Loading fails in two ways. The table shows the first way twice, because the search
+            has two halves. A path can resolve to nothing at the classpath root, or inside a
+            folder on it. The second way is a file that resolves while the declared encoding
+            cannot decode it.
+
+            Every failure raises the same exception type. The message tells the two ways apart,
+            and each message names the file the rule could not read.
             """)
     @TableTest("""
         Scenario                | Resource path  | Encoding | Throws?                                | Error message?
@@ -106,9 +109,10 @@ public class JavaExternalTableTest {
 
     @DisplayName("Resource files can declare a non-default character encoding")
     @Description("""
-            The rows below are the lines of src/test/resources/subfolder/custom_encoding.table, read
-            with encoding = "ISO-8859-1". The letters in the last row count as six characters only
-            because the file was decoded in the encoding it was written in.
+            The rows below are the lines of src/test/resources/subfolder/custom_encoding.table.
+            The rule reads that file with encoding = "ISO-8859-1". The letters in the last row
+            count as six characters. That holds only where the rule reads the file in the
+            encoding the author wrote it in.
             """)
     @TableTest(resource = "/subfolder/custom_encoding.table", encoding = "ISO-8859-1")
     void table_in_external_file_in_subfolder_with_custom_encoding(String string, int expectedLength) {

@@ -18,24 +18,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Parameter resolvers")
 @Description("""
-        Parameters supplied by JUnit parameter resolvers — TestInfo,
-        TestReporter, @TempDir, and the like — can follow the table-bound
-        parameters. When resolver parameters are present, a scenario column
-        must be declared with @Scenario to be recognised.
+        A JUnit parameter resolver supplies parameters such as TestInfo, TestReporter, and
+        @TempDir. Those parameters can follow the table-bound parameters.
+
+        Where a resolver parameter is present, a scenario column needs @Scenario. Without it
+        TableTest does not recognise the column.
         """)
 public class JavaParameterResolversTest {
 
     @DisplayName("Resolver-supplied parameters follow the table-bound parameters")
     @Description("""
-            The rule is the parameter order, and the byte count is how a row proves it. Each
-            invocation writes its File content to a JUnit-supplied temporary directory and measures
-            the file, so a count matching the content is only possible if the table's value reached
-            the parameter the table names and not one of the three resolved after it. TestInfo,
-            TestReporter and the temporary directory are all resolved alongside, and the body
-            asserts that each arrived.
+            The rule is the parameter order. The byte count is how a row proves it.
 
-            Two rows rather than one, because an empty file writes no bytes and would also be the
-            count of a parameter that never received the cell.
+            Each invocation writes its File content to a temporary directory that JUnit supplies,
+            and then measures the file. A count that matches the content is possible only where
+            the table's value reached the parameter the table names. It cannot come from one of
+            the three parameters the resolvers fill after it.
+
+            JUnit resolves TestInfo, TestReporter and the temporary directory alongside, and the
+            body asserts that each one arrived.
+
+            Two rows, and not one. An empty file writes no bytes, and that is also the count of a
+            parameter that never received the cell.
             """)
     @TableTest("""
         Scenario                | File content | File size in bytes?

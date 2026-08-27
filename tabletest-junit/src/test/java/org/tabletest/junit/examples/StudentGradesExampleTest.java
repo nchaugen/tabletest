@@ -23,10 +23,11 @@ public class StudentGradesExampleTest {
 
     @DisplayName("Nested collections convert to domain types")
     @Description("""
-            A student passes on their own average, so Pass Count is a count of students rather
-            than of grades. The second row straddles the pass mark inside one cell: David's
-            average falls a third of a point short of it and Emma's sits exactly on it, so the
-            two of them are the pair the rule is decided between.
+            A student passes on their own average, so Pass Count counts students and not
+            grades.
+
+            The second row holds the pair that decides the rule. David's average is just
+            below the pass mark. Emma's average is exactly the pass mark.
             """)
     @TableTest("""
         Scenario                     | Student grades                                                  | Pass Mark | Highest Grade? | Average Grade? | Pass Count?

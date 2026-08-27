@@ -46,7 +46,7 @@ public class JavaCollectionIterationOrderTest {
     }
 
     @DisplayName("Iterates a map in the order the cell wrote its entries")
-    @Description("Keys and values are read off the same map, entry by entry.")
+    @Description("The rule reads the keys and the values off the same map, entry by entry.")
     @TableTest("""
         Scenario                  | Map input          | Key order? | Value order?
         Written ascending         | [a: 1, b: 2, c: 3] | [a, b, c]  | [1, 2, 3]

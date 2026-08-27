@@ -18,9 +18,8 @@ public class JavaScenarioNameTest {
 
     @DisplayName("Names a row from an extra first column, binding nothing")
     @Description("""
-            The method takes two parameters, the table has three columns — the
-            first column is the scenario name. The name may be empty or blank;
-            the row runs regardless.
+            The method takes two parameters and the table has three columns. The first column
+            is the scenario name. The name may be empty or blank, and the row runs either way.
             """)
     @TableTest("""
         Scenario   | Number | Doubled?

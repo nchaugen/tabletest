@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Immutable collection parameters")
 @Description("""
-        A collection passed from a table is read-only. Adding to a List or a Set throws. Putting
+        A collection that a table passes to a test method is read-only. Adding to a List or a Set throws. Putting
         into a Map throws. Modifying any collection nested inside them throws. A row's data
         therefore stays as written, however the test method treats it.
         """)

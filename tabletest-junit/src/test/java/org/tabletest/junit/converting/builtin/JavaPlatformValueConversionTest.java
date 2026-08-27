@@ -14,12 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         converter to write.
 
         Every table below reads the same way. An Input value column holds the text as written in
-        the cell. A Parameter type column holds the type it converts to. Expectation columns
-        state observable properties of the object the test method received, so each row shows
-        that the text became a valid object of that type, not merely that it converted.
+        the cell. A Parameter type column holds the type the text converts to. Expectation
+        columns state observable properties of the object the test method receives. Each row
+        therefore shows that the text became a valid object of that type, and not merely that
+        it converted.
 
-        A parameter type is fixed by the test method signature and cannot vary by row, so each
-        type gets its own short table.
+        The test method signature fixes a parameter type, and no row can vary it. Each type
+        therefore gets its own short table.
         """)
 public class JavaPlatformValueConversionTest {
 

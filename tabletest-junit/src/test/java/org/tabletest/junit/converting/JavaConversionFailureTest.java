@@ -24,13 +24,14 @@ public class JavaConversionFailureTest {
 
     @DisplayName("Fails a value that fits no built-in conversion")
     @Description("""
-            Five things raise a parse-time failure: a number outside the target's range, a malformed
-            date or character, text that is no spelling of a boolean, an address whose scheme the
-            target type cannot handle, and a type with no available converter.
+            Five things raise a parse-time failure. They are a number outside the target's range,
+            a malformed date or character, text that is no spelling of a boolean, an address whose
+            scheme the target type cannot handle, and a type with no available converter.
 
-            Two of these are worth knowing because the plain Java call they resemble does not fail.
-            Reading yes as a boolean gives false there and nothing here; the URL row rejects a
-            urn: address that Files and addresses shows converting to a URI.
+            Two of them are worth knowing, because the plain Java call they resemble does not
+            fail. Reading yes as a boolean gives false in plain Java, and a failure here. The URL
+            row rejects a urn: address, and Files and addresses shows the same address converting
+            to a URI.
 
             Each message closes by naming the classes searched for a type converter. Those depend on
             where the test lives, so the table leaves them out.
