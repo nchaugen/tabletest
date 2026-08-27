@@ -56,7 +56,7 @@ class JavaValueSetTest {
             """)
     @TableTest("""
         Scenario          | Score (any of) | Pass mark | Passes?
-        Scores above mark | {60, 75, 100}  | 50        | true
+        Scores above mark | {50, 75, 100}  | 50        | true
         Scores below mark | {10, 30, 49}   | 50        | false
         """)
     void value_set_shares_one_expectation(int score, int passMark, boolean passes) {

@@ -24,6 +24,20 @@ public class TableTestExceptionAssertions {
     }
 
     /**
+     * The whole message conversion fails with for this value and type, or null when it converts.
+     * Lets one table state an accepted row and a rejected row side by side, without the test
+     * method branching on which it is.
+     */
+    public static String conversionFailureFor(Object parsedValue, Class<?> type) {
+        try {
+            convertValue(parsedValue, parameter(type));
+            return null;
+        } catch (TableTestException failure) {
+            return failure.getMessage();
+        }
+    }
+
+    /**
      * The suffix every converter-lookup failure ends with, naming the classes searched. It depends
      * on where the test lives, so a table states the message without it.
      */
