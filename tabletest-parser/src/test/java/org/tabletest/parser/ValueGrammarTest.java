@@ -46,7 +46,7 @@ public class ValueGrammarTest {
         );
     }
 
-    @DisplayName("Tells a list from a value that only opens with [")
+    @DisplayName("Tells a list from a value that merely starts with a bracket")
     @Description("""
             Two outcomes share this table, and which one a value gets is the rule. A value that
             never opens a list captures as a plain string — quoted brackets, a stray closing
@@ -94,7 +94,7 @@ public class ValueGrammarTest {
         );
     }
 
-    @DisplayName("Tells a set from a value that only opens with {")
+    @DisplayName("Tells a set from a value that merely starts with a brace")
     @Description("""
             Two outcomes share this table, as they do for a list. A value that never opens a set
             captures as a plain string; one that opens a set and then goes wrong fails to parse.
