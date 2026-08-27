@@ -24,13 +24,14 @@ public class StudentGradesExampleTest {
     @DisplayName("Nested collections convert to domain types")
     @Description("""
             A student passes on their own average, so Pass Count is a count of students rather
-            than of grades. Emma's average in the second row is exactly the pass mark, which is
-            the boundary the rule is decided at.
+            than of grades. The second row straddles the pass mark inside one cell: David's
+            average falls a third of a point short of it and Emma's sits exactly on it, so the
+            two of them are the pair the rule is decided between.
             """)
     @TableTest("""
         Scenario                     | Student grades                                                  | Pass Mark | Highest Grade? | Average Grade? | Pass Count?
         Every student above the mark | [Alice: [95, 87, 92], Bob: [78, 85, 90], Charlie: [98, 89, 91]] | 70        | 98             | 89.4           | 3
-        One below, one at the mark   | [David: [45, 60, 70], Emma: [65, 70, 75], Frank: [82, 78, 60]]  | 70        | 82             | 67.2           | 2
+        One below, one at the mark   | [David: [69, 70, 70], Emma: [65, 70, 75], Frank: [82, 78, 60]]  | 70        | 82             | 71.0           | 2
         No students at all           | [:]                                                             | 70        | 0              | 0.0            | 0
         """)
     void testNestedParameterizedTypes(

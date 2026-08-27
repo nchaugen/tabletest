@@ -4,13 +4,10 @@ import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;
 import org.tabletest.junit.TypeConverter;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import java.time.Year;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Leap year rules")
 @Description("""
@@ -19,28 +16,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         """)
 public class LeapYearExampleTest {
 
-    @Test
-    void yearNotDivisibleBy4_isNotLeap() {
-        assertFalse(Year.isLeap(2001));
-    }
-
-    @Test
-    void yearDivisibleBy4_isLeap() {
-        assertTrue(Year.isLeap(2004));
-    }
-
-    @Test
-    void yearDivisibleBy100Not400_isNotLeap() {
-        assertFalse(Year.isLeap(2100));
-    }
-
-    @Test
-    void yearDivisibleBy400_isLeap() {
-        assertTrue(Year.isLeap(2000));
-    }
-
     @DisplayName("The four rules, one example year each")
-    @Description("Yes/No in the expectation column is read by a custom type converter.")
+    @Description("""
+            Yes/No in the expectation column is read by a custom type converter.
+
+            Six rows for four rules: the last two are outside them. Year zero and a year before
+            the common era are where a reader wonders whether the arithmetic still holds, and the
+            rows say that it does.
+            """)
     @TableTest("""
         Scenario                        | Year | Is Leap Year?
         Not divisible by 4              | 2001 | No
