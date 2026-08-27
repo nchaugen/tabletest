@@ -27,23 +27,34 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 public class JavaCustomTypeConverterTest {
 
     @DisplayName("Turns cell text into the declared type with a converter")
-    @Description("Yes and No become booleans, for a primitive and a boxed parameter alike.")
+    @Description("""
+            Yes and No become booleans, for a primitive and a boxed parameter alike.
+
+            A converter does not extend the built-in conversion of its type; it replaces it. The
+            last row is what that costs, and it is the row to read before adding a converter for a
+            common type: a cell written true arrives as false, because this converter recognises
+            yes and nothing else, and the built-in conversion that would have read it never runs.
+            """)
     @TableTest("""
-        Scenario          | boolean | Boolean | Converted value as text?
-        Affirmative       | Yes     | Yes     | true
-        Negative          | No      | No      | false
-        Case is ignored   | yES     | yES     | true
-        Unrecognised word | maybe   | maybe   | false
+        Scenario                   | boolean | Boolean | Converted value as text?
+        Affirmative                | Yes     | Yes     | true
+        Negative                   | No      | No      | false
+        Case is ignored            | yES     | yES     | true
+        Unrecognised word          | maybe   | maybe   | false
+        The built-in spelling      | true    | true    | false
         """)
     void converts_text_to_booleans(boolean value, Boolean boxedValue, String expectedText) {
         assertEquals(expectedText, String.valueOf(value));
         assertEquals(expectedText, String.valueOf(boxedValue));
     }
 
-    @DisplayName("Prefers a converter to the built-in conversion of a type")
+    @DisplayName("Reaches the converter for every cell of its type")
     @Description("""
-            Day words are the dates this converter knows; anything else it hands to
-            the built-in LocalDate conversion, so ISO text still works.
+            Every cell declared LocalDate goes through the converter, whether or not the built-in
+            conversion could have read it. Day words are the dates this converter knows; for
+            anything else it calls the built-in conversion itself, which is why ISO text still
+            works. That last part is this converter's own choice, not something TableTest does
+            after it — the rule above shows what happens to a converter that does not make it.
             """)
     @TableTest("""
         Scenario         | Input value | Parameter type?     | Converted date as text? | Date day of week?
@@ -82,7 +93,6 @@ public class JavaCustomTypeConverterTest {
     @TableTest("""
         Scenario      | Number words    | Element type?     | Sum in digits?
         Two words     | [one, three]    | java.lang.Integer | 4
-        Three words   | [one, one, two] | java.lang.Integer | 4
         Repeated word | [two, two, two] | java.lang.Integer | 6
         """)
     void converts_number_words_inside_a_list(

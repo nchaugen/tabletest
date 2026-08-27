@@ -27,8 +27,9 @@ public class JavaFallbackConversionTest {
             wrap the LocalDate in the expectation column.
             """)
     @TableTest("""
-        Scenario                 | Constructor | Factory method in type | List with fallback | Wrapped date?
-        ISO date in every column | 2025-05-27  | 2025-05-27             | [2025-05-27]       | 2025-05-27
+        Scenario                | Constructor | Factory method in type | List with fallback | Wrapped date?
+        A date in May           | 2025-05-27  | 2025-05-27             | [2025-05-27]       | 2025-05-27
+        A leap day              | 2024-02-29  | 2024-02-29             | [2024-02-29]       | 2024-02-29
         """)
     void converts_custom_types_with_constructor_or_type_internal_factory(
         ConstructorDate withConstructor,
