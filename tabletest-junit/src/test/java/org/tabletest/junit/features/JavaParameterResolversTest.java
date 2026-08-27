@@ -27,15 +27,20 @@ public class JavaParameterResolversTest {
 
     @DisplayName("Resolver-supplied parameters follow the table-bound parameters")
     @Description("""
-            Each invocation takes its file content from the table, writes it to
-            a JUnit-supplied temporary directory, and verifies the size of the
-            written file. TestInfo and TestReporter are resolved alongside.
+            The rule is the parameter order, and the byte count is how a row proves it. Each
+            invocation writes its File content to a JUnit-supplied temporary directory and measures
+            the file, so a count matching the content is only possible if the table's value reached
+            the parameter the table names and not one of the three resolved after it. TestInfo,
+            TestReporter and the temporary directory are all resolved alongside, and the body
+            asserts that each arrived.
+
+            Two rows rather than one, because an empty file writes no bytes and would also be the
+            count of a parameter that never received the cell.
             """)
     @TableTest("""
-        Scenario     | File content | File size in bytes?
-        Single word  | hello        | 5
-        Two words    | hello world  | 11
-        Empty file   | ''           | 0
+        Scenario                | File content | File size in bytes?
+        Content written to file | hello        | 5
+        Nothing written to file | ''           | 0
         """)
     void parameter_resolvers_with_declared_scenario(
         @Scenario String scenario,

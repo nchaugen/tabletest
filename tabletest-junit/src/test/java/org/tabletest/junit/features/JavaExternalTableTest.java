@@ -67,9 +67,11 @@ public class JavaExternalTableTest {
 
     @DisplayName("Names the file when a resource cannot be read")
     @Description("""
-            The two ways loading can fail: the path resolves to nothing, or the file
-            resolves but the declared encoding cannot decode it. Both raise the same
-            exception type, so the message is what tells the two apart.
+            Loading fails in two ways, and the first is shown twice because the search has two
+            halves: a path can resolve to nothing at the classpath root, or inside a folder on it.
+            The second way is a file that resolves while the declared encoding cannot decode it.
+            Every failure raises the same exception type, so the message is what tells them apart,
+            and each message names the file it could not read.
             """)
     @TableTest("""
         Scenario                | Resource path  | Encoding | Throws?                                | Error message?
