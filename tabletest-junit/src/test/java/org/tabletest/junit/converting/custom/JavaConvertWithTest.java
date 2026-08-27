@@ -1,4 +1,4 @@
-package org.tabletest.junit.converting;
+package org.tabletest.junit.converting.custom;
 
 import org.tabletest.junit.TableTest;
 import org.junit.jupiter.api.extension.ParameterContext;

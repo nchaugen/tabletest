@@ -1,8 +1,9 @@
 package org.tabletest.junit.converting
 
+import org.tabletest.junit.TableTest
 import org.tabletest.junit.TypeConverter
 import org.tabletest.junit.TypeConverterSources
-import org.tabletest.junit.TableTest
+import org.tabletest.junit.converting.custom.JavaCustomTypeConverterTest
 import kotlin.test.assertEquals
 
 @TypeConverterSources(JavaCustomTypeConverterTest::class)

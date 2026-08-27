@@ -1,4 +1,4 @@
-package org.tabletest.junit.converting;
+package org.tabletest.junit.converting.collections;
 
 import org.tabletest.junit.Description;
 import org.tabletest.junit.TableTest;

@@ -1,4 +1,4 @@
-package org.tabletest.junit.converting;
+package org.tabletest.junit.converting.custom;
 
 import org.junit.jupiter.api.DisplayName;
 import org.tabletest.junit.Description;

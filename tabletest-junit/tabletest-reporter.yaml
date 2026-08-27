@@ -22,6 +22,10 @@ features:
     features:
       - name: builtin
         title: "Built-in conversion"
+      - name: collections
+        title: "Collections and arrays"
+      - name: custom
+        title: "Custom converters"
   - name: features
     title: "Table semantics"
   - name: examples
@@ -38,15 +42,15 @@ site:
 publish:
   exclude:
     # --- Kotlin twins: one language publishes; Kotlin mirrors the Java suite ---
-    - converting/kotlin-array-parameter-conversion-test
+    - converting/collections/kotlin-array-parameter-conversion-test
+    - converting/collections/kotlin-immutable-collection-parameters-test
+    - converting/collections/kotlin-parameterized-type-conversion-test
+    - converting/custom/kotlin-convert-with-test
+    - converting/custom/kotlin-factory-method-in-test-class-conversion-test
+    - converting/custom/kotlin-fallback-conversion-test
+    - converting/custom/kotlin-type-converter-sources-test
     - converting/kotlin-conversion-failure-test
-    - converting/kotlin-convert-with-test
-    - converting/kotlin-factory-method-in-test-class-conversion-test
-    - converting/kotlin-fallback-conversion-test
-    - converting/kotlin-immutable-collection-parameters-test
-    - converting/kotlin-parameterized-type-conversion-test
     - converting/kotlin-primitive-conversion-test
-    - converting/kotlin-type-converter-sources-test
     - examples/kotlin-student-grades-example-test
     - features/kotlin-comments-and-blank-lines-test
     - features/kotlin-external-table-test
@@ -57,10 +61,10 @@ publish:
 
     # --- Converter-mechanism rules whose meaning lives in converter code the
     #     report cannot show; stay conformance ---
-    - converting/java-convert-with-test
-    - converting/java-factory-method-in-test-class-conversion-test
-    - converting/java-type-converter-selection-test
-    - converting/java-type-converter-sources-test
+    - converting/custom/java-convert-with-test
+    - converting/custom/java-factory-method-in-test-class-conversion-test
+    - converting/custom/java-type-converter-selection-test
+    - converting/custom/java-type-converter-sources-test
     - converting/conversion-failures/fails-when-multiple-type-converters-found  # one row: ambiguous converter selection
 
     # --- Duplicates a rule the parser's own grammar spec (/spec/parser) already states ---
