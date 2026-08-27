@@ -22,6 +22,19 @@ features:
     features:
       - name: builtin
         title: "Built-in conversion"
+        # The four undeclared siblings keep their alphabetical place; datetime is declared
+        # only to hold its own reading order, so all five are listed to preserve it.
+        features:
+          - name: characters-booleans-and-enums
+          - name: datetime
+            title: "Dates and times"
+            features:
+              - name: dates-and-times-without-an-offset
+              - name: instants-offsets-and-zones
+              - name: amounts-of-time
+          - name: files-and-addresses
+          - name: numbers
+          - name: platform-value-types
       - name: collections
         title: "Collections and arrays"
       - name: custom
