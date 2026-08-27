@@ -14,6 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         A cell in {curly braces} lists several example values that share one
         expectation. Scalar parameters expand the row into one invocation per
         value; a Set-typed parameter receives the whole set as a single argument.
+
+        A value here is a converted value, not the text written in the cell. The last
+        rule says what follows from that, and it is the one to read before using a
+        value set to show that several spellings of something are accepted.
         """)
 class JavaValueSetTest {
 
@@ -46,6 +50,26 @@ class JavaValueSetTest {
         """)
     void value_set_combinations(int x, int y, boolean expectedEvenSum) {
         assertEquals(expectedEvenSum, (x + y) % 2 == 0);
+    }
+
+    @DisplayName("Counts a value once however it is spelled")
+    @Description("""
+            A set holds converted values, so two cells that convert to the same object are one
+            member and the row expands once rather than twice. The hexadecimal, decimal and octal
+            spellings of fifteen are one value.
+
+            This is the trap in reaching for a value set to show that several spellings are all
+            accepted: the set keeps one of them and the others never run. Give each spelling a row
+            instead. A value set claims the outcome is the same for several values, which is a
+            different claim.
+            """)
+    @TableTest("""
+        Scenario                         | Spellings      | Members after conversion?
+        Three spellings of one number    | {0xF, 15, 017} | 1
+        Three numbers that stay distinct | {1, 2, 3}      | 3
+        """)
+    void value_set_holds_converted_values(Set<Integer> spellings, int expectedMembers) {
+        assertEquals(expectedMembers, spellings.size());
     }
 
     @DisplayName("Groups values sharing an expectation, repeating fixed columns")

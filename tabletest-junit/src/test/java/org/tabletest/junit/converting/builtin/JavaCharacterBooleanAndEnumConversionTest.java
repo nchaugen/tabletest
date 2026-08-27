@@ -42,10 +42,20 @@ public class JavaCharacterBooleanAndEnumConversionTest {
     }
 
     @DisplayName("Converts true and false to boolean")
+    @Description("""
+            Case does not matter, so each word gets a row in lower case and a row in upper case.
+            A value set would not do here: it holds converted values, so every spelling of true
+            would collapse to one member and only one of them would run.
+
+            No other text converts. A cell holding yes or 1 fails rather than quietly becoming
+            false, which Conversion failures shows.
+            """)
     @TableTest("""
-        Scenario | boolean | Boolean | Negated?
-        True     | true    | true    | false
-        False    | false   | false   | true
+        Scenario                    | boolean | Boolean | Negated?
+        True written in lower case  | true    | true    | false
+        True written in upper case  | TRUE    | TRUE    | false
+        False written in lower case | false   | false   | true
+        False written in upper case | FALSE   | FALSE   | true
         """)
     void converts_booleans(boolean boolPrimitive, Boolean boolBoxed, boolean expectedNegated) {
         assertEquals(expectedNegated, !boolPrimitive);
