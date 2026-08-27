@@ -21,6 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         quoted so that it stays text. Parameter type is the array type the test method declares.
         Converted value is the array the method received, one entry per element.
 
+        A family of array types that convert the same text shares one table. There the type is the
+        value column's own header rather than a column of its own, and each column holds the list
+        that column's type receives. A cell that fails to convert never reaches the test method, so
+        a row that runs is a row that converted.
+
         The map rule is the exception. Its input column is unquoted, because that column is the
         array itself, so the published cell shows the parsed value rather than the text. It reports
         the keys and the values in place of a converted value, because Java's map notation is not a
@@ -53,38 +58,54 @@ public class JavaArrayParameterConversionTest {
         assertEquals(inputValue, renderedValueOf(values));
     }
 
-    @DisplayName("Converts a list to a primitive int array")
+    @DisplayName("Converts a list to an array of any whole-number width")
     @TableTest("""
-        Scenario       | Input value | Parameter type? | Converted value?
-        Single element | "[1]"       | int[]           | [1]
-        Several        | "[1, 2, 3]" | int[]           | [1, 2, 3]
-        Empty list     | "[]"        | int[]           | []
+        Scenario       | byte[]    | short[]   | int[]     | long[]    | Converted value?
+        Single element | [1]       | [1]       | [1]       | [1]       | "[1]"
+        Several        | [1, 2, 3] | [1, 2, 3] | [1, 2, 3] | [1, 2, 3] | "[1, 2, 3]"
+        Empty list     | []        | []        | []        | []        | "[]"
         """)
-    void converts_to_primitive_int_array(String inputValue, String expectedType, int[] values) {
-        assertEquals(expectedType, typeNameOf(values));
-        assertEquals(inputValue, Arrays.toString(values));
+    void converts_to_whole_number_array(
+        byte[] bytes,
+        short[] shorts,
+        int[] ints,
+        long[] longs,
+        String expectedValue
+    ) {
+        assertEquals(expectedValue, Arrays.toString(bytes));
+        assertEquals(expectedValue, Arrays.toString(shorts));
+        assertEquals(expectedValue, Arrays.toString(ints));
+        assertEquals(expectedValue, Arrays.toString(longs));
     }
 
-    @DisplayName("Converts a list to a primitive long array")
+    @DisplayName("Converts a list to an array of either decimal width")
     @TableTest("""
-        Scenario       | Input value | Parameter type? | Converted value?
-        Single element | "[1]"       | long[]          | [1]
-        Several        | "[1, 2, 3]" | long[]          | [1, 2, 3]
+        Scenario       | float[]           | double[]          | Converted value?
+        Single element | [1.5]             | [1.5]             | "[1.5]"
+        Several        | [1.25, 2.5, 3.75] | [1.25, 2.5, 3.75] | "[1.25, 2.5, 3.75]"
+        Empty list     | []                | []                | "[]"
         """)
-    void converts_to_primitive_long_array(String inputValue, String expectedType, long[] values) {
-        assertEquals(expectedType, typeNameOf(values));
-        assertEquals(inputValue, Arrays.toString(values));
+    void converts_to_decimal_array(float[] floats, double[] doubles, String expectedValue) {
+        assertEquals(expectedValue, Arrays.toString(floats));
+        assertEquals(expectedValue, Arrays.toString(doubles));
     }
 
-    @DisplayName("Converts a list to a primitive double array")
+    @DisplayName("Converts a list to a char or a boolean array")
+    @Description("A char cell holds the single character itself, not its code point.")
     @TableTest("""
-        Scenario       | Input value       | Parameter type? | Converted value?
-        Single element | "[1.5]"           | double[]        | [1.5]
-        Several        | "[1.5, 2.5, 3.5]" | double[]        | [1.5, 2.5, 3.5]
+        Scenario       | char[]    | boolean[]           | Chars converted? | Booleans converted?
+        Single element | [a]       | [true]              | "[a]"            | "[true]"
+        Several        | [a, b, c] | [true, false, true] | "[a, b, c]"      | "[true, false, true]"
+        Empty list     | []        | []                  | "[]"             | "[]"
         """)
-    void converts_to_primitive_double_array(String inputValue, String expectedType, double[] values) {
-        assertEquals(expectedType, typeNameOf(values));
-        assertEquals(inputValue, Arrays.toString(values));
+    void converts_to_char_or_boolean_array(
+        char[] chars,
+        boolean[] booleans,
+        String expectedChars,
+        String expectedBooleans
+    ) {
+        assertEquals(expectedChars, Arrays.toString(chars));
+        assertEquals(expectedBooleans, Arrays.toString(booleans));
     }
 
     @DisplayName("Converts nested lists to a two-dimensional array")

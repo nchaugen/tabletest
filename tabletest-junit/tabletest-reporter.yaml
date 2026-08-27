@@ -94,9 +94,14 @@ publish:
     #     demonstrated self-referentially here, which no reporter capability can show ---
     - features/java-comments-and-blank-lines-test
 
-    # --- Temporary: the Java string-array table form renders invisibly today;
-    #     re-admit once the reporter shows it ---
-    - features/java-string-array-value-test
+    # --- The array form of a table: its elements are joined with a newline, and a
+    #     published table shows the rows it produced, never the source it was written
+    #     from. A rule that joined the lines in its own body would restate the one
+    #     production line (TableArgumentsProvider) and verify nothing, so this stays
+    #     conformance. Not a reporter gap: @Lines renders a data value, and the array
+    #     form is source. The parser's own Table structure rules already publish what
+    #     an empty line and a comment line mean. Reviewed 2026-08-27 ---
+    - features/java-table-as-string-array-test
 
     # --- Rows that render nothing they demonstrate, or duplicate/implementation
     #     detail within an otherwise published class ---
