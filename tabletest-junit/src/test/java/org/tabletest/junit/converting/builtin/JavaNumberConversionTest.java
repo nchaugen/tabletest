@@ -138,10 +138,16 @@ public class JavaNumberConversionTest {
     }
 
     @DisplayName("Converts whole numbers beyond the long range to BigInteger")
+    @Description("""
+            BigInteger is the type for a whole number no other type can hold, so the pair below
+            straddles the largest value a long holds. A number either side of it is written out in
+            full rather than as a count of digits, because the boundary falls inside the
+            nineteen-digit numbers rather than between two digit counts.
+            """)
     @TableTest("""
-        Scenario        | Input value                    | Parameter type?      | BigInteger beyond long range?
-        Nineteen digits | 1234567890123456789            | java.math.BigInteger | false
-        Thirty digits   | 123456789012345678901234567890 | java.math.BigInteger | true
+        Scenario                     | Input value          | Parameter type?      | BigInteger beyond long range?
+        The largest a long holds     | 9223372036854775807  | java.math.BigInteger | false
+        One more than a long holds   | 9223372036854775808  | java.math.BigInteger | true
         """)
     void converts_big_integers(BigInteger value, Class<?> parameterType, boolean expectedBeyondLong) {
         assertInstanceOf(parameterType, value);

@@ -24,8 +24,10 @@ public class JavaConversionFailureTest {
 
     @DisplayName("Fails a value that fits no built-in conversion")
     @Description("""
-            Three things raise a parse-time failure: a number outside the target's range, a malformed
-            date or character, and a type with no available converter.
+            Four things raise a parse-time failure: a number outside the target's range, a malformed
+            date or character, an address whose scheme the target type cannot handle, and a type
+            with no available converter. The URL row is the one that separates two types accepting
+            the same text: Files and addresses shows the same urn: address converting to a URI.
 
             Each message closes by naming the classes searched for a type converter. Those depend on
             where the test lives, so the table leaves them out.
@@ -36,6 +38,7 @@ public class JavaConversionFailureTest {
         Whole number outside the range   | 128         | java.lang.Byte                      | Built-in conversion of value "128" to type java.lang.Byte failed. Are you missing a type converter for this conversion?
         More than a single character     | abc         | java.lang.Character                 | Built-in conversion of value "abc" to type java.lang.Character failed. Are you missing a type converter for this conversion?
         Malformed date                   | invalid     | java.time.LocalDate                 | Built-in conversion of value "invalid" to type java.time.LocalDate failed. Are you missing a type converter for this conversion?
+        Scheme with no protocol handler  | urn:isbn:0451450523 | java.net.URL                | Built-in conversion of value "urn:isbn:0451450523" to type java.net.URL failed. Are you missing a type converter for this conversion?
         Type with no built-in conversion | 52          | org.tabletest.junit.javadomain.Ages | Built-in conversion of value "52" to type org.tabletest.junit.javadomain.Ages failed. Are you missing a type converter for this conversion?
         """)
     void fails_builtin_conversion(String value, Class<?> type, String expectedMessage) {

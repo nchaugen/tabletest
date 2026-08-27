@@ -64,12 +64,17 @@ public class JavaPlatformValueConversionTest {
     }
 
     @DisplayName("Converts an IETF BCP 47 language tag to Locale")
-    @Description("Language and country are separated by a hyphen, not an underscore.")
+    @Description("""
+            A language tag separates language from country with a hyphen. The underscore of Java's
+            older locale spelling is the mistake to know about, because it does not fail: the tag
+            simply matches nothing and both parts come back empty.
+            """)
     @TableTest("""
-        Scenario             | Input value | Parameter type?  | Locale language? | Locale country?
-        Language only        | en          | java.util.Locale | en               | ''
-        Language and country | en-US       | java.util.Locale | en               | US
-        Non-English tag      | nb-NO       | java.util.Locale | nb               | NO
+        Scenario               | Input value | Parameter type?  | Locale language? | Locale country?
+        Language only          | en          | java.util.Locale | en               | ''
+        Language and country   | en-US       | java.util.Locale | en               | US
+        Non-English tag        | nb-NO       | java.util.Locale | nb               | NO
+        Underscore, not hyphen | en_US       | java.util.Locale | ''               | ''
         """)
     void converts_locales(
         java.util.Locale value,

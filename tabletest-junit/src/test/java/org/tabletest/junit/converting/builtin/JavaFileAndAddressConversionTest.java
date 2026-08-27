@@ -64,7 +64,11 @@ public class JavaFileAndAddressConversionTest {
     }
 
     @DisplayName("Converts address text to URL")
-    @Description("A URL needs a protocol handler, so unlike URI it rejects schemes such as urn:.")
+    @Description("""
+            A URL needs a protocol handler, where a URI needs only a well-formed scheme. That is why
+            the urn: address in the rule above has no row here — it fails instead, and Conversion
+            failures is where it does so.
+            """)
     @TableTest("""
         Scenario   | Input value        | Parameter type? | URL protocol?
         Web        | https://junit.org/ | java.net.URL    | https
