@@ -17,8 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         An order-sensitive assertion against a List, Set, or Map parameter is therefore safe to
         write.
 
-        The elements below are text. The guarantee is about position rather than element type,
-        and it holds whatever type the signature declares.
+        The elements below are text throughout, so nothing here varies the element type. The
+        guarantee is about position, and Parameterized collection element types is where the
+        element type is the subject.
 
         Each rule shows the parameter's iteration as a list. A row whose input is already in
         ascending order proves nothing on its own. The rows that reverse or shuffle the written

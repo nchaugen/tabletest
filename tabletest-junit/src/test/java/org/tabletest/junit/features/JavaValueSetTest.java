@@ -52,6 +52,32 @@ class JavaValueSetTest {
         assertEquals(expectedEvenSum, (x + y) % 2 == 0);
     }
 
+    @DisplayName("Passes the whole set to any parameter that can hold one")
+    @Description("""
+            A row expands only where the set cannot be the parameter's own value. A Set parameter
+            takes it whole, and so does any type a Set can be assigned to — Object, Collection,
+            Iterable. A method declaring one of those sees a single invocation holding every
+            member, which is the opposite of what a value set is usually written for.
+
+            The two input columns hold the same cell, bound to an Object parameter and to a Set
+            parameter. The counts show the Object parameter received the set itself rather than
+            one of its members.
+            """)
+    @TableTest("""
+        Scenario      | Bound to Object | Bound to Set | Members via Object? | Members via Set?
+        Three members | {1, 2, 3}       | {1, 2, 3}    | 3                   | 3
+        Two members   | {4, 5}          | {4, 5}       | 2                   | 2
+        """)
+    void whole_set_reaches_a_parameter_that_can_hold_one(
+        Object asObject,
+        Set<Integer> asSet,
+        int expectedViaObject,
+        int expectedViaSet
+    ) {
+        assertEquals(expectedViaObject, ((Set<?>) asObject).size());
+        assertEquals(expectedViaSet, asSet.size());
+    }
+
     @DisplayName("Counts a value once however it is spelled")
     @Description("""
             A set holds converted values, so two cells that convert to the same object are one
