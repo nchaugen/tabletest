@@ -46,10 +46,12 @@ public class ValueGrammarTest {
         );
     }
 
-    @DisplayName("Refuses a value that opens with [ and is not a list")
+    @DisplayName("Tells a list from a value that only opens with [")
     @Description("""
-            A value that does not open a list captures as a plain string. Quoted brackets, a
-            stray closing bracket, and a letter before the bracket are all such values.
+            Two outcomes share this table, and which one a value gets is the rule. A value that
+            never opens a list captures as a plain string — quoted brackets, a stray closing
+            bracket, and a letter before the bracket are all such values. A value that does open
+            one and then goes wrong fails to parse instead.
             """)
     @TableTest("""
         Scenario                      | Input    | Parsed type?     | Error message?
@@ -92,8 +94,11 @@ public class ValueGrammarTest {
         );
     }
 
-    @DisplayName("Refuses a value that opens with { and is not a set")
-    @Description("Values that do not open a set capture as plain strings.")
+    @DisplayName("Tells a set from a value that only opens with {")
+    @Description("""
+            Two outcomes share this table, as they do for a list. A value that never opens a set
+            captures as a plain string; one that opens a set and then goes wrong fails to parse.
+            """)
     @TableTest("""
         Scenario                      | Input    | Parsed type?     | Error message?
         Quoted braces                 | '"{}"'   | java.lang.String |
@@ -139,8 +144,13 @@ public class ValueGrammarTest {
         );
     }
 
-    @DisplayName("Refuses a malformed map or a duplicate key")
-    @Description("Values that do not open a map capture as plain strings.")
+    @DisplayName("Tells a map from a lookalike, and refuses a duplicate key")
+    @Description("""
+            Two outcomes share this table, as they do for a list and a set: a value that never
+            opens a map captures as a plain string, and one that opens a map and goes wrong fails
+            to parse. A duplicate key is the third case, and the only one where a well-formed
+            value is still refused — the message names the key and quotes the map it found it in.
+            """)
     @TableTest("""
         Scenario                       | Input                          | Parsed type?     | Error message?
         Quoted empty map               | '"[:]"'                        | java.lang.String |

@@ -20,17 +20,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class RowGrammarTest {
 
     @DisplayName("Divides a row into fields at each unquoted pipe")
-    @Description("A missing field — from a leading, trailing, or doubled pipe — is captured as null.")
+    @Description("""
+            A missing field — from a leading, trailing, or doubled pipe — is captured as null.
+
+            Spacing around a pipe makes no difference, so the row that would have shown it twice
+            carries both spellings in one cell instead.
+            """)
     @TableTest("""
-        Scenario                     | Row         | Fields?
-        Single field                 | a           | "[a]"
-        Two fields                   | "a | b"     | "[a, b]"
-        Three fields                 | "a | b | c" | "[a, b, c]"
-        No spaces around pipe        | "a|b|c"     | "[a, b, c]"
-        Trailing pipe adds a null    | "a | b |"   | "[a, b, null]"
-        Leading pipe adds a null     | "| a | b"   | "[null, a, b]"
-        Interior empty field is null | "a | | c"   | "[a, null, c]"
-        Only pipes are all null      | "|||"       | "[null, null, null, null]"
+        Scenario                     | Row                            | Fields?
+        No pipe at all               | a                              | "[a]"
+        One pipe                     | "a | b"                        | "[a, b]"
+        Spaced or unspaced pipes     | {"a | b | c", "a|b|c"}         | "[a, b, c]"
+        A trailing pipe              | "a | b |"                      | "[a, b, null]"
+        A leading pipe               | "| a | b"                      | "[null, a, b]"
+        An empty field between pipes | "a | | c"                      | "[a, null, c]"
+        Nothing but pipes            | "|||"                          | "[null, null, null, null]"
         """)
     void shouldDivideRowIntoFields(String row, String fields) {
         assertEquals(fields, TableParser.parse("Field\n" + row).row(0).values().toString());
