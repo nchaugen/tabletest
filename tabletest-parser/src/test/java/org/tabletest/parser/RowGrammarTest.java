@@ -21,10 +21,11 @@ public class RowGrammarTest {
 
     @DisplayName("Divides a row into fields at each unquoted pipe")
     @Description("""
-            A missing field — from a leading, trailing, or doubled pipe — is captured as null.
+            A leading pipe, a trailing pipe, or two pipes together leave a field with no text.
+            The parser captures that field as null.
 
-            Spacing around a pipe makes no difference, so the row that would have shown it twice
-            carries both spellings in one cell instead.
+            Spacing around a pipe changes nothing. One row carries both spellings of the same
+            three fields, in place of two rows with one expectation between them.
             """)
     @TableTest("""
         Scenario                     | Row                            | Fields?

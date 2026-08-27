@@ -48,10 +48,10 @@ public class ValueGrammarTest {
 
     @DisplayName("Tells a list from a value that merely starts with a bracket")
     @Description("""
-            Two outcomes share this table, and which one a value gets is the rule. A value that
-            never opens a list captures as a plain string — quoted brackets, a stray closing
-            bracket, and a letter before the bracket are all such values. A value that does open
-            one and then goes wrong fails to parse instead.
+            This table holds two outcomes, and the rule is which outcome a value gets. A value
+            that does not open a list captures as a plain string. Quoted brackets, a stray closing
+            bracket, and a letter before the bracket are three such values. A value that opens a
+            list and does not complete it fails to parse.
             """)
     @TableTest("""
         Scenario                      | Input    | Parsed type?     | Error message?
@@ -96,8 +96,9 @@ public class ValueGrammarTest {
 
     @DisplayName("Tells a set from a value that merely starts with a brace")
     @Description("""
-            Two outcomes share this table, as they do for a list. A value that never opens a set
-            captures as a plain string; one that opens a set and then goes wrong fails to parse.
+            This table holds two outcomes, as the table for a list does. A value that does not
+            open a set captures as a plain string. A value that opens a set and does not complete
+            it fails to parse.
             """)
     @TableTest("""
         Scenario                      | Input    | Parsed type?     | Error message?
@@ -146,10 +147,10 @@ public class ValueGrammarTest {
 
     @DisplayName("Tells a map from a lookalike, and refuses a duplicate key")
     @Description("""
-            Two outcomes share this table, as they do for a list and a set: a value that never
-            opens a map captures as a plain string, and one that opens a map and goes wrong fails
-            to parse. A duplicate key is the third case, and the only one where a well-formed
-            value is still refused — the message names the key and quotes the map it found it in.
+            This table holds three outcomes. A value that does not open a map captures as a plain
+            string. A value that opens a map and does not complete it fails to parse. A map with a
+            duplicate key is the third outcome. It is the only outcome where a complete value
+            still fails, and the message names the key and quotes the map.
             """)
     @TableTest("""
         Scenario                       | Input                          | Parsed type?     | Error message?
@@ -199,17 +200,17 @@ public class ValueGrammarTest {
 
     @DisplayName("Captures a value with its quotes discarded or kept")
     @Description("""
-            The parser trims an unquoted value and keeps the whitespace of a quoted one. Either
-            quote style protects a pipe, a bracket, and a brace. A blank cell captures null, and
-            its Captured Type is blank because nothing was captured.
+            The parser trims an unquoted value. It keeps the whitespace of a quoted value. Either
+            quote style protects a pipe, a bracket, and a brace. A blank cell captures null. The
+            Captured Type column is then blank, because the parser captures no value.
 
-            The two expectation columns are the same parse in its two modes. Discarding is what a
-            test method sees. Keeping is for a tool that rewrites a table, the formatter among
-            them, so the original quoting survives the round trip. Where the two columns agree,
-            the value carried no delimiting quotes to discard.
+            The two expectation columns show the same input in the two modes of the parser. A test
+            method reads the value with the quotes discarded. A tool that rewrites a table reads
+            the value with the quotes kept, and the table keeps the quoting the author wrote. Two
+            columns with the same value mean the value has no delimiting quotes.
 
-            Nothing here converts a number: 1 and 3.14 capture as text, because a parameter type
-            is what decides that and the parser never sees one.
+            The parser converts no number. The values 1 and 3.14 capture as text. The parameter
+            type decides a conversion, and the parser does not read the parameter type.
             """)
     @TableTest("""
         Scenario                          | Input             | Discarding quotes? | Keeping quotes?   | Captured Type?
