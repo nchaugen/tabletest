@@ -24,7 +24,7 @@
         <version.plugin.license>5.1.2</version.plugin.license>
         <version.plugin.clean>3.5.0</version.plugin.clean>
         <version.plugin.resources>3.5.0</version.plugin.resources>
-        <version.plugin.compiler>3.15.0</version.plugin.compiler>
+        <version.plugin.compiler>3.16.0</version.plugin.compiler>
         <version.plugin.surefire>3.5.6</version.plugin.surefire>
         <version.plugin.jar>3.5.1</version.plugin.jar>
         <version.plugin.install>3.1.4</version.plugin.install>
