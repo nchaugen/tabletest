@@ -1,0 +1,110 @@
+name: Test New JUnit Releases
+
+on:
+  schedule:
+    # Poll metadata daily; only untested releases run the expensive checks.
+    - cron: '17 7 * * *'
+  workflow_dispatch:
+    inputs:
+      junit_version:
+        description: 'JUnit version to retest (blank discovers new releases, including M/RC)'
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: junit-releases-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      versions: ${{ steps.releases.outputs.versions }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Verify release selection
+        run: python3 -m unittest discover -s .github/scripts -p 'test_junit_releases.py' -v
+
+      - name: Find successfully tested releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --paginate --method GET "repos/$GITHUB_REPOSITORY/actions/caches" \
+            -f per_page=100 -f ref="$GITHUB_REF" -f key=junit-release-v1- \
+            --jq '.actions_caches[].key' > "$RUNNER_TEMP/junit-tested-keys"
+
+      - name: Discover published JUnit releases
+        id: releases
+        env:
+          REQUESTED_JUNIT: ${{ inputs.junit_version }}
+        run: |
+          python3 .github/scripts/junit_releases.py \
+            --pom tabletest-junit/pom.xml \
+            --tested-keys "$RUNNER_TEMP/junit-tested-keys" --version "$REQUESTED_JUNIT"
+
+  test:
+    name: JUnit ${{ matrix.version }}
+    needs: discover
+    if: ${{ needs.discover.outputs.versions != '[]' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        version: ${{ fromJSON(needs.discover.outputs.versions) }}
+    env:
+      JUNIT_VERSION: ${{ matrix.version }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            21
+          cache: maven
+
+      - name: Test and install tabletest-junit
+        run: mvn -B --no-transfer-progress -pl tabletest-junit clean install "-Dversion.junit=$JUNIT_VERSION"
+
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.13'
+
+      - name: Test Java and Kotlin consumers with Maven and Gradle
+        env:
+          TEST_GROUPS: basic
+          JUNIT_VERSIONS: ${{ matrix.version }}
+        run: bash test-compatibility.sh
+
+      - name: Upload test reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: junit-${{ matrix.version }}-reports
+          path: |
+            **/target/surefire-reports/**
+            **/target/junit-jupiter/**
+            compatibility-tests/**/build/test-results/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Record successful release check
+        run: |
+          mkdir -p .junit-release-results
+          printf '%s %s\n' "$JUNIT_VERSION" "$GITHUB_SHA" > .junit-release-results/passed
+
+      - name: Remember successfully tested release
+        uses: actions/cache/save@v6
+        with:
+          path: .junit-release-results
+          key: junit-release-v1-${{ matrix.version }}

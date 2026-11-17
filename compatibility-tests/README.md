@@ -2,6 +2,34 @@
 
 This directory contains compatibility test projects that verify TableTest works correctly across different build tools, JUnit versions, and framework versions.
 
+## New JUnit releases
+
+The **Test New JUnit Releases** workflow checks Maven Central daily for versions
+newer than `version.junit` in `tabletest-junit/pom.xml`, including milestones (`M`)
+and release candidates (`RC`). Each untested release runs the JUnit module's Java
+and Kotlin tests, followed by the four `basic` consumer projects using Maven and
+Gradle. JDKs 17 and 21 are installed; the build runs on 21 and Gradle consumers use
+their configured Java 17 toolchain.
+
+Versions are overridden on the command line; production POMs and the normal
+minimum-version matrix stay unchanged. Successful release checks are remembered
+in GitHub Actions caches. Failed checks are retried on the next poll; cache expiry
+or eviction can also cause a successful version to be retested. Test reports are
+uploaded even if checks fail.
+
+Use **Run workflow** with `junit_version` to retest a specific JUnit 6 or newer
+release, including an already tested version after a code change. Leave it blank
+to discover untested releases. A workflow in this repository cannot subscribe
+directly to releases in the upstream JUnit repository, so the daily metadata poll
+provides discovery without another service or token. Workflow permissions are
+limited to reading repository contents and Actions cache metadata.
+
+The discovery helper can be checked locally with:
+
+```sh
+python3 -m unittest discover -s .github/scripts -p 'test_junit_releases.py' -v
+```
+
 ## Structure
 
 | Group | Projects | Purpose |
