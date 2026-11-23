@@ -56,6 +56,34 @@ jobs:
       - name: Run compatibility tests
         run: TEST_GROUPS="basic frameworks" ./test-compatibility.sh
 
+  java21-quarkus4-compatibility:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Cache Maven repository
+        uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-java21-quarkus4-${{ hashFiles('compatibility-tests/frameworks/maven-quarkus-java/pom.xml', 'compatibility-tests/latest-versions.env') }}
+      - name: Download tabletest artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: tabletest-artifacts
+          path: ~/.m2/repository/org/tabletest
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.13'
+      - name: Run Quarkus 4 compatibility tests
+        run: |
+          source compatibility-tests/latest-versions.env
+          TEST_GROUPS=frameworks TEST_FRAMEWORK=quarkus QUARKUS_VERSIONS="${QUARKUS_4_LATEST:?}" ./test-compatibility.sh
+
   java8-compatibility:
     needs: build
     runs-on: ubuntu-latest

@@ -42,7 +42,9 @@ python3 -m unittest discover -s .github/scripts -p 'test_junit_releases.py' -v
 
 **Minimum and latest versions** are both tracked in [`latest-versions.env`](latest-versions.env). Minimum versions represent the oldest supported release and are updated manually. Latest versions represent the newest compatible release and are auto-bumped weekly by the `check-versions.yml` workflow.
 
-CI runs both minimum and latest to catch regressions at both ends of the supported range.
+Java 17 CI runs the minimum and latest Quarkus 3 versions. A separate Java 21 job
+runs the Maven and Gradle Quarkus examples with the latest stable Quarkus 4
+version. The weekly version check updates the two major lines independently.
 
 ## Runtime Testing
 
@@ -62,6 +64,13 @@ Run with specific versions:
 
 ```bash
 TEST_GROUPS="basic frameworks" JUNIT_VERSIONS="5.11.0" QUARKUS_VERSIONS="3.21.2" SPRINGBOOT_VERSIONS="3.0.0" ./test-compatibility.sh
+```
+
+With Java 21 active, run the Quarkus 4 job locally:
+
+```bash
+source compatibility-tests/latest-versions.env
+TEST_GROUPS=frameworks TEST_FRAMEWORK=quarkus QUARKUS_VERSIONS="$QUARKUS_4_LATEST" ./test-compatibility.sh
 ```
 
 The `TABLETEST_VERSION` environment variable overrides the artifact version used (defaults to the version defined in each project's build file):

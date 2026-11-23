@@ -32,17 +32,19 @@ jobs:
             | grep -o '<version>[^<]*</version>' | grep -o '[0-9][^<]*' \
             | grep -v 'SNAPSHOT\|RC\|M[0-9]' | sort -V | tail -1)
 
-          # Quarkus latest
-          QUARKUS=$(curl -s https://repo1.maven.org/maven2/io/quarkus/quarkus-core/maven-metadata.xml \
-            | grep -o '<version>[^<]*</version>' | grep -o '[0-9][^<]*' \
-            | grep -v 'SNAPSHOT\|CR\|Alpha\|Beta' | sort -V | tail -1)
+          # Quarkus 3.x runs on Java 17, and Quarkus 4.x runs on Java 21.
+          QUARKUS_VERSIONS=$(curl -s https://repo1.maven.org/maven2/io/quarkus/quarkus-core/maven-metadata.xml \
+            | grep -o '<version>[^<]*</version>' | grep -o '[0-9][^<]*' | sort -V)
+          QUARKUS=$(printf '%s\n' "$QUARKUS_VERSIONS" | grep -E '^3(\.[0-9]+){2,}$' | tail -1)
+          QUARKUS_4=$(printf '%s\n' "$QUARKUS_VERSIONS" | grep -E '^4(\.[0-9]+){2,}$' | tail -1)
 
           echo "junit_latest=${JUNIT_LATEST}" >> $GITHUB_OUTPUT
           echo "junit_5_latest=${JUNIT_5}" >> $GITHUB_OUTPUT
           echo "springboot_latest=${SPRINGBOOT}" >> $GITHUB_OUTPUT
           echo "quarkus_latest=${QUARKUS}" >> $GITHUB_OUTPUT
+          echo "quarkus_4_latest=${QUARKUS_4}" >> $GITHUB_OUTPUT
 
-          echo "Queried versions: JUnit=${JUNIT_LATEST}, JUnit5=${JUNIT_5}, SpringBoot=${SPRINGBOOT}, Quarkus=${QUARKUS}"
+          echo "Queried versions: JUnit=${JUNIT_LATEST}, JUnit5=${JUNIT_5}, SpringBoot=${SPRINGBOOT}, Quarkus3=${QUARKUS}, Quarkus4=${QUARKUS_4}"
 
       - name: Load current versions
         id: current
@@ -52,6 +54,7 @@ jobs:
           echo "junit_5_current=${JUNIT_5_LATEST}" >> $GITHUB_OUTPUT
           echo "springboot_current=${SPRINGBOOT_LATEST}" >> $GITHUB_OUTPUT
           echo "quarkus_current=${QUARKUS_LATEST}" >> $GITHUB_OUTPUT
+          echo "quarkus_4_current=${QUARKUS_4_LATEST}" >> $GITHUB_OUTPUT
 
       - name: Update latest-versions.env if changed
         id: update
@@ -60,11 +63,13 @@ jobs:
           JUNIT_5_NEW="${{ steps.versions.outputs.junit_5_latest }}"
           SPRINGBOOT_NEW="${{ steps.versions.outputs.springboot_latest }}"
           QUARKUS_NEW="${{ steps.versions.outputs.quarkus_latest }}"
+          QUARKUS_4_NEW="${{ steps.versions.outputs.quarkus_4_latest }}"
 
           JUNIT_OLD="${{ steps.current.outputs.junit_current }}"
           JUNIT_5_OLD="${{ steps.current.outputs.junit_5_current }}"
           SPRINGBOOT_OLD="${{ steps.current.outputs.springboot_current }}"
           QUARKUS_OLD="${{ steps.current.outputs.quarkus_current }}"
+          QUARKUS_4_OLD="${{ steps.current.outputs.quarkus_4_current }}"
 
           CHANGES=""
           UPDATED=false
@@ -91,10 +96,17 @@ jobs:
           fi
 
           if [ -n "$QUARKUS_NEW" ] && [ "$QUARKUS_NEW" != "$QUARKUS_OLD" ]; then
-            CHANGES="${CHANGES}- Quarkus ${QUARKUS_OLD} → ${QUARKUS_NEW}\n"
+            CHANGES="${CHANGES}- Quarkus 3 ${QUARKUS_OLD} → ${QUARKUS_NEW}\n"
             UPDATED=true
           else
             QUARKUS_NEW="$QUARKUS_OLD"
+          fi
+
+          if [ -n "$QUARKUS_4_NEW" ] && [ "$QUARKUS_4_NEW" != "$QUARKUS_4_OLD" ]; then
+            CHANGES="${CHANGES}- Quarkus 4 ${QUARKUS_4_OLD} → ${QUARKUS_4_NEW}\n"
+            UPDATED=true
+          else
+            QUARKUS_4_NEW="$QUARKUS_4_OLD"
           fi
 
           echo "updated=${UPDATED}" >> $GITHUB_OUTPUT
@@ -104,8 +116,8 @@ jobs:
 
           if [ "$UPDATED" = "true" ]; then
             source compatibility-tests/latest-versions.env
-            printf 'JUNIT_LATEST=%s\nJUNIT_5_LATEST=%s\nSPRINGBOOT_LATEST=%s\nQUARKUS_LATEST=%s\nJUNIT_MIN=%s\nJUNIT_5_MIN=%s\nSPRINGBOOT_MIN=%s\nQUARKUS_MIN=%s\n' \
-              "$JUNIT_NEW" "$JUNIT_5_NEW" "$SPRINGBOOT_NEW" "$QUARKUS_NEW" \
+            printf 'JUNIT_LATEST=%s\nJUNIT_5_LATEST=%s\nSPRINGBOOT_LATEST=%s\nQUARKUS_LATEST=%s\nQUARKUS_4_LATEST=%s\nJUNIT_MIN=%s\nJUNIT_5_MIN=%s\nSPRINGBOOT_MIN=%s\nQUARKUS_MIN=%s\n' \
+              "$JUNIT_NEW" "$JUNIT_5_NEW" "$SPRINGBOOT_NEW" "$QUARKUS_NEW" "$QUARKUS_4_NEW" \
               "$JUNIT_MIN" "$JUNIT_5_MIN" "$SPRINGBOOT_MIN" "$QUARKUS_MIN" \
               > compatibility-tests/latest-versions.env
           fi
