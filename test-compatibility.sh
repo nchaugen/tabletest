@@ -8,6 +8,7 @@
 #   SPRINGBOOT_VERSIONS="<SPRINGBOOT_LATEST> <SPRINGBOOT_MIN>"
 #   TABLETEST_VERSION="1.2.3-SNAPSHOT"  # default TableTest version (can be overridden via env)
 #   TEST_GROUPS="basic frameworks"       # space-separated list of groups to run (all if unset)
+#   TEST_FRAMEWORK="quarkus"             # select one framework inside the frameworks group
 # Usage examples:
 #   ./test-compatibility.sh                    # run all with defaults
 #   JUNIT_VERSIONS="5.13.4 5.11.0" ./test-compatibility.sh
@@ -152,6 +153,10 @@ for group_dir in compatibility-tests/*/; do
                     done
                     ;;
                   frameworks)
+                    if [[ -n "$TEST_FRAMEWORK" && "$(basename "$config_dir")" != *-"$TEST_FRAMEWORK"-* ]]; then
+                      continue
+                    fi
+
                     if [[ "$config_dir" == *quarkus* ]]; then
                       for v in $QUARKUS_VERSIONS; do
                         if [ "$tool" = "maven" ]; then

@@ -2,9 +2,12 @@ plugins {
     kotlin("jvm") version "2.4.21"
 }
 
+// Allow overriding Quarkus version via -Pquarkus.version
+val quarkusVersion = (project.findProperty("quarkus.version") as String?) ?: "3.21.2"
+
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(if (quarkusVersion.startsWith("4.")) 21 else 17)
     }
 }
 
@@ -13,8 +16,6 @@ repositories {
     mavenLocal()
 }
 
-// Allow overriding Quarkus version via -Pquarkus.version
-val quarkusVersion = (project.findProperty("quarkus.version") as String?) ?: "3.21.2"
 // Allow overriding TableTest version via -Ptabletest.version
 val tabletestVersion = (project.findProperty("tabletest.version") as String?) ?: "1.2.3-SNAPSHOT"
 
